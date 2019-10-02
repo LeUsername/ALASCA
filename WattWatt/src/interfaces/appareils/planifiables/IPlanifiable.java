@@ -1,5 +1,29 @@
 package interfaces.appareils.planifiables;
 
-public interface IPlanifiable  {
+import interfaces.appareils.IAppareil;
 
+/**
+ * L'interface <code>IPlanifiable</code>
+ * 
+ * <p>
+ * Created on : 2019-10-02
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
+public interface IPlanifiable extends IAppareil {
+	/**
+	 * Fixe une heure a laquelle demarrer l'appareil
+	 * 
+	 * @throws Exception
+	 */
+	public void setStart() throws Exception;
+
+	/**
+	 * Fixe une heure a laquelle stopper l'appareil
+	 * 
+	 * @throws Exception
+	 */
+	public void setStop() throws Exception;
 }
