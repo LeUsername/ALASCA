@@ -14,4 +14,24 @@ import interfaces.productions.IProduction;
  */
 public interface IIntermittente extends IProduction{
 
+	/**
+	 * Renvoie la quantite de kWh disponible dans la ressource
+	 * @return nombre de kWh dans la ressource
+	 * @throws Exception
+	 */
+	public int quantiteDisponible() throws Exception;
+	
+	/**
+	 * Recharge l'unité de stockage de quantite kWh 
+	 * @param kWh
+	 * @throws Exception
+	 */
+	public void recharger(int quantite) throws Exception;
+	
+	/**
+	 * Decharge l'unité de stockage de quantité kWh 
+	 * @param quantite
+	 * @throws Exception
+	 */
+	public void decharger(int quantite) throws Exception;
 }

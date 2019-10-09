@@ -1,5 +1,7 @@
 package interfaces.ports;
 
+import fr.sorbonne_u.components.ports.PortI;
+
 /***
  * L'interface <code>IPort</code>
  * 
@@ -10,6 +12,6 @@ package interfaces.ports;
  * @author 3410456
  *
  */
-public interface IPort {
+public interface IPort extends PortI {
 
 }

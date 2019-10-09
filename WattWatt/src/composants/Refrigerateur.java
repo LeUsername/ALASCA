@@ -1,4 +1,4 @@
-package implementations.appareils.suspensibles;
+package composants;
 
 import interfaces.appareils.suspensibles.IRefrigerateur;
 
@@ -35,7 +35,19 @@ public class Refrigerateur implements IRefrigerateur {
 	}
 
 	@Override
-	public int consommation() throws Exception {
+	public void suspendre() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reprendre() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getConsommation() throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}

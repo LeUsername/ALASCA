@@ -18,12 +18,12 @@ public interface IPlanifiable extends IAppareil {
 	 * 
 	 * @throws Exception
 	 */
-	public void setStart() throws Exception;
+	public void setStart(int date) throws Exception;
 
 	/**
 	 * Fixe une heure a laquelle stopper l'appareil
 	 * 
 	 * @throws Exception
 	 */
-	public void setStop() throws Exception;
+	public void setStop(int date) throws Exception;
 }

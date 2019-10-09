@@ -1,8 +1,8 @@
-package implementations.productions.aleatoires;
+package composants;
 
-import interfaces.productions.aleatoires.IEolienne;
+import interfaces.appareils.incontrolables.ISecheCheveux;
 
-public class Eolienne implements IEolienne {
+public class SecheCheveux implements ISecheCheveux {
 
 	@Override
 	public void allumer() throws Exception {
@@ -17,9 +17,8 @@ public class Eolienne implements IEolienne {
 	}
 
 	@Override
-	public int quantiteProduite() throws Exception {
+	public int getConsommation() throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

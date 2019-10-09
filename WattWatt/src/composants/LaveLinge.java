@@ -1,17 +1,17 @@
-package implementations.appareils.planifiables;
+package composants;
 
 import interfaces.appareils.planifiables.ILaveLinge;
 
 public class LaveLinge implements ILaveLinge {
 
 	@Override
-	public void setStart() throws Exception {
+	public void setStart(int date) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void setStop() throws Exception {
+	public void setStop(int date) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -29,8 +29,9 @@ public class LaveLinge implements ILaveLinge {
 	}
 
 	@Override
-	public int consommation() throws Exception {
+	public int getConsommation() throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 }

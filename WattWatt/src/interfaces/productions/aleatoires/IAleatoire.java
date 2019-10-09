@@ -14,4 +14,11 @@ import interfaces.productions.IProduction;
  */
 public interface IAleatoire extends IProduction {
 
+	/**
+	 * Renvoie le nombre de kWh au moment T
+	 * 
+	 * @return Nombre de kWh consomme a l'instant T
+	 * @throws Exception
+	 */
+	public int quantiteProduite() throws Exception;
 }

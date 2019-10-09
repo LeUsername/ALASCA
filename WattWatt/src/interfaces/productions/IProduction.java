@@ -15,11 +15,4 @@ import fr.sorbonne_u.components.interfaces.RequiredI;
  */
 public interface IProduction extends RequiredI, OfferedI {
 
-	/**
-	 * Renvoie le nombre de kWh au moment T
-	 * 
-	 * @return Nombre de kWh consomme a l'instant T
-	 * @throws Exception
-	 */
-	public int quantiteProduite() throws Exception;
 }

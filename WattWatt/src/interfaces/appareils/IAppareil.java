@@ -31,5 +31,5 @@ public interface IAppareil extends OfferedI {
 	 * @return Nombre de kWh consomme a l'instant T
 	 * @throws Exception
 	 */
-	public int consommation() throws Exception;
+	public int getConsommation() throws Exception;
 }

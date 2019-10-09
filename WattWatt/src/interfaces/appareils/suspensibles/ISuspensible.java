@@ -13,5 +13,17 @@ import interfaces.appareils.IAppareil;
  */
 
 public interface ISuspensible extends IAppareil {
+	
+	/**
+	 * Suspend l'appareil suspensible
+	 * @throws Exception
+	 */
+	public void suspendre() throws Exception;
+	
+	/**
+	 * L'appareil suspendu reprend son activité
+	 * @throws Exception
+	 */
+	public void reprendre() throws Exception;
 
 }
