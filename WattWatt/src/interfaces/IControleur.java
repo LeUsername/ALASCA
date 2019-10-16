@@ -1,5 +1,8 @@
 package interfaces;
 
+import fr.sorbonne_u.components.interfaces.OfferedI;
+import fr.sorbonne_u.components.interfaces.RequiredI;
+
 /**
  * L'interface <code>IControleur</code>
  * 
@@ -10,7 +13,7 @@ package interfaces;
  * @author 3408625
  *
  */
-public interface IControleur {
+public interface IControleur extends OfferedI,RequiredI {
 
 	
 	public void gestionRefigerateur() throws Exception;

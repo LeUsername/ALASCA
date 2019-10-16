@@ -1,5 +1,8 @@
 package interfaces;
 
+import fr.sorbonne_u.components.interfaces.OfferedI;
+import fr.sorbonne_u.components.interfaces.RequiredI;
+
 /**
  * L'interface <code>ICompteur</code>
  * 
@@ -10,7 +13,7 @@ package interfaces;
  * @author 3408625
  *
  */
-public interface ICompteur {
+public interface ICompteur extends OfferedI,RequiredI {
 
 	/**
 	 * renvoie la consommation totale de tous les appareils allumes
