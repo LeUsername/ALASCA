@@ -1,6 +1,5 @@
 package interfaces;
 
-import data.StringData;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 
 /**
@@ -23,7 +22,15 @@ public interface IControleur extends DataOfferedI {
 	//
 	// public void gestionEolienne() throws Exception;
 
-	public DataOfferedI.DataI getData(String uri) throws Exception;
+	/**
+	 * Envoi du message en tete de liste sur le service reference par l'URI en
+	 * parametre
+	 * 
+	 * @param uri
+	 *            service sur lequel envoyer le message
+	 * @throws Exception
+	 *             todo
+	 */
+	public DataI getData(String uri) throws Exception;
 
-	public void sendData(StringData msg) throws Exception;
 }
