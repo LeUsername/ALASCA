@@ -1,32 +1,63 @@
 package composants;
 
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+
+import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IControleur;
+import ports.ControleurDataInPort;
 
 public class Controleur extends AbstractComponent implements IControleur {
 
-	protected Controleur(int nbThreads, int nbSchedulableThreads) {
-		super(nbThreads, nbSchedulableThreads);
+	public ControleurDataInPort dataInPort;
+	protected ConcurrentHashMap<String, Vector<StringData>> controleurMessages = new ConcurrentHashMap<>();
+
+	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
+		super(uri,nbThreads, nbSchedulableThreads);
+		
+		this.addOfferedInterface(IControleur.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		
+		String dataInPortURI = java.util.UUID.randomUUID().toString();
+		this.dataInPort = new ControleurDataInPort(dataInPortURI, this);
+		this.addPort(dataInPort);
+		this.dataInPort.publishPort();
 	}
 
 	@Override
-	public void gestionRefigerateur() throws Exception {
-		System.out.println("gestion refrigerateur");
+	public DataI getData(String uri) throws Exception {
+		return controleurMessages.get(uri).remove(0);
 	}
 
 	@Override
-	public void gestionLaveLinge() throws Exception {
-		System.out.println("gestion lavelinge");
+	public void sendData(StringData msg) throws Exception {
+		// A faire plus tard ?
 	}
-
+	protected void envoyerMessage(String uri) throws Exception {
+		StringData m = controleurMessages.get(uri).get(0);
+		controleurMessages.get(uri).remove(m);
+		this.dataInPort.send(m);
+}
 	@Override
-	public void gestionBatterie() throws Exception {
-		System.out.println("gestion batterie");
+	public void execute() throws Exception{
+		super.execute();
+		this.runTask(new AbstractTask() {
+			public void run() {
+				try {
+					StringData m = new StringData();
+					m.setMessage("controleur ici");
+					controleurMessages.put("compteur", new Vector<StringData>());
+					controleurMessages.get("compteur").add(m);
+					envoyerMessage("compteur");
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
-
-	@Override
-	public void gestionEolienne() throws Exception {
-		System.out.println("gestion eolienne");
-	}
+	
 
 }

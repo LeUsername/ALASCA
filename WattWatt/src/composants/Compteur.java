@@ -1,74 +1,50 @@
 package composants;
 
+import java.util.Vector;
+
+import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
-import fr.sorbonne_u.components.connectors.DataConnector;
-import fr.sorbonne_u.components.examples.pingpong.connectors.PingPongConnector;
-import fr.sorbonne_u.components.examples.pingpong.interfaces.PingPongI;
-import fr.sorbonne_u.components.examples.pingpong.ports.PingPongInboundPort;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.ICompteur;
-import ports.CompteurInBoundPort;
-import ports.CompteurOutBoundPort;
+import ports.CompteurDataOutPort;
 
-public class Compteur extends AbstractComponent {
+public class Compteur extends AbstractComponent implements ICompteur {
 
-	protected final String uri;
-	protected String coutUri;
-	protected String cinUri;
-	protected CompteurOutBoundPort compteurOutboundPort;
-	protected CompteurInBoundPort compteurInboundPort;
+	public CompteurDataOutPort dataOutPort;
+	Vector<StringData> messages_recu = new Vector<>();
 
-	protected Compteur(String uri, String out, String in) throws Exception {
-		super(uri, 1, 1);
-		this.uri = uri;
-		this.coutUri = out;
-		this.cinUri = in;
+	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 		
-		this.init();
+		String dataOutPortURI = java.util.UUID.randomUUID().toString();
+		dataOutPort = new CompteurDataOutPort(dataOutPortURI, this);
+		this.addPort(dataOutPort);
+		dataOutPort.publishPort();
 	}
 
-	public void init() throws Exception {
-		this.addRequiredInterface(ICompteur.class);
-		this.addOfferedInterface(ICompteur.class);
-		this.compteurOutboundPort = new CompteurOutBoundPort(this);
-		this.compteurOutboundPort.localPublishPort();
-		this.compteurInboundPort = new CompteurInBoundPort(this.cinUri, this);
-		this.compteurInboundPort.publishPort();
+	@Override
+	public DataI getData(String uri) throws Exception {
+		// A faire plus tard ?
+		return null;
+	}
+
+	@Override
+	public void sendData(StringData msg) throws Exception {
+		messages_recu.add(msg);
+		this.logMessage("Frigo : " + messages_recu.get(0).getMessage());
 	}
 	
 	@Override
-	public void			start() throws ComponentStartException
-	{
-		super.start() ;
-//		this.doPortConnection(
-//				this.compteurOutboundPort.getPortURI(),
-//				this.player2PingPongInboundPortURI,
-//				PingPongConnector.class.getCanonicalName()) ;
-//		this.doPortConnection(
-//				this.pingPongDataInboundPort.getPortURI(),
-//				this.player2PingPongDataOutboundPortURI,
-//				DataConnector.class.getCanonicalName()) ;
+	public  void start() throws ComponentStartException {
+		super.start();
+		this.runTask(new AbstractTask() {
+			public void run() {
+				try {
+					Thread.sleep(5000);
+				}catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
-	
-
-	public int getAllConsommation() throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public void reset() throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	public int getAllProductionsAleatoires() throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getAllProductionsIntermittentes() throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 }

@@ -3,6 +3,7 @@ package tests;
 
 import composants.Compteur;
 import composants.Controleur;
+import connecteurs.CompteurConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
@@ -70,12 +71,15 @@ extends		AbstractCVM
 {
 	/** URI of the reflection inbound port of the concurrent map
 	 *  component.														*/
-	protected static final String	COMPTEUR_URI = "cpt" ;
-	protected static final String	CONTROLLEUR_URI = "ctl" ;
+	protected  String	COMPTEUR_URI = "abc" ;
+	protected  String	CONTROLLEUR_URI = "def" ;
+	
+	Controleur cont;
+	Compteur cpt;
 
 	public				CVM() throws Exception
 	{
-		super(false) ;
+		super() ;
 	}
 
 	/**
@@ -88,19 +92,18 @@ extends		AbstractCVM
 		// Creation phase
 		// --------------------------------------------------------------------
 
-		System.out.println(Controleur.class.getCanonicalName());
-		System.out.println(CONTROLLEUR_URI.getClass());
-		String cmcURI =
-			AbstractComponent.createComponent(
-				Controleur.class.getCanonicalName(),
-				new Object[]{CONTROLLEUR_URI}) ;
-		this.toggleTracing(cmcURI) ;
+		this.cont = new Controleur(CONTROLLEUR_URI,1,0);
+		this.cpt = new Compteur(COMPTEUR_URI,1,0);
+		this.addDeployedComponent(CONTROLLEUR_URI,cont);
+		this.addDeployedComponent(COMPTEUR_URI,cpt);
+		this.toggleTracing(CONTROLLEUR_URI);
+		this.toggleTracing(COMPTEUR_URI);
 
-		String tcURI =
-			AbstractComponent.createComponent(
-				Compteur.class.getCanonicalName(),
-				new Object[]{COMPTEUR_URI}) ;
-		this.toggleTracing(tcURI) ;
+		this.doPortConnection(
+				CONTROLLEUR_URI,
+				this.cont.dataInPort.getPortURI(),
+				this.cpt.dataOutPort.getPortURI(),
+				CompteurConnector.class.getCanonicalName()) ;
 
 		super.deploy();
 	}
@@ -108,16 +111,9 @@ extends		AbstractCVM
 	public static void	main(String[] args)
 	{
 		try {
-			
-			// Create an instance of the defined component virtual machine.
 			CVM a = new CVM() ;
-			// Execute the application.
-//			a.execute();
 			a.startStandardLifeCycle(5000L) ;
-			// Give some time to see the traces (convenience).
 			Thread.sleep(500000L) ;
-			// Simplifies the termination (termination has yet to be treated
-			// properly in BCM).
 			System.exit(0) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
