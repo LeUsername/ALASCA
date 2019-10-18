@@ -2,6 +2,7 @@ package composants;
 
 import java.util.ArrayList;
 
+import data.CompteurData;
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
@@ -45,6 +46,11 @@ public class Compteur extends AbstractComponent implements ICompteur {
 		messages_recus.add(msg);
 		this.logMessage("Frigo : " + messages_recus.get(0).getMessage());
 	}
+	
+	@Override
+	public void sendData(CompteurData msg) throws Exception {
+		
+	}
 
 	@Override
 	public void start() throws ComponentStartException {
@@ -59,4 +65,6 @@ public class Compteur extends AbstractComponent implements ICompteur {
 			}
 		});
 	}
+
+	
 }

@@ -1,6 +1,6 @@
 package ports;
 
-import data.StringData;
+import data.CompteurData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
@@ -24,7 +24,7 @@ public class CompteurDataOutPort extends AbstractDataOutboundPort {
 		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
-				((ICompteur) this.getServiceOwner()).sendData((StringData) d);
+				((ICompteur) this.getServiceOwner()).sendData((CompteurData) d);
 				return null;
 			}
 		});

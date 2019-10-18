@@ -1,6 +1,8 @@
 package interfaces;
 
+import data.StringData;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
+import fr.sorbonne_u.components.interfaces.DataRequiredI;
 
 /**
  * L'interface <code>IControleur</code>
@@ -12,7 +14,7 @@ import fr.sorbonne_u.components.interfaces.DataOfferedI;
  * @author 3408625
  *
  */
-public interface IControleur extends DataOfferedI {
+public interface IControleur extends DataOfferedI, DataRequiredI {
 
 	// public void gestionRefigerateur() throws Exception;
 	//
@@ -31,6 +33,8 @@ public interface IControleur extends DataOfferedI {
 	 * @throws Exception
 	 *             todo
 	 */
-	public DataI getData(String uri) throws Exception;
+	public DataOfferedI.DataI sendDataOffered(String uri) throws Exception;
+
+	public DataRequiredI.DataI getDataRequired(StringData msg) throws Exception;
 
 }

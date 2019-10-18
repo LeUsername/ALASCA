@@ -1,7 +1,8 @@
 package interfaces;
 
+import data.CompteurData;
 import data.StringData;
-import fr.sorbonne_u.components.interfaces.DataRequiredI;
+import fr.sorbonne_u.components.interfaces.DataOfferedI;
 
 /**
  * L'interface <code>ICompteur</code>
@@ -13,7 +14,7 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI;
  * @author 3408625
  *
  */
-public interface ICompteur extends DataRequiredI {
+public interface ICompteur extends DataOfferedI {
 
 	// /**
 	// * renvoie la consommation totale de tous les appareils allumes
@@ -55,5 +56,7 @@ public interface ICompteur extends DataRequiredI {
 	 *             todo
 	 */
 	public void sendData(StringData msg) throws Exception;
+	
+	public void sendData(CompteurData msg) throws Exception;
 
 }
