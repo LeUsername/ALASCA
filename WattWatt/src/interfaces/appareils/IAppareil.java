@@ -1,6 +1,7 @@
 package interfaces.appareils;
 
 import fr.sorbonne_u.components.interfaces.OfferedI;
+import fr.sorbonne_u.components.interfaces.RequiredI;
 
 /**
  * L'interface <code>IAppareil</code>
@@ -12,7 +13,7 @@ import fr.sorbonne_u.components.interfaces.OfferedI;
  * @author 3410456
  *
  */
-public interface IAppareil extends OfferedI {
+public interface IAppareil extends OfferedI,RequiredI {
 	/**
 	 * 
 	 * @throws Exception
