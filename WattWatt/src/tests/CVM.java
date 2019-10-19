@@ -1,10 +1,9 @@
 package tests;
 
-
 import composants.Compteur;
 import composants.Controleur;
-import connecteurs.CompteurConnector;
-import fr.sorbonne_u.components.AbstractComponent;
+import connecteurs.CompteurControleurConnector;
+import connecteurs.ControleurCompteurConnector;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 //
@@ -40,81 +39,82 @@ import fr.sorbonne_u.components.AbstractComponent;
 // The fact that you are presently reading this means that you have had
 // knowledge of the CeCILL-C license and that you accept its terms.
 
-import fr.sorbonne_u.components.cvm.AbstractCVM ;
+import fr.sorbonne_u.components.cvm.AbstractCVM;
 
 //------------------------------------------------------------------------------
 /**
  * The class <code>CVM</code> deploys and launch a simple tests for the
  * <code>ConcurrentMapComponent</code>.
  *
- * <p><strong>Description</strong></p>
+ * <p>
+ * <strong>Description</strong>
+ * </p>
  * 
  * <p>
  * The class creates two components, an instance of
  * <code>ConcurrentMapComponent</code> and an instance of
- * <code>TesterComponent</code>. Their inter-connection and the test
- * scenario is implemented in the two components.
+ * <code>TesterComponent</code>. Their inter-connection and the test scenario is
+ * implemented in the two components.
  * </p>
  * 
- * <p><strong>Invariant</strong></p>
+ * <p>
+ * <strong>Invariant</strong>
+ * </p>
  * 
  * <pre>
  * invariant		true
  * </pre>
  * 
- * <p>Created on : 2019-02-11</p>
+ * <p>
+ * Created on : 2019-02-11
+ * </p>
  * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author <a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class				CVM
-extends		AbstractCVM
-{
-	/** URI of the reflection inbound port of the concurrent map
-	 *  component.														*/
-	protected  String	COMPTEUR_URI = "abc" ;
-	protected  String	CONTROLLEUR_URI = "def" ;
-	
+public class CVM extends AbstractCVM {
+	/**
+	 * URI of the reflection inbound port of the concurrent map component.
+	 */
+	protected String COMPTEUR_URI = "compteur";
+	protected String CONTROLLEUR_URI = "controleur";
+
 	Controleur cont;
 	Compteur cpt;
 
-	public				CVM() throws Exception
-	{
-		super() ;
+	public CVM() throws Exception {
+		super();
 	}
 
 	/**
 	 * @see fr.sorbonne_u.components.cvm.AbstractCVM#deploy()
 	 */
 	@Override
-	public void			deploy() throws Exception
-	{
+	public void deploy() throws Exception {
 		// --------------------------------------------------------------------
 		// Creation phase
 		// --------------------------------------------------------------------
 
-		this.cont = new Controleur(CONTROLLEUR_URI,1,0);
-		this.cpt = new Compteur(COMPTEUR_URI,1,0);
-		this.addDeployedComponent(CONTROLLEUR_URI,cont);
-		this.addDeployedComponent(COMPTEUR_URI,cpt);
+		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0);
+		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);
+		this.addDeployedComponent(CONTROLLEUR_URI, cont);
+		this.addDeployedComponent(COMPTEUR_URI, cpt);
 		this.toggleTracing(CONTROLLEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
 
-		this.doPortConnection(
-				CONTROLLEUR_URI,
-				this.cont.dataInPort.getPortURI(),
-				this.cpt.dataOutPort.getPortURI(),
-				CompteurConnector.class.getCanonicalName()) ;
-
+		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.getPortURI(),
+				this.cpt.stringDataOutPort.getPortURI(), ControleurCompteurConnector.class.getCanonicalName());
+		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.getPortURI(),
+				this.cont.stringDataOutPort.getPortURI(), CompteurControleurConnector.class.getCanonicalName());
+		
 		super.deploy();
 	}
 
-	public static void	main(String[] args)
-	{
+	public static void main(String[] args) {
 		try {
-			CVM a = new CVM() ;
-			a.startStandardLifeCycle(5000L) ;
-			Thread.sleep(500000L) ;
-			System.exit(0) ;
+			CVM a = new CVM();
+			a.startStandardLifeCycle(5000L);
+			Thread.sleep(500000L);
+			System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

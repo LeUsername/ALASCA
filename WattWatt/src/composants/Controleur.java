@@ -1,13 +1,17 @@
 package composants;
 
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import data.CompteurData;
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
-import interfaces.IControleur;
-import ports.ControleurDataInPort;
+import interfaces.IControleurOffered;
+import interfaces.IControleurRequired;
+import ports.ControleurCompteurDataOutPort;
+import ports.ControleurStringDataInPort;
+import ports.ControleurStringDataOutPort;
 
 /**
  * La classe <code>Controleur</code>
@@ -19,40 +23,58 @@ import ports.ControleurDataInPort;
  * @author 3408625
  *
  */
-public class Controleur extends AbstractComponent implements IControleur {
+public class Controleur extends AbstractComponent implements IControleurOffered, IControleurRequired {
 
 	/**
 	 * Le port par lequel le controleur envoie des donnees representees par la
 	 * classe Data
 	 */
-	public ControleurDataInPort dataInPort;
+	public ControleurStringDataInPort stringDataInPort;
+	public ControleurCompteurDataOutPort compteurDataOutPort;
+	public ControleurStringDataOutPort stringDataOutPort;
 
 	/**
-	 * La liste des messages recues
+	 * La liste des messages recus
 	 */
-	protected ConcurrentHashMap<String, ArrayList<StringData>> controleurMessages = new ConcurrentHashMap<>();
+	public Vector<StringData> messages_recus = new Vector<StringData>();
+
+	/**
+	 * La liste des messages a envoyer
+	 */
+	protected ConcurrentHashMap<String, Vector<StringData>> controleurMessages = new ConcurrentHashMap<>();
+	protected ConcurrentHashMap<String, Vector<CompteurData>> controleurCompteurData = new ConcurrentHashMap<>();
 
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
 
-		this.addOfferedInterface(IControleur.class);
+		this.addOfferedInterface(IControleurOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
 
-		String dataInPortURI = java.util.UUID.randomUUID().toString();
-		this.dataInPort = new ControleurDataInPort(dataInPortURI, this);
-		this.addPort(dataInPort);
-		this.dataInPort.publishPort();
+		String randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataInPort = new ControleurStringDataInPort(randomURIPort, this);
+		this.addPort(stringDataInPort);
+		this.stringDataInPort.publishPort();
+
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.compteurDataOutPort = new ControleurCompteurDataOutPort(randomURIPort, this);
+		this.addPort(compteurDataOutPort);
+		this.compteurDataOutPort.publishPort();
+
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataOutPort = new ControleurStringDataOutPort(randomURIPort, this);
+		this.addPort(stringDataOutPort);
+		this.stringDataOutPort.publishPort();
 	}
 
 	@Override
-	public DataI getData(String uri) throws Exception {
-		return controleurMessages.get(uri).remove(0);
-	}
-
-	protected void envoyerMessage(String uri) throws Exception {
+	public StringData sendMessage(String uri) throws Exception {
 		StringData m = controleurMessages.get(uri).get(0);
 		controleurMessages.get(uri).remove(m);
-		this.dataInPort.send(m);
+		this.stringDataInPort.send(m);
+		return m;
 	}
 
 	@Override
@@ -61,16 +83,30 @@ public class Controleur extends AbstractComponent implements IControleur {
 		this.runTask(new AbstractTask() {
 			public void run() {
 				try {
+					String msg = "hello";
 					StringData m = new StringData();
-					m.setMessage("controleur ici");
-					controleurMessages.put("compteur", new ArrayList<StringData>());
+					m.setMessage(msg);
+					controleurMessages.put("compteur", new Vector<StringData>());
 					controleurMessages.get("compteur").add(m);
-					envoyerMessage("compteur");
+					sendMessage("compteur");
+					Thread.sleep(2000);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+
+	@Override
+	public void getMessage(StringData msg) throws Exception {
+		messages_recus.add(msg);
+		this.logMessage(" Controleur recoit : " + messages_recus.remove(0).getMessage());
+	}
+
+	@Override
+	public void getCompteurData(CompteurData msg) throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }
