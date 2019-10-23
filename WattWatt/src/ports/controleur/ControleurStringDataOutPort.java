@@ -1,4 +1,4 @@
-package ports;
+package ports.controleur;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -8,11 +8,20 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI.DataI;
 import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
 import interfaces.IControleurRequired;
 
+
+/**
+ * La classe <code>ControleurStringDataOutPort</code> qui represente le port du
+ * Controleur par lequel vont etre recu des message de type StringData
+ * 
+ * <p>
+ * Created on : 2019-10-19
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
 public class ControleurStringDataOutPort extends AbstractDataOutboundPort{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5788843329662501354L;
 
 	public ControleurStringDataOutPort(String uri,ComponentI owner)

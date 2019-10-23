@@ -6,6 +6,18 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI.DataI;
 import interfaces.ICompteurOffered;
 import interfaces.IControleurRequired;
 
+
+/**
+ * La classe <code>CompteurControleurConnector</code> qui creer une connexion du Compteur au Controleur
+ * 
+ * <p>
+ * Created on : 2019-10-19
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
+
 public class CompteurControleurConnector  extends AbstractDataConnector{
 	
 	@Override

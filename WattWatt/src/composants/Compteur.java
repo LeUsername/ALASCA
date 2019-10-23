@@ -9,9 +9,9 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.ICompteurOffered;
 import interfaces.ICompteurRequired;
-import ports.CompteurCompteurDataInPort;
-import ports.CompteurStringDataInPort;
-import ports.CompteurStringDataOutPort;
+import ports.compteur.CompteurCompteurDataInPort;
+import ports.compteur.CompteurStringDataInPort;
+import ports.compteur.CompteurStringDataOutPort;
 
 /**
  * La classe <code>Compteur</code>
@@ -23,21 +23,31 @@ import ports.CompteurStringDataOutPort;
  * @author 3408625
  *
  */
+
 public class Compteur extends AbstractComponent implements ICompteurOffered, ICompteurRequired {
 
+	int c = 0;
+	int a = 0;
+	int i = 0;
+	
 	/**
 	 * Le port par lequel le compteur recoit des donnees representees par la classe
-	 * Data
+	 * StringData
 	 */
 	public CompteurStringDataOutPort stringDataOutPort;
 
+	/**
+	 * Les ports par lesquels on envoie des messages: on fait la difference entre
+	 * StringData et CompteurData pour le moment
+	 */
 	public CompteurStringDataInPort stringDataInPort;
 	public CompteurCompteurDataInPort compteurDataInPort;
-	
+
 	/**
-	 * La liste des messages recues
+	 * La liste des messages recues, representees par la classe StringData.
 	 */
 	Vector<StringData> messages_recus = new Vector<>();
+
 	
 	/**
 	 * La liste des messages a envoyer
@@ -48,22 +58,22 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
 		String randomURI = java.util.UUID.randomUUID().toString();
-		
+
 		stringDataOutPort = new CompteurStringDataOutPort(randomURI, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
-		
+
 		randomURI = java.util.UUID.randomUUID().toString();
 		stringDataInPort = new CompteurStringDataInPort(randomURI, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
-		
+
 		randomURI = java.util.UUID.randomUUID().toString();
 		compteurDataInPort = new CompteurCompteurDataInPort(randomURI, this);
 		this.addPort(compteurDataInPort);
 		compteurDataInPort.publishPort();
 	}
-	
+
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -74,9 +84,14 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 					String msg = "hello";
 					StringData m = new StringData();
 					m.setMessage(msg);
+
 					messages_envoyes.put("controleur", new Vector<StringData>());
 					messages_envoyes.get("controleur").add(m);
 					sendMessage("controleur");
+					Thread.sleep(1000);
+					messages_envoyes.get("controleur").add(m);
+					sendMessage("controleur");
+					sendCompteurData("controleur");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -88,7 +103,7 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage(" Compteur recoit : " + messages_recus.remove(0).getMessage());
-		
+
 	}
 
 	@Override
@@ -101,9 +116,14 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 
 	@Override
 	public CompteurData sendCompteurData(String uri) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		CompteurData m = new CompteurData();
+		m.setConsommation(c);
+		m.setProdAlea(a);
+		m.setProdInterm(i);
+		
+		this.compteurDataInPort.send(m);
+		
+		return m;
 	}
 
-	
 }

@@ -1,4 +1,4 @@
-package ports;
+package ports.controleur;
 
 import data.CompteurData;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -8,6 +8,17 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI.DataI;
 import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
 import interfaces.IControleurRequired;
 
+/**
+ * La classe <code>ControleurStringDataOutPort</code> qui represente le port du
+ * Controleur par lequel vont etre recu des message de type CompteurData
+ * 
+ * <p>
+ * Created on : 2019-10-19
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
 public class ControleurCompteurDataOutPort extends AbstractDataOutboundPort{
 
 	/**

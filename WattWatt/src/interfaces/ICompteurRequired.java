@@ -1,11 +1,11 @@
 package interfaces;
 
-import data.CompteurData;
 import data.StringData;
 import fr.sorbonne_u.components.interfaces.DataRequiredI;
 
 /**
- * L'interface <code>ICompteur</code>
+ * L'interface <code>ICompteurRequired</code> qui permet à un composant Compteur
+ * de recuperer des messages
  * 
  * <p>
  * Created on : 2019-10-09

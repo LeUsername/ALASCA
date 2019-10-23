@@ -9,9 +9,9 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IControleurOffered;
 import interfaces.IControleurRequired;
-import ports.ControleurCompteurDataOutPort;
-import ports.ControleurStringDataInPort;
-import ports.ControleurStringDataOutPort;
+import ports.controleur.ControleurCompteurDataOutPort;
+import ports.controleur.ControleurStringDataInPort;
+import ports.controleur.ControleurStringDataOutPort;
 
 /**
  * La classe <code>Controleur</code>
@@ -27,17 +27,28 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 
 	/**
 	 * Le port par lequel le controleur envoie des donnees representees par la
-	 * classe Data
+	 * classe StringData
 	 */
 	public ControleurStringDataInPort stringDataInPort;
+
+	/**
+	 * Le port par lequel le compteur envoie des donnees representees par la classe
+	 * StringData: pour l'instant il n'existe que des ports vers le compteur
+	 */
 	public ControleurCompteurDataOutPort compteurDataOutPort;
 	public ControleurStringDataOutPort stringDataOutPort;
 
 	/**
-	 * La liste des messages recus
+	 * La liste des messages recues, representees par la classe StringData.
 	 */
 	public Vector<StringData> messages_recus = new Vector<StringData>();
 
+	/**
+	 * Ses 3 entiers vont servir a stocker les informations recu du compteur
+	 */
+	public int consommation = 0;
+	public int productionAleatoire = 0;
+	public int productionIntermittente = 0;
 	/**
 	 * La liste des messages a envoyer
 	 */
@@ -90,6 +101,8 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 					controleurMessages.get("compteur").add(m);
 					sendMessage("compteur");
 					Thread.sleep(2000);
+					
+					Thread.sleep(2000);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -105,7 +118,10 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 
 	@Override
 	public void getCompteurData(CompteurData msg) throws Exception {
-		// TODO Auto-generated method stub
+		this.consommation = msg.getConsommation();
+		this.productionAleatoire = msg.getProdAlea();
+		this.productionIntermittente = msg.getProdInterm();
+		this.logMessage(" Controleur a mis a jour les informations sur les quantité d'energie");
 
 	}
 

@@ -95,7 +95,7 @@ public class CVM extends AbstractCVM {
 		// --------------------------------------------------------------------
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0);
-		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);
+		this.cpt = new Compteur(COMPTEUR_URI, 2, 0);
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);
 		this.toggleTracing(CONTROLLEUR_URI);
@@ -105,6 +105,8 @@ public class CVM extends AbstractCVM {
 				this.cpt.stringDataOutPort.getPortURI(), ControleurCompteurConnector.class.getCanonicalName());
 		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.getPortURI(),
 				this.cont.stringDataOutPort.getPortURI(), CompteurControleurConnector.class.getCanonicalName());
+		this.doPortConnection(COMPTEUR_URI, this.cpt.compteurDataInPort.getPortURI(),
+				this.cont.compteurDataOutPort.getPortURI(), CompteurControleurConnector.class.getCanonicalName());
 		
 		super.deploy();
 	}
@@ -112,7 +114,7 @@ public class CVM extends AbstractCVM {
 	public static void main(String[] args) {
 		try {
 			CVM a = new CVM();
-			a.startStandardLifeCycle(5000L);
+			a.startStandardLifeCycle(500000L);
 			Thread.sleep(500000L);
 			System.exit(0);
 		} catch (Exception e) {

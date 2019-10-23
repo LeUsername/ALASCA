@@ -1,4 +1,4 @@
-package ports;
+package ports.compteur;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -8,15 +8,27 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI;
 import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
 import interfaces.ICompteurRequired;
 
+/**
+ * La classe <code>CompteurStringDataOutPort</code> qui represente le port du
+ * Compteur par lequel vont etre recu des message de type StringData
+ * 
+ * <p>
+ * Created on : 2019-10-19
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
 public class CompteurStringDataOutPort extends AbstractDataOutboundPort {
+
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4649573259830759119L;
 
 	public CompteurStringDataOutPort(String uri, ComponentI owner) throws Exception {
-		super(uri, DataOfferedI.PullI.class,DataOfferedI.PushI.class, owner);
+		super(uri, DataOfferedI.PullI.class, DataOfferedI.PushI.class, owner);
 	}
 
 	@Override

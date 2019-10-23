@@ -7,11 +7,10 @@ import interfaces.ICompteurRequired;
 import interfaces.IControleurOffered;
 
 /**
- * La classe <code>CompteurConnector</code> qui permet de se connecter à un
- * Compteur et d'appeler ses methodes
+ * La classe <code>ControleurCompteurConnector</code> qui creer une connexion du Controleur au Compteur
  * 
  * <p>
- * Created on : 2019-10-17
+ * Created on : 2019-10-19
  * </p>
  * 
  * @author 3408625

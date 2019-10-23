@@ -2,6 +2,17 @@ package composants;
 
 import interfaces.productions.intermittentes.IBatterie;
 
+/**
+ * La classe <code>Batterie</code>
+ * 
+ * <p>
+ * Created on : 2019-10-19
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
+
 public class Batterie implements IBatterie {
 
 	@Override
