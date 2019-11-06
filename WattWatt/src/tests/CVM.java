@@ -2,8 +2,11 @@ package tests;
 
 import composants.Compteur;
 import composants.Controleur;
+import composants.SecheCheveux;
 import connecteurs.CompteurControleurConnector;
 import connecteurs.ControleurCompteurConnector;
+import connecteurs.ControleurSecheCheveuxConnector;
+import connecteurs.SecheCheveuxControleurConnector;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 //
@@ -77,9 +80,11 @@ public class CVM extends AbstractCVM {
 	 */
 	protected String COMPTEUR_URI = "compteur";
 	protected String CONTROLLEUR_URI = "controleur";
+	protected String SECHE_CHEVEUX_URI = "secheCheveux";
 
 	Controleur cont;
 	Compteur cpt;
+	SecheCheveux secheCheveux;
 
 	public CVM() throws Exception {
 		super();
@@ -95,19 +100,30 @@ public class CVM extends AbstractCVM {
 		// --------------------------------------------------------------------
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0);
-		this.cpt = new Compteur(COMPTEUR_URI, 2, 0);
+		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);
+		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);
+		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
 		this.toggleTracing(CONTROLLEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
+		this.toggleTracing(SECHE_CHEVEUX_URI);
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.getPortURI(),
 				this.cpt.stringDataOutPort.getPortURI(), ControleurCompteurConnector.class.getCanonicalName());
 		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.getPortURI(),
 				this.cont.stringDataOutPort.getPortURI(), CompteurControleurConnector.class.getCanonicalName());
+		
 		this.doPortConnection(COMPTEUR_URI, this.cpt.compteurDataInPort.getPortURI(),
 				this.cont.compteurDataOutPort.getPortURI(), CompteurControleurConnector.class.getCanonicalName());
 		
+		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort2.getPortURI(),
+				this.secheCheveux.stringDataOutPort.getPortURI(),
+				ControleurSecheCheveuxConnector.class.getCanonicalName());
+		this.doPortConnection(SECHE_CHEVEUX_URI, this.secheCheveux.stringDataInPort.getPortURI(),
+				this.cont.stringDataOutPort2.getPortURI(),
+				SecheCheveuxControleurConnector.class.getCanonicalName());
+	
 		super.deploy();
 	}
 
@@ -122,4 +138,4 @@ public class CVM extends AbstractCVM {
 		}
 	}
 }
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------

@@ -1,0 +1,25 @@
+<!-- fr.sorbonne_u.devs_simulation.models.events ---------------------------- -->
+<html>
+<body>
+<p><b>Events for DEVS simulation models.</b></p>
+
+<p>
+This package implements generic events for DEVS simulation models. Some classes
+refer to events used at run time by the simulation. Others refer to the
+description of the connections (event sources and sinks) in a simulation
+architecture that describes models imported and exported events as well
+as links from models exporting events to the ones importing them. This is
+complicated by the fact that this library promotes the idea of reusable
+models developed by independent teams. Hence, exported events may have to
+be translated to imported ones when connecting independently developed
+models. Similarly, a coupled model may import a type of event that needs to be
+translated to another type before being imported by some submodels, as well
+as exported events from submodels may have to be translated into the coupled
+model types of exported events. Hence, event converter may need to be added
+at connection time to cater for these translations, and converters may have
+to be composed into a chain of translations in complex simulation
+architectures.
+</p>
+
+</body>
+</html>

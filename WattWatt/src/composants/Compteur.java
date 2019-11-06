@@ -81,7 +81,7 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 			public void run() {
 				try {
 					Thread.sleep(1000);
-					String msg = "hello";
+					String msg = "hello8";
 					StringData m = new StringData();
 					m.setMessage(msg);
 

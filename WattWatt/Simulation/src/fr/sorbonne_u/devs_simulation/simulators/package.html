@@ -1,0 +1,44 @@
+<!-- fr.sorbonne_u.devs_simulation.simulators ------------------------------- -->
+<html>
+<body>
+<p><b>DEVS simulation engines.</b></p>
+
+<p>
+This packages defines the implementation of simulation engines.
+DEVS simulation engines implements simulation algorithms at their
+level. Essentially, they ensure the coordinated execution of
+models by implementing a strategy to coordinate their simulation
+clocks in such a way that they respect the advance of the global
+simulation clock.
+</p>
+
+<p>
+Strategies to coordinate the simulation clocks can go from perfect
+synchronisation to no synchronisation at all. The standard DEVS
+coordination algorithm is an example of perfect synchronisation
+as the coordinators select the most imminent internal step to be
+performed among all of their atomic models and then perform each of
+them one at a time making sure that the simulation clocks of all
+models advance at exactly the same global pace. Such globally
+synchronised algorithms ensure a deterministic execution of simulation
+runs but are ill-suited for parallel or distributed simulations as
+they force a fully serialised execution of all events. The classes
+<code>SimulationEngine</code>, <code>AtomicEngine</code>
+and <code>CoordinationEngine</code> implement the standard DEVS
+coordination algorithm with tightly synchronised simulation clocks.
+</p>
+
+<p>
+Other algorithms, like the real time one, align the simulation clocks
+to the real time (e.g., using the computer clock).
+These unsynchronised algorithms are fine when the models are loosely
+coupled and when the simulation results can admit some imprecision
+if the models remain sufficiently synchronised implicitly, like
+models carrying out continuous simulations over differential equations
+with integration steps among models that are small and close to each
+others so that the imprecision amounts to relatively small differences
+in the tiles at which the variables have been last updated.
+</p>
+
+</body>
+</html>

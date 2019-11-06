@@ -25,7 +25,7 @@ public interface ICompteurOffered extends DataOfferedI {
 	 * @throws Exception
 	 */
 	public StringData sendMessage(String uri) throws Exception;
-
+	
 	/**
 	 * Methode qui sert a l'envoie d'un message CompteurData
 	 * 

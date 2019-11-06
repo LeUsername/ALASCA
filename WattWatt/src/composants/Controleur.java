@@ -30,6 +30,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	 * classe StringData
 	 */
 	public ControleurStringDataInPort stringDataInPort;
+	public ControleurStringDataInPort stringDataInPort2;
 
 	/**
 	 * Le port par lequel le compteur envoie des donnees representees par la classe
@@ -37,6 +38,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	 */
 	public ControleurCompteurDataOutPort compteurDataOutPort;
 	public ControleurStringDataOutPort stringDataOutPort;
+	public ControleurStringDataOutPort stringDataOutPort2;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -66,6 +68,12 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		this.stringDataInPort = new ControleurStringDataInPort(randomURIPort, this);
 		this.addPort(stringDataInPort);
 		this.stringDataInPort.publishPort();
+		
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataInPort2 = new ControleurStringDataInPort(randomURIPort, this);
+		this.addPort(stringDataInPort2);
+		this.stringDataInPort2.publishPort();
 
 		randomURIPort = java.util.UUID.randomUUID().toString();
 
@@ -78,6 +86,12 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		this.stringDataOutPort = new ControleurStringDataOutPort(randomURIPort, this);
 		this.addPort(stringDataOutPort);
 		this.stringDataOutPort.publishPort();
+		
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataOutPort2 = new ControleurStringDataOutPort(randomURIPort, this);
+		this.addPort(stringDataOutPort2);
+		this.stringDataOutPort2.publishPort();
 	}
 
 	@Override
@@ -89,20 +103,29 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	}
 
 	@Override
+	public StringData sendMessage2(String uri) throws Exception {
+		StringData m = controleurMessages.get(uri).get(0);
+		controleurMessages.get(uri).remove(m);
+		this.stringDataInPort2.send(m);
+		return m;
+	}
+	
+	@Override
 	public void execute() throws Exception {
 		super.execute();
 		this.runTask(new AbstractTask() {
 			public void run() {
 				try {
-					String msg = "hello";
+					String msg = "hello45894894";
 					StringData m = new StringData();
 					m.setMessage(msg);
 					controleurMessages.put("compteur", new Vector<StringData>());
 					controleurMessages.get("compteur").add(m);
 					sendMessage("compteur");
-					Thread.sleep(2000);
 					
-					Thread.sleep(2000);
+					controleurMessages.put("secheCheveux", new Vector<StringData>());
+					controleurMessages.get("secheCheveux").add(m);
+					sendMessage2("secheCheveux");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
