@@ -1,10 +1,9 @@
-package sechecheveux;
+package ports.sechecheveux;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI.DataI;
 import fr.sorbonne_u.components.ports.AbstractDataInboundPort;
-import interfaces.ICompteurOffered;
 import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
 
 /**

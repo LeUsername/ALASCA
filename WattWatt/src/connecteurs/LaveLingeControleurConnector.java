@@ -4,25 +4,25 @@ import fr.sorbonne_u.components.connectors.AbstractDataConnector;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import fr.sorbonne_u.components.interfaces.DataRequiredI.DataI;
 import interfaces.IControleurRequired;
-import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
+import interfaces.appareils.planifiables.ILaveLingeOffered;
 
 
 /**
- * La classe <code>CompteurControleurConnector</code> qui creer une connexion du Compteur au Controleur
+ * La classe <code>LaveLingeControleurConnector</code> qui creer une connexion du lave linge au Controleur
  * 
  * <p>
- * Created on : 2019-10-19
+ * Created on : 2019-11-07
  * </p>
  * 
  * @author 3408625
  *
  */
 
-public class SecheCheveuxControleurConnector  extends AbstractDataConnector{
+public class LaveLingeControleurConnector extends AbstractDataConnector{
 	
 	@Override
 	public DataI request() throws Exception {
-		return this.offered2required(((ISecheCheveuxOffered.PullI)this.offering).get());
+		return this.offered2required(((ILaveLingeOffered.PullI)this.offering).get());
 	}
 
 	@Override

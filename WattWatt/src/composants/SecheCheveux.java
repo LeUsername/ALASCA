@@ -8,13 +8,11 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
 import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
-import sechecheveux.SecheCheveuxStringDataInPort;
-import sechecheveux.SecheCheveuxStringDataOutPort;
-
+import ports.sechecheveux.SecheCheveuxStringDataInPort;
+import ports.sechecheveux.SecheCheveuxStringDataOutPort;
 
 public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequired, ISecheCheveuxOffered {
 
-	
 	/**
 	 * Le port par lequel le compteur recoit des donnees representees par la classe
 	 * StringData
@@ -26,17 +24,17 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 	 * StringData et CompteurData pour le moment
 	 */
 	public SecheCheveuxStringDataInPort stringDataInPort;
-	
+
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
 	 */
 	Vector<StringData> messages_recus = new Vector<>();
-	
+
 	/**
 	 * La liste des messages a envoyer
 	 */
 	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
-	
+
 	public SecheCheveux(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
@@ -50,6 +48,13 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		stringDataInPort = new SecheCheveuxStringDataInPort(randomURI, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
+	}
+
+	public void on() {
+
+	}
+
+	public void off() {
 
 	}
 
@@ -58,17 +63,19 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		super.start();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				try {
-					Thread.sleep(1000);
-					String msg = "hello je suis le cehsfsjef";
-					StringData m = new StringData();
-					m.setMessage(msg);
-					messages_envoyes.put("controleur", new Vector<StringData>());
-					messages_envoyes.get("controleur").add(m);
-					sendMessage("controleur");
-					Thread.sleep(1000);
-				} catch (Exception e) {
-					e.printStackTrace();
+				while (true) {
+					try {
+						Thread.sleep(10);
+						String msg = "hello je suis le cehsfsjef";
+						StringData m = new StringData();
+						m.setMessage(msg);
+						messages_envoyes.put("controleur", new Vector<StringData>());
+						messages_envoyes.get("controleur").add(m);
+						sendMessage("controleur");
+						Thread.sleep(10);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -87,5 +94,13 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		messages_envoyes.get(uri).remove(m);
 		this.stringDataInPort.send(m);
 		return m;
+	}
+
+	@Override
+	public void finalise() throws Exception {
+		stringDataInPort.unpublishPort();
+		stringDataOutPort.unpublishPort();
+
+		super.finalise();
 	}
 }

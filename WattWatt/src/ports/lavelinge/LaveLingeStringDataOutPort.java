@@ -1,4 +1,4 @@
-package sechecheveux;
+package ports.lavelinge;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -6,28 +6,27 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import fr.sorbonne_u.components.interfaces.DataRequiredI;
 import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
-import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
+import interfaces.appareils.planifiables.ILaveLingeRequired;
 
 /**
- * La classe <code>SecheCheveuxStringDataOutPort</code> qui represente le port du
- * Seche Cheveux par lequel vont etre recu des message de type StringData
+ * La classe <code>LaveLingeStringDataOutPort</code> qui represente le port du
+ * lave linge par lequel vont etre recu des message de type StringData
  * 
  * <p>
- * Created on : 2019-11-06
+ * Created on : 2019-11-07
  * </p>
  * 
  * @author 3408625
  *
  */
-public class SecheCheveuxStringDataOutPort extends AbstractDataOutboundPort {
-
+public class LaveLingeStringDataOutPort extends AbstractDataOutboundPort {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -980940227955490454L;
+	private static final long serialVersionUID = 4366810096253141613L;
 
-	public SecheCheveuxStringDataOutPort(String uri, ComponentI owner) throws Exception {
+	public LaveLingeStringDataOutPort(String uri, ComponentI owner) throws Exception {
 		super(uri, DataOfferedI.PullI.class, DataOfferedI.PushI.class, owner);
 	}
 
@@ -36,7 +35,7 @@ public class SecheCheveuxStringDataOutPort extends AbstractDataOutboundPort {
 		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
-				((ISecheCheveuxRequired) this.getServiceOwner()).getMessage((StringData) d);
+				((ILaveLingeRequired) this.getServiceOwner()).getMessage((StringData) d);
 				return null;
 			}
 		});

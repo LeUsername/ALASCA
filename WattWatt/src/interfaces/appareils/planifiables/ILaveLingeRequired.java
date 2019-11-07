@@ -1,11 +1,11 @@
-package interfaces.appareils.incontrolables;
+package interfaces.appareils.planifiables;
 
 import data.StringData;
 import fr.sorbonne_u.components.interfaces.DataRequiredI;
 
 /**
- * L'interface <code>ISecheCheveuxRequired</code> qui permet à un composant
- * Seche cheveux de recuperer des messages
+ * L'interface <code>ILaveLingeRequired</code> qui permet à un composant
+ * LaveLinge de recuperer des messages
  * 
  * <p>
  * Created on : 2019-11-06
@@ -14,7 +14,7 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI;
  * @author 3408625
  *
  */
-public interface ISecheCheveuxRequired extends DataRequiredI {
+public interface ILaveLingeRequired extends DataRequiredI {
 
 	/**
 	 * Recuperation du message envoye par un autre service (le controleur)

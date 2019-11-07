@@ -29,7 +29,7 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 	int c = 0;
 	int a = 0;
 	int i = 0;
-	
+
 	/**
 	 * Le port par lequel le compteur recoit des donnees representees par la classe
 	 * StringData
@@ -48,7 +48,6 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 	 */
 	Vector<StringData> messages_recus = new Vector<>();
 
-	
 	/**
 	 * La liste des messages a envoyer
 	 */
@@ -79,21 +78,23 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		super.start();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				try {
-					Thread.sleep(1000);
-					String msg = "hello8";
-					StringData m = new StringData();
-					m.setMessage(msg);
+				while (true) {
+					try {
+						Thread.sleep(10);
+						String msg = "hello8";
+						StringData m = new StringData();
+						m.setMessage(msg);
 
-					messages_envoyes.put("controleur", new Vector<StringData>());
-					messages_envoyes.get("controleur").add(m);
-					sendMessage("controleur");
-					Thread.sleep(1000);
-					messages_envoyes.get("controleur").add(m);
-					sendMessage("controleur");
-					sendCompteurData("controleur");
-				} catch (Exception e) {
-					e.printStackTrace();
+						messages_envoyes.put("controleur", new Vector<StringData>());
+						messages_envoyes.get("controleur").add(m);
+						sendMessage("controleur");
+						Thread.sleep(10);
+						messages_envoyes.get("controleur").add(m);
+						sendMessage("controleur");
+						sendCompteurData("controleur");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -120,9 +121,9 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		m.setConsommation(c);
 		m.setProdAlea(a);
 		m.setProdInterm(i);
-		
+
 		this.compteurDataInPort.send(m);
-		
+
 		return m;
 	}
 

@@ -1,5 +1,6 @@
 package composants;
 
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,16 +30,18 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	 * Le port par lequel le controleur envoie des donnees representees par la
 	 * classe StringData
 	 */
-	public ControleurStringDataInPort stringDataInPort;
-	public ControleurStringDataInPort stringDataInPort2;
+	// public ControleurStringDataInPort stringDataInPort;
+	// public ControleurStringDataInPort stringDataInPort2;
+	public HashMap<String, ControleurStringDataInPort> stringDataInPort;
 
 	/**
 	 * Le port par lequel le compteur envoie des donnees representees par la classe
 	 * StringData: pour l'instant il n'existe que des ports vers le compteur
 	 */
 	public ControleurCompteurDataOutPort compteurDataOutPort;
-	public ControleurStringDataOutPort stringDataOutPort;
-	public ControleurStringDataOutPort stringDataOutPort2;
+	// public ControleurStringDataOutPort stringDataOutPort;
+	// public ControleurStringDataOutPort stringDataOutPort2;
+	public HashMap<String, ControleurStringDataOutPort> stringDataOutPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -46,7 +49,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	public Vector<StringData> messages_recus = new Vector<StringData>();
 
 	/**
-	 * Ses 3 entiers vont servir a stocker les informations recu du compteur
+	 * Ces 3 entiers vont servir a stocker les informations recues du compteur
 	 */
 	public int consommation = 0;
 	public int productionAleatoire = 0;
@@ -63,17 +66,28 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		this.addOfferedInterface(IControleurOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
 
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
+
 		String randomURIPort = java.util.UUID.randomUUID().toString();
 
-		this.stringDataInPort = new ControleurStringDataInPort(randomURIPort, this);
-		this.addPort(stringDataInPort);
-		this.stringDataInPort.publishPort();
-		
+		// this.stringDataInPort = new ControleurStringDataInPort(randomURIPort, this);
+		this.stringDataInPort.put("compteur", new ControleurStringDataInPort(randomURIPort, this));
+		this.addPort(stringDataInPort.get("compteur"));
+		this.stringDataInPort.get("compteur").publishPort();
+
 		randomURIPort = java.util.UUID.randomUUID().toString();
 
-		this.stringDataInPort2 = new ControleurStringDataInPort(randomURIPort, this);
-		this.addPort(stringDataInPort2);
-		this.stringDataInPort2.publishPort();
+		// this.stringDataInPort2 = new ControleurStringDataInPort(randomURIPort, this);
+		this.stringDataInPort.put("secheCheveux", new ControleurStringDataInPort(randomURIPort, this));
+		this.addPort(stringDataInPort.get("secheCheveux"));
+		this.stringDataInPort.get("secheCheveux").publishPort();
+
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataInPort.put("laveLinge", new ControleurStringDataInPort(randomURIPort, this));
+		this.addPort(stringDataInPort.get("laveLinge"));
+		this.stringDataInPort.get("laveLinge").publishPort();
 
 		randomURIPort = java.util.UUID.randomUUID().toString();
 
@@ -83,51 +97,57 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 
 		randomURIPort = java.util.UUID.randomUUID().toString();
 
-		this.stringDataOutPort = new ControleurStringDataOutPort(randomURIPort, this);
-		this.addPort(stringDataOutPort);
-		this.stringDataOutPort.publishPort();
-		
+		// this.stringDataOutPort = new ControleurStringDataOutPort(randomURIPort,
+		// this);
+		this.stringDataOutPort.put("compteur", new ControleurStringDataOutPort(randomURIPort, this));
+		this.addPort(stringDataOutPort.get("compteur"));
+		this.stringDataOutPort.get("compteur").publishPort();
+
 		randomURIPort = java.util.UUID.randomUUID().toString();
 
-		this.stringDataOutPort2 = new ControleurStringDataOutPort(randomURIPort, this);
-		this.addPort(stringDataOutPort2);
-		this.stringDataOutPort2.publishPort();
+		this.stringDataOutPort.put("secheCheveux", new ControleurStringDataOutPort(randomURIPort, this));
+		this.addPort(stringDataOutPort.get("secheCheveux"));
+		this.stringDataOutPort.get("secheCheveux").publishPort();
+
+		randomURIPort = java.util.UUID.randomUUID().toString();
+
+		this.stringDataOutPort.put("laveLinge", new ControleurStringDataOutPort(randomURIPort, this));
+		this.addPort(stringDataOutPort.get("laveLinge"));
+		this.stringDataOutPort.get("laveLinge").publishPort();
 	}
 
 	@Override
 	public StringData sendMessage(String uri) throws Exception {
 		StringData m = controleurMessages.get(uri).get(0);
 		controleurMessages.get(uri).remove(m);
-		this.stringDataInPort.send(m);
+		this.stringDataInPort.get(uri).send(m);
 		return m;
 	}
 
-	@Override
-	public StringData sendMessage2(String uri) throws Exception {
-		StringData m = controleurMessages.get(uri).get(0);
-		controleurMessages.get(uri).remove(m);
-		this.stringDataInPort2.send(m);
-		return m;
-	}
-	
 	@Override
 	public void execute() throws Exception {
 		super.execute();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				try {
-					String msg = "hello45894894";
-					StringData m = new StringData();
-					m.setMessage(msg);
-					controleurMessages.put("compteur", new Vector<StringData>());
-					controleurMessages.get("compteur").add(m);
-					sendMessage("compteur");
-					
-					controleurMessages.put("secheCheveux", new Vector<StringData>());
-					controleurMessages.get("secheCheveux").add(m);
-					sendMessage2("secheCheveux");
-				} catch (Exception e) {
-					e.printStackTrace();
+				while (true) {
+					try {
+						String msg = "Hello controleur";
+						StringData m = new StringData();
+						m.setMessage(msg);
+						controleurMessages.put("compteur", new Vector<StringData>());
+						controleurMessages.get("compteur").add(m);
+						sendMessage("compteur");
+
+						controleurMessages.put("secheCheveux", new Vector<StringData>());
+						controleurMessages.get("secheCheveux").add(m);
+						sendMessage("secheCheveux");
+
+						controleurMessages.put("laveLinge", new Vector<StringData>());
+						controleurMessages.get("laveLinge").add(m);
+						sendMessage("laveLinge");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});

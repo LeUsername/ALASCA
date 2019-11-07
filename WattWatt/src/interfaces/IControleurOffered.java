@@ -24,8 +24,4 @@ public interface IControleurOffered extends DataOfferedI {
 	 * @throws Exception
 	 */
 	public StringData sendMessage(String uri) throws Exception;
-
-
-	public StringData sendMessage2(String uri) throws Exception;
-
 }
