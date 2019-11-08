@@ -1,12 +1,7 @@
 package ports.sechecheveux;
 
-import data.StringData;
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
-import fr.sorbonne_u.components.interfaces.DataOfferedI;
-import fr.sorbonne_u.components.interfaces.DataRequiredI;
-import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
-import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
+import ports.StringDataOutPort;
 
 /**
  * La classe <code>SecheCheveuxStringDataOutPort</code> qui represente le port du
@@ -19,26 +14,14 @@ import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
  * @author 3408625
  *
  */
-public class SecheCheveuxStringDataOutPort extends AbstractDataOutboundPort {
-
+public class SecheCheveuxStringDataOutPort extends StringDataOutPort {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -980940227955490454L;
+	private static final long serialVersionUID = -5325366480013582988L;
 
 	public SecheCheveuxStringDataOutPort(String uri, ComponentI owner) throws Exception {
-		super(uri, DataOfferedI.PullI.class, DataOfferedI.PushI.class, owner);
-	}
-
-	@Override
-	public void receive(DataRequiredI.DataI d) throws Exception {
-		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
-			@Override
-			public Void call() throws Exception {
-				((ISecheCheveuxRequired) this.getServiceOwner()).getMessage((StringData) d);
-				return null;
-			}
-		});
+		super(uri, owner);
 	}
 }

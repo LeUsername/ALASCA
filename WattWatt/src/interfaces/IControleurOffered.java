@@ -1,8 +1,5 @@
 package interfaces;
 
-import data.StringData;
-import fr.sorbonne_u.components.interfaces.DataOfferedI;
-
 /**
  * L'interface <code>IControleurOffered</code> qui permet à un composant
  * Controleur d'envoyer des messages
@@ -14,14 +11,6 @@ import fr.sorbonne_u.components.interfaces.DataOfferedI;
  *
  */
 
-public interface IControleurOffered extends DataOfferedI {
+public interface IControleurOffered extends IStringDataOffered {
 	
-	/**
-	 * Methode qui sert a l'envoi d'un message StringData
-	 * 
-	 * @param uri : URI du composant destinataire
-	 * @return un StringData
-	 * @throws Exception
-	 */
-	public StringData sendMessage(String uri) throws Exception;
 }

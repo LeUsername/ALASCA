@@ -56,19 +56,17 @@ public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, 
 		super.start();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(10);
-						String msg = "hello je suis le lave linge";
-						StringData m = new StringData();
-						m.setMessage(msg);
-						messages_envoyes.put("controleur", new Vector<StringData>());
-						messages_envoyes.get("controleur").add(m);
-						sendMessage("controleur");
-						Thread.sleep(10);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				try {
+					Thread.sleep(10);
+					String msg = "hello je suis le lave linge";
+					StringData m = new StringData();
+					m.setMessage(msg);
+					messages_envoyes.put("controleur", new Vector<StringData>());
+					messages_envoyes.get("controleur").add(m);
+					sendMessage("controleur");
+					Thread.sleep(10);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});

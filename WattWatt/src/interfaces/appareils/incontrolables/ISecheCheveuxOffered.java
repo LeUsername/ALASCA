@@ -1,7 +1,6 @@
 package interfaces.appareils.incontrolables;
 
-import data.StringData;
-import fr.sorbonne_u.components.interfaces.DataOfferedI;
+import interfaces.IStringDataOffered;
 
 /**
  * L'interface <code>ISecheCheveuxOffered</code> qui permet à un composant
@@ -15,14 +14,6 @@ import fr.sorbonne_u.components.interfaces.DataOfferedI;
  *
  */
 
-public interface ISecheCheveuxOffered extends DataOfferedI {
+public interface ISecheCheveuxOffered extends IStringDataOffered {
 
-	/**
-	 * Methode qui sert a l'envoi d'un message StringData
-	 * 
-	 * @param uri : URI du composant destinataire
-	 * @return un StringData
-	 * @throws Exception
-	 */
-	public StringData sendMessage(String uri) throws Exception;
 }

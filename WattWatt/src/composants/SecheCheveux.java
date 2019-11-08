@@ -63,10 +63,9 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		super.start();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				while (true) {
 					try {
 						Thread.sleep(10);
-						String msg = "hello je suis le cehsfsjef";
+						String msg = "hello je suis le seche poils";
 						StringData m = new StringData();
 						m.setMessage(msg);
 						messages_envoyes.put("controleur", new Vector<StringData>());
@@ -75,7 +74,6 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 						Thread.sleep(10);
 					} catch (Exception e) {
 						e.printStackTrace();
-					}
 				}
 			}
 		});

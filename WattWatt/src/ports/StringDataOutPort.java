@@ -1,16 +1,16 @@
-package ports.controleur;
+package ports;
 
-import data.CompteurData;
+import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import fr.sorbonne_u.components.interfaces.DataRequiredI.DataI;
 import fr.sorbonne_u.components.ports.AbstractDataOutboundPort;
-import interfaces.IControleurRequired;
+import interfaces.IStringDataRequired;
 
 /**
- * La classe <code>ControleurStringDataOutPort</code> qui represente le port du
- * Controleur par lequel vont etre recu des message de type CompteurData
+ * La classe <code>StringDataOutPort</code> qui represente le port par lequel
+ * vont etre recu des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19
@@ -19,15 +19,11 @@ import interfaces.IControleurRequired;
  * @author 3408625
  *
  */
-public class ControleurCompteurDataOutPort extends AbstractDataOutboundPort{
+public class StringDataOutPort extends AbstractDataOutboundPort {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	public ControleurCompteurDataOutPort(String uri, ComponentI owner)
-			throws Exception {
+	public StringDataOutPort(String uri, ComponentI owner) throws Exception {
 		super(uri, DataOfferedI.PullI.class, DataOfferedI.PushI.class, owner);
 	}
 
@@ -36,11 +32,11 @@ public class ControleurCompteurDataOutPort extends AbstractDataOutboundPort{
 		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
-				((IControleurRequired) this.getServiceOwner()).getCompteurData(((CompteurData) d));
+				((IStringDataRequired) this.getServiceOwner()).getMessage(((StringData) d));
 				return null;
 			}
 		});
-		
+
 	}
 
 }

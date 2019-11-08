@@ -1,9 +1,5 @@
 package interfaces;
 
-import data.CompteurData;
-import data.StringData;
-import fr.sorbonne_u.components.interfaces.DataRequiredI;
-
 /**
  * L'interface <code>IControleurRequired</code> qui permet à un composant
  * Controleur de recuperer des messages
@@ -14,7 +10,7 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI;
  * @author 3408625
  *
  */
-public interface IControleurRequired extends DataRequiredI {
+public interface IControleurRequired extends IStringDataRequired {
 
 	// public void gestionRefigerateur() throws Exception;
 	//
@@ -23,25 +19,5 @@ public interface IControleurRequired extends DataRequiredI {
 	// public void gestionBatterie() throws Exception;
 	//
 	// public void gestionEolienne() throws Exception;
-
-	/**
-	 * Recuperation du message envoye par un autre service
-	 * 
-	 * @param msg
-	 *            la donnee a stocker dans le compteur
-	 * @throws Exception
-	 *             todo
-	 */
-	public void getMessage(StringData msg) throws Exception;
-
-	/**
-	 * Recuperation du message envoye par le compteur
-	 * 
-	 * @param msg
-	 *            la donnee a stocker dans le compteur
-	 * @throws Exception
-	 *             todo
-	 */
-	public void getCompteurData(CompteurData msg) throws Exception;
 
 }

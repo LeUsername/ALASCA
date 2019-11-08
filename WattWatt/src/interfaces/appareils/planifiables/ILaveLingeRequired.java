@@ -1,7 +1,6 @@
 package interfaces.appareils.planifiables;
 
-import data.StringData;
-import fr.sorbonne_u.components.interfaces.DataRequiredI;
+import interfaces.IStringDataRequired;
 
 /**
  * L'interface <code>ILaveLingeRequired</code> qui permet à un composant
@@ -14,15 +13,6 @@ import fr.sorbonne_u.components.interfaces.DataRequiredI;
  * @author 3408625
  *
  */
-public interface ILaveLingeRequired extends DataRequiredI {
+public interface ILaveLingeRequired extends IStringDataRequired {
 
-	/**
-	 * Recuperation du message envoye par un autre service (le controleur)
-	 * 
-	 * @param msg
-	 *            la donnee a stocker dans le Seche cheveux
-	 * @throws Exception
-	 *             todo
-	 */
-	public void getMessage(StringData msg) throws Exception;
 }

@@ -3,13 +3,11 @@ package composants;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import data.CompteurData;
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.ICompteurOffered;
 import interfaces.ICompteurRequired;
-import ports.compteur.CompteurCompteurDataInPort;
 import ports.compteur.CompteurStringDataInPort;
 import ports.compteur.CompteurStringDataOutPort;
 
@@ -41,7 +39,6 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 	 * StringData et CompteurData pour le moment
 	 */
 	public CompteurStringDataInPort stringDataInPort;
-	public CompteurCompteurDataInPort compteurDataInPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -67,10 +64,6 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 
-		randomURI = java.util.UUID.randomUUID().toString();
-		compteurDataInPort = new CompteurCompteurDataInPort(randomURI, this);
-		this.addPort(compteurDataInPort);
-		compteurDataInPort.publishPort();
 	}
 
 	@Override
@@ -78,23 +71,17 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		super.start();
 		this.runTask(new AbstractTask() {
 			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(10);
-						String msg = "hello8";
-						StringData m = new StringData();
-						m.setMessage(msg);
+				try {
+					Thread.sleep(10);
+					String msg = "hello je suis compteur";
+					StringData m = new StringData();
+					m.setMessage(msg);
 
-						messages_envoyes.put("controleur", new Vector<StringData>());
-						messages_envoyes.get("controleur").add(m);
-						sendMessage("controleur");
-						Thread.sleep(10);
-						messages_envoyes.get("controleur").add(m);
-						sendMessage("controleur");
-						sendCompteurData("controleur");
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					messages_envoyes.put("controleur", new Vector<StringData>());
+					messages_envoyes.get("controleur").add(m);
+					sendMessage("controleur");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -114,17 +101,4 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		this.stringDataInPort.send(m);
 		return m;
 	}
-
-	@Override
-	public CompteurData sendCompteurData(String uri) throws Exception {
-		CompteurData m = new CompteurData();
-		m.setConsommation(c);
-		m.setProdAlea(a);
-		m.setProdInterm(i);
-
-		this.compteurDataInPort.send(m);
-
-		return m;
-	}
-
 }

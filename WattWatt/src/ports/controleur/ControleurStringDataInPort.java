@@ -19,11 +19,11 @@ import interfaces.IControleurOffered;
  *
  */
 public class ControleurStringDataInPort extends AbstractDataInboundPort {
-	
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2589277986119924194L;
 
 	public ControleurStringDataInPort(String uri,ComponentI owner)
 			throws Exception {
@@ -35,5 +35,4 @@ public class ControleurStringDataInPort extends AbstractDataInboundPort {
 	public DataI get() throws Exception {
 		return((IControleurOffered) this.owner).sendMessage(this.getClientPortURI());
 	}
-
 }

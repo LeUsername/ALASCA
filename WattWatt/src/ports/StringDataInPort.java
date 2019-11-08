@@ -1,14 +1,15 @@
-package ports.compteur;
+package ports;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import fr.sorbonne_u.components.interfaces.DataOfferedI.DataI;
 import fr.sorbonne_u.components.ports.AbstractDataInboundPort;
-import interfaces.ICompteurOffered;
+import interfaces.IStringDataOffered;
+
 
 /**
- * La classe <code>CompteurCompteurDataInPort</code> qui represente le port du
- * Compteur par lequel vont etre envoyer des message de type CompteurData
+ * La classe <code>StringDataInPort</code> qui represente le port du
+ * Controleur par lequel vont etre envoyees des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19
@@ -17,19 +18,22 @@ import interfaces.ICompteurOffered;
  * @author 3408625
  *
  */
-public class CompteurCompteurDataInPort extends AbstractDataInboundPort {
-
+public class StringDataInPort extends AbstractDataInboundPort {
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public CompteurCompteurDataInPort(String uri, ComponentI owner) throws Exception {
+	public StringDataInPort(String uri,ComponentI owner)
+			throws Exception {
 		super(uri, DataOfferedI.PullI.class, DataOfferedI.PushI.class, owner);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public DataI get() throws Exception {
-		return ((ICompteurOffered) this.owner).sendCompteurData(this.getClientPortURI());
+		return((IStringDataOffered) this.owner).sendMessage(this.getClientPortURI());
 	}
+
 }
