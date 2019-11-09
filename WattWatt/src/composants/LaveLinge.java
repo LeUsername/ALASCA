@@ -11,6 +11,18 @@ import interfaces.appareils.planifiables.ILaveLingeRequired;
 import ports.lavelinge.LaveLingeStringDataInPort;
 import ports.lavelinge.LaveLingeStringDataOutPort;
 
+
+/**
+ * La classe <code>Eolienne</code>
+ * 
+ * <p>
+ * Created on : 2019-11-09
+ * </p>
+ * 
+ * @author 3410456
+ *
+ */
+
 public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, ILaveLingeOffered {
 
 	/**

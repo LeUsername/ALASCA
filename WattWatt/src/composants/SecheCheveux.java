@@ -11,6 +11,17 @@ import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
 import ports.sechecheveux.SecheCheveuxStringDataInPort;
 import ports.sechecheveux.SecheCheveuxStringDataOutPort;
 
+/**
+ * La classe <code>SecheCheveux</code>
+ * 
+ * <p>
+ * Created on : 2019-11-09
+ * </p>
+ * 
+ * @author 3410456
+ *
+ */
+
 public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequired, ISecheCheveuxOffered {
 
 	/**

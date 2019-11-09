@@ -11,6 +11,17 @@ import interfaces.productions.aleatoires.IEolienneRequired;
 import ports.eolienne.EolienneStringDataInPort;
 import ports.eolienne.EolienneStringDataOutPort;
 
+/**
+ * La classe <code>Eolienne</code>
+ * 
+ * <p>
+ * Created on : 2019-11-09
+ * </p>
+ * 
+ * @author 3410456
+ *
+ */
+
 public class Eolienne extends AbstractComponent implements IEolienneRequired, ISecheCheveuxOffered {
 	/**
 	 * Le port par lequel l'eolienne recoit des donnees representees par la classe

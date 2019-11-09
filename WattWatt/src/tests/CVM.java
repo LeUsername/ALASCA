@@ -95,6 +95,8 @@ public class CVM extends AbstractCVM {
 	LaveLinge laveLinge;
 	Eolienne eolienne;
 	Batterie batterie;
+	
+	int quantiteMaxBatterie = 10;
 
 	public CVM() throws Exception {
 		super();
@@ -119,7 +121,7 @@ public class CVM extends AbstractCVM {
 		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
 		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
 		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0);
-		this.batterie = new Batterie(BATTERIE_URI, 1, 0);
+		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie);
 
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);

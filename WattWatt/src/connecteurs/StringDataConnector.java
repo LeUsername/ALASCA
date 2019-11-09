@@ -8,7 +8,7 @@ import interfaces.IStringDataRequired;
 
 
 /**
- * La classe <code>StringDataConnector</code> qui creer une connexion entre deux appareils
+ * La classe <code>StringDataConnector</code> qui cree une connexion entre deux appareils
  * 
  * <p>
  * Created on : 2019-11-09

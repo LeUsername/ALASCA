@@ -1,11 +1,15 @@
 package composants;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IControleurOffered;
 import interfaces.IControleurRequired;
@@ -81,21 +85,46 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	}
 
 	@Override
-	public StringData sendMessage(String uri) throws Exception {
-		StringData m = controleurMessages.get(uri).get(0);
-		controleurMessages.get(uri).remove(m);
-		this.stringDataInPort.get(uri).send(m);
+	public void start() throws ComponentStartException{
+		super.start();
 		
-		return m;
-	}
-
-	@Override
-	public void execute() throws Exception {
-		super.execute();
-		this.runTask(new AbstractTask() {
+		Collection<Runnable> tasks = new Vector<Runnable>();
+		Runnable task2 = new Runnable() {
 			public void run() {
 				try {
-					String msg = "Hello controleur";
+					Thread.sleep(100);
+					String msg = "charge";
+					StringData m = new StringData();
+					m.setMessage(msg);
+					controleurMessages.put("batterie", new Vector<StringData>());
+					controleurMessages.get("batterie").add(m);
+					sendMessage("batterie");
+
+					Thread.sleep(2000);
+					msg = "discharge";
+					m = new StringData();
+					m.setMessage(msg);
+					controleurMessages.put("batterie", new Vector<StringData>());
+					controleurMessages.get("batterie").add(m);
+					sendMessage("batterie");
+
+					Thread.sleep(3000);
+					msg = "value";
+					m = new StringData();
+					m.setMessage(msg);
+					controleurMessages.put("batterie", new Vector<StringData>());
+					controleurMessages.get("batterie").add(m);
+					sendMessage("batterie");
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		Runnable task1 = new Runnable() {
+			public void run() {
+				try {
+					String msg = "Hello from controlla";
 					StringData m = new StringData();
 					m.setMessage(msg);
 					for (String appareilURI : uris) {
@@ -107,13 +136,35 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 					e.printStackTrace();
 				}
 			}
-		});
+		};
+
+
+
+		tasks.add(task1);
+		tasks.add(task2);
+
+		ExecutorService threads = Executors.newFixedThreadPool(2);
+		for (Runnable t : tasks)
+			threads.execute(t);
+	}
+	@Override
+	public void execute() throws Exception {
+		super.execute();
+
 	}
 
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage(" Controleur recoit : " + messages_recus.remove(0).getMessage());
+	}
+
+	@Override
+	public StringData sendMessage(String uri) throws Exception {
+		StringData m = controleurMessages.get(uri).get(0);
+		controleurMessages.get(uri).remove(m);
+		this.stringDataInPort.get(uri).send(m);
+		return m;
 	}
 
 }
