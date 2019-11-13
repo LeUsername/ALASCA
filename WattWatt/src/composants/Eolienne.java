@@ -59,6 +59,18 @@ public class Eolienne extends AbstractComponent implements IEolienneRequired, IS
 		stringDataInPort.publishPort();
 
 	}
+	
+	public Eolienne(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out) throws Exception {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+
+		stringDataOutPort = new EolienneStringDataOutPort(out, this);
+		this.addPort(stringDataOutPort);
+		stringDataOutPort.publishPort();
+
+		stringDataInPort = new EolienneStringDataInPort(in, this);
+		this.addPort(stringDataInPort);
+		stringDataInPort.publishPort();
+	}
 
 	@Override
 	public void start() throws ComponentStartException {

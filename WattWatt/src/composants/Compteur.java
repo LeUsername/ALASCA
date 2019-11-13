@@ -66,18 +66,16 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 
 	}
 	
-	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String inCont, String outCont) throws Exception {
+	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
-
-		stringDataOutPort = new CompteurStringDataOutPort(outCont, this);
+		stringDataOutPort = new CompteurStringDataOutPort(out, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
 
-		stringDataInPort = new CompteurStringDataInPort(inCont, this);
+		stringDataInPort = new CompteurStringDataInPort(in, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
-
 	}
 
 	@Override
