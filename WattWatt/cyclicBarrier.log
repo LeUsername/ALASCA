@@ -1,0 +1,45 @@
+1573659451535|DCVM Cyclic Barrier up and running!
+1573659461021|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659461022|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659469261|All connected!
+1573659469261|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659469263|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659469263|DCVM Cyclic Barrier releases 2 sites.
+1573659469266|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659469267|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659469325|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659469326|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659469326|DCVM Cyclic Barrier releases 2 sites.
+1573659469905|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659469906|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659470081|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659470081|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659470081|DCVM Cyclic Barrier releases 2 sites.
+1573659470221|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659470221|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659470269|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659470269|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659470269|DCVM Cyclic Barrier releases 2 sites.
+1573659470274|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659470274|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659470317|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659470317|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659470317|DCVM Cyclic Barrier releases 2 sites.
+1573659520362|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659520364|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659520405|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659520406|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659520406|DCVM Cyclic Barrier releases 2 sites.
+1573659520537|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659520537|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659520585|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659520585|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659520585|DCVM Cyclic Barrier releases 2 sites.
+1573659520631|DCVM Cyclic Barrier accepts: controleur localhost 49498
+1573659520632|DCVM Cyclic Barrier has received 1 out of 2 expected.
+1573659520673|DCVM Cyclic Barrier accepts: compteur localhost 49500
+1573659520673|DCVM Cyclic Barrier has received 2 out of 2 expected.
+1573659520673|DCVM Cyclic Barrier releases 2 sites.
+1573659520674|DCVMCyclicBarrier.run() finished.
+1573659520674|DCVMCyclicBarrier.run() finished.
+1573659520674|DCVM Cyclic Barrier shuts down!

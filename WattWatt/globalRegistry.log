@@ -1,0 +1,25 @@
+1573659449364|Registry up and running!
+1573659469462|GlobalRegistry processing put controleur rmi=localhost
+1573659469517|GlobalRegistry processing put inPortCont rmi=localhost
+1573659469542|All connected!
+1573659469542|GlobalRegistry processing put compteur rmi=localhost
+1573659469605|GlobalRegistry processing put outPortCpt rmi=localhost
+1573659469605|GlobalRegistry processing put outPortCont rmi=localhost
+1573659469701|GlobalRegistry processing put inPortCpt rmi=localhost
+1573659469801|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-a5a0f0f9-847e-42f3-8ac3-ccd6a1035722 rmi=localhost
+1573659469857|GlobalRegistry processing put controleur-dcc rmi=localhost
+1573659469937|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-fd8d21a5-f292-4cb6-953a-8db0905a3de9 rmi=localhost
+1573659469993|GlobalRegistry processing put compteur-dcc rmi=localhost
+1573659470125|GlobalRegistry processing lookup outPortCpt
+1573659470125|GlobalRegistry processing lookup outPortCont
+1573659470173|GlobalRegistry processing lookup inPortCont
+1573659470181|GlobalRegistry processing lookup inPortCpt
+1573659520449|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-a5a0f0f9-847e-42f3-8ac3-ccd6a1035722
+1573659520449|GlobalRegistry processing remove compteur
+1573659520493|GlobalRegistry processing remove controleur
+1573659520497|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-fd8d21a5-f292-4cb6-953a-8db0905a3de9
+1573659520629|GlobalRegistry processing remove compteur-dcc
+1573659520629|GlobalRegistry processing remove controleur-dcc
+1573659520717|GlobalRegistry processing shutdown
+1573659520717|GlobalRegistry processing shutdown
+1573659520718|Global registry shuts down!

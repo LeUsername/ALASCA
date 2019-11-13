@@ -83,38 +83,56 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 			this.stringDataOutPort.get(appareilURI).publishPort();
 		}
 	}
+	
+	public Controleur(String uri, int nbThreads, int nbSchedulableThreads, String cptIn, String cptOut) throws Exception {
+		super(uri, nbThreads, nbSchedulableThreads);
 
+		this.addOfferedInterface(IControleurOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
+
+		this.uris = uris;
+		this.stringDataInPort.put("compteur", new ControleurStringDataInPort(cptIn, this));
+		this.addPort(stringDataInPort.get("compteur"));
+		this.stringDataInPort.get("compteur").publishPort();
+		this.stringDataOutPort.put("compteur", new ControleurStringDataOutPort(cptOut, this));
+		this.addPort(stringDataOutPort.get("compteur"));
+		this.stringDataOutPort.get("compteur").publishPort();
+	}
+	
 	@Override
-	public void start() throws ComponentStartException{
+	public void start() throws ComponentStartException {
 		super.start();
-		
+
 		Collection<Runnable> tasks = new Vector<Runnable>();
 		Runnable task2 = new Runnable() {
 			public void run() {
 				try {
-					Thread.sleep(100);
-					String msg = "charge";
-					StringData m = new StringData();
-					m.setMessage(msg);
-					controleurMessages.put("batterie", new Vector<StringData>());
-					controleurMessages.get("batterie").add(m);
-					sendMessage("batterie");
-
-					Thread.sleep(2000);
-					msg = "discharge";
-					m = new StringData();
-					m.setMessage(msg);
-					controleurMessages.put("batterie", new Vector<StringData>());
-					controleurMessages.get("batterie").add(m);
-					sendMessage("batterie");
-
-					Thread.sleep(3000);
-					msg = "value";
-					m = new StringData();
-					m.setMessage(msg);
-					controleurMessages.put("batterie", new Vector<StringData>());
-					controleurMessages.get("batterie").add(m);
-					sendMessage("batterie");
+//					Thread.sleep(100);
+//					String msg = "charge";
+//					StringData m = new StringData();
+//					m.setMessage(msg);
+//					controleurMessages.put("batterie", new Vector<StringData>());
+//					controleurMessages.get("batterie").add(m);
+//					sendMessage("batterie");
+//
+//					Thread.sleep(2000);
+//					msg = "discharge";
+//					m = new StringData();
+//					m.setMessage(msg);
+//					controleurMessages.put("batterie", new Vector<StringData>());
+//					controleurMessages.get("batterie").add(m);
+//					sendMessage("batterie");
+//
+//					Thread.sleep(3000);
+//					msg = "value";
+//					m = new StringData();
+//					m.setMessage(msg);
+//					controleurMessages.put("batterie", new Vector<StringData>());
+//					controleurMessages.get("batterie").add(m);
+//					sendMessage("batterie");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -127,18 +145,18 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 					String msg = "Hello from controlla";
 					StringData m = new StringData();
 					m.setMessage(msg);
-					for (String appareilURI : uris) {
-						controleurMessages.put(appareilURI, new Vector<StringData>());
-						controleurMessages.get(appareilURI).add(m);
-						sendMessage(appareilURI);
-					}
+//					for (String appareilURI : uris) {
+//						controleurMessages.put(appareilURI, new Vector<StringData>());
+//						controleurMessages.get(appareilURI).add(m);
+					controleurMessages.put("compteur", new Vector<StringData>());
+					controleurMessages.get("compteur").add(m);
+						sendMessage("compteur");
+//					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		};
-
-
 
 		tasks.add(task1);
 		tasks.add(task2);
@@ -147,6 +165,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		for (Runnable t : tasks)
 			threads.execute(t);
 	}
+
 	@Override
 	public void execute() throws Exception {
 		super.execute();
@@ -167,4 +186,17 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		return m;
 	}
 
+	public void updateURI() throws Exception {
+		for (String appareilURI : uris) {
+			String randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataInPort.put(appareilURI, new ControleurStringDataInPort(randomURIPort, this));
+			this.addPort(stringDataInPort.get(appareilURI));
+			this.stringDataInPort.get(appareilURI).publishPort();
+
+			randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataOutPort.put(appareilURI, new ControleurStringDataOutPort(randomURIPort, this));
+			this.addPort(stringDataOutPort.get(appareilURI));
+			this.stringDataOutPort.get(appareilURI).publishPort();
+		}
+	}
 }

@@ -46,36 +46,6 @@ import connecteurs.StringDataConnector;
 
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
-//------------------------------------------------------------------------------
-/**
- * The class <code>CVM</code> deploys and launch a simple tests for the
- * <code>ConcurrentMapComponent</code>.
- *
- * <p>
- * <strong>Description</strong>
- * </p>
- * 
- * <p>
- * The class creates two components, an instance of
- * <code>ConcurrentMapComponent</code> and an instance of
- * <code>TesterComponent</code>. Their inter-connection and the test scenario is
- * implemented in the two components.
- * </p>
- * 
- * <p>
- * <strong>Invariant</strong>
- * </p>
- * 
- * <pre>
- * invariant		true
- * </pre>
- * 
- * <p>
- * Created on : 2019-02-11
- * </p>
- * 
- * @author <a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
- */
 public class CVM extends AbstractCVM {
 	/**
 	 * URI of the reflection inbound port of the concurrent map component.
