@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.appareils.planifiables.ILaveLingeOffered;
 import interfaces.appareils.planifiables.ILaveLingeRequired;
@@ -109,5 +110,25 @@ public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, 
 		messages_envoyes.get(uri).remove(m);
 		this.stringDataInPort.send(m);
 		return m;
+	}
+	
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Lave linge shutdown");
+		try {
+			stringDataOutPort.unpublishPort();
+			stringDataInPort.unpublishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+	
+	@Override
+	public void finalise() throws Exception {
+		stringDataInPort.unpublishPort();
+		stringDataOutPort.unpublishPort();
+
+		super.finalise();
 	}
 }

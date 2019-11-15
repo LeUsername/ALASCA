@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
 import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
@@ -116,6 +117,18 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		messages_envoyes.get(uri).remove(m);
 		this.stringDataInPort.send(m);
 		return m;
+	}
+	
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Seche cheveux shutdown");
+		try {
+			stringDataOutPort.unpublishPort();
+			stringDataInPort.unpublishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
 	}
 
 	@Override

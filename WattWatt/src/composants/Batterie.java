@@ -139,7 +139,7 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		case "discharge":
 			isOn = false;
 			this.logMessage("La batterie est éteinte");
-			timer.schedule(new DechargeTask(this), 0, 300);
+			timer.schedule(new DechargeTask(this), 0, 1000);
 			break;
 		case "value":
 			String message = "Batterie à :" + quantite + " sur " + quantiteMax;
@@ -175,6 +175,14 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 			e.printStackTrace();
 		}
 		super.shutdown();
+	}
+	
+	@Override
+	public void finalise() throws Exception {
+		stringDataInPort.unpublishPort();
+		stringDataOutPort.unpublishPort();
+
+		super.finalise();
 	}
 
 	class ChargeTask extends TimerTask {

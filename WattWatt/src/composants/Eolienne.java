@@ -148,6 +148,14 @@ public class Eolienne extends AbstractComponent implements IEolienneRequired, IS
 		}
 		super.shutdown();
 	}
+	
+	@Override
+	public void finalise() throws Exception {
+		stringDataInPort.unpublishPort();
+		stringDataOutPort.unpublishPort();
+
+		super.finalise();
+	}
 
 	public void print() {
 		// Il faut faire un truc de prod plus realiste

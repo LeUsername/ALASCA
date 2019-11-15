@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IControleurOffered;
@@ -239,6 +240,38 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		controleurMessages.get(uri).remove(m);
 		this.stringDataInPort.get(uri).send(m);
 		return m;
+	}
+	
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Controleur shutdown");
+		try {
+			for(String s: stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for(String s: stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+	
+	@Override
+	public void finalise() throws Exception {
+		try {
+			for(String s: stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for(String s: stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		super.finalise();
 	}
 
 	public void updateURI() throws Exception {

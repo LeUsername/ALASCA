@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import interfaces.ICompteurOffered;
 import interfaces.ICompteurRequired;
@@ -112,5 +113,25 @@ public class Compteur extends AbstractComponent implements ICompteurOffered, ICo
 		messages_envoyes.get(uri).remove(m);
 		this.stringDataInPort.send(m);
 		return m;
+	}
+	
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Compteur shutdown");
+		try {
+			stringDataOutPort.unpublishPort();
+			stringDataInPort.unpublishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+	
+	@Override
+	public void finalise() throws Exception {
+		stringDataInPort.unpublishPort();
+		stringDataOutPort.unpublishPort();
+
+		super.finalise();
 	}
 }
