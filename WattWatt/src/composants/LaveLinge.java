@@ -62,6 +62,19 @@ public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, 
 		stringDataInPort.publishPort();
 
 	}
+	
+	public LaveLinge(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out)
+			throws Exception {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+
+		stringDataOutPort = new LaveLingeStringDataOutPort(out, this);
+		this.addPort(stringDataOutPort);
+		stringDataOutPort.publishPort();
+
+		stringDataInPort = new LaveLingeStringDataInPort(in, this);
+		this.addPort(stringDataInPort);
+		stringDataInPort.publishPort();
+	}
 
 	@Override
 	public void start() throws ComponentStartException {

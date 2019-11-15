@@ -60,6 +60,19 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 	}
+	
+	public SecheCheveux(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out)
+			throws Exception {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+
+		stringDataOutPort = new SecheCheveuxStringDataOutPort(out, this);
+		this.addPort(stringDataOutPort);
+		stringDataOutPort.publishPort();
+
+		stringDataInPort = new SecheCheveuxStringDataInPort(in, this);
+		this.addPort(stringDataInPort);
+		stringDataInPort.publishPort();
+	}
 
 	public void on() {
 

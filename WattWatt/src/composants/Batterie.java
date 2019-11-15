@@ -28,6 +28,11 @@ import ports.batterie.BatterieStringDataOutPort;
 public class Batterie extends AbstractComponent implements IBatterieOffered, IBatterieRequired {
 
 	/**
+	 * URI du composant
+	 */
+	public String URI;
+	
+	/**
 	 * Le port par lequel la batterie recoit des donnees representees par la classe
 	 * StringData
 	 */
@@ -59,6 +64,8 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 	public Batterie(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, int quantiteMax)
 			throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		URI = reflectionInboundPortURI;
 
 		String randomURI = java.util.UUID.randomUUID().toString();
 
@@ -71,6 +78,24 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 
+		this.quantite = 0;
+		this.quantiteMax = quantiteMax;
+	}
+
+	public Batterie(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, int quantiteMax, String in,
+			String out) throws Exception {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		URI = reflectionInboundPortURI;
+		
+		stringDataOutPort = new BatterieStringDataOutPort(out, this);
+		this.addPort(stringDataOutPort);
+		stringDataOutPort.publishPort();
+
+		stringDataInPort = new BatterieStringDataInPort(in, this);
+		this.addPort(stringDataInPort);
+		stringDataInPort.publishPort();
+		
 		this.quantite = 0;
 		this.quantiteMax = quantiteMax;
 	}
@@ -163,6 +188,19 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 			if (v.isOn && v.quantite < v.quantiteMax) {
 				v.quantite++;
 				v.print();
+			}
+			if (v.quantite == v.quantiteMax) {
+				String message = URI + ":charge:100";
+				StringData sD = new StringData();
+				sD.setMessage(message);
+				messages_envoyes.put("controleur", new Vector<StringData>());
+				messages_envoyes.get("controleur").add(sD);
+				try {
+					v.sendMessage("controleur");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}

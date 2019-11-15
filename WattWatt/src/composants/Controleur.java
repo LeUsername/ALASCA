@@ -2,6 +2,7 @@ package composants;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -97,7 +98,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 		super.start();
 
 		Collection<Runnable> tasks = new Vector<Runnable>();
-		Runnable task2 = new Runnable() {
+		Runnable eolienneTask = new Runnable() {
 			public void run() {
 				try {
 					// Thread.sleep(100);
@@ -123,13 +124,31 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 					// controleurMessages.put("batterie", new Vector<StringData>());
 					// controleurMessages.get("batterie").add(m);
 					// sendMessage("batterie");
+					String msg = "switchOn";
+					StringData m = new StringData();
+					m.setMessage(msg);
+					// for (String appareilURI : uris) {
+					// controleurMessages.put(appareilURI, new Vector<StringData>());
+					// controleurMessages.get(appareilURI).add(m);
+					controleurMessages.put("eolienne", new Vector<StringData>());
+					controleurMessages.get("eolienne").add(m);
+					sendMessage("eolienne");
+					Random r = new Random();
+					while (true) {
+						Thread.sleep(5000);
+						if (r.nextBoolean())
+							envoieString("eolienne", "switchOff");
+						else
+							envoieString("eolienne", "switchOn");
+					}
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		};
-		Runnable task1 = new Runnable() {
+
+		Runnable compteurTask = new Runnable() {
 			public void run() {
 				try {
 					String msg = "Hello from controlla";
@@ -148,8 +167,37 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 			}
 		};
 
-		tasks.add(task1);
-		tasks.add(task2);
+		Runnable batterieTask = new Runnable() {
+			public void run() {
+				try {
+					String msg = "Hello from controlla";
+					StringData m = new StringData();
+					m.setMessage(msg);
+					// for (String appareilURI : uris) {
+					// controleurMessages.put(appareilURI, new Vector<StringData>());
+					// controleurMessages.get(appareilURI).add(m);
+					controleurMessages.put("batterie", new Vector<StringData>());
+					controleurMessages.get("batterie").add(m);
+					sendMessage("batterie");
+					msg = "charge";
+					m = new StringData();
+					m.setMessage(msg);
+					// for (String appareilURI : uris) {
+					// controleurMessages.put(appareilURI, new Vector<StringData>());
+					// controleurMessages.get(appareilURI).add(m);
+					controleurMessages.put("batterie", new Vector<StringData>());
+					controleurMessages.get("batterie").add(m);
+					sendMessage("batterie");
+					// }
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		tasks.add(compteurTask);
+		tasks.add(eolienneTask);
+		tasks.add(batterieTask);
 
 		ExecutorService threads = Executors.newFixedThreadPool(2);
 		for (Runnable t : tasks)
@@ -165,7 +213,24 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
-		this.logMessage(" Controleur recoit : " + messages_recus.remove(0).getMessage());
+		String message = messages_recus.remove(0).getMessage();
+		this.logMessage(" Controleur recoit : " + message);
+		String[] messageSplit = message.split(":");
+		if (messageSplit[0].equals("batterie")) {
+			if (messageSplit[1].equals("charge")) {
+				if (messageSplit[2].equals("100")) {
+					envoieString("batterie", "discharge");
+				}
+			}
+		}
+	}
+
+	public void envoieString(String uri, String msg) throws Exception {
+		StringData m = new StringData();
+		m.setMessage(msg);
+		controleurMessages.put(uri, new Vector<StringData>());
+		controleurMessages.get(uri).add(m);
+		sendMessage(uri);
 	}
 
 	@Override
@@ -189,7 +254,7 @@ public class Controleur extends AbstractComponent implements IControleurOffered,
 			this.stringDataOutPort.get(appareilURI).publishPort();
 		}
 	}
-	
+
 	public void plug(String uriCible, String in, String out) throws Exception {
 		this.stringDataInPort.put(uriCible, new ControleurStringDataInPort(in, this));
 		this.addPort(stringDataInPort.get(uriCible));
