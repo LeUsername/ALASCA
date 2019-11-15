@@ -3,7 +3,7 @@ package interfaces.appareils.incontrolables;
 import interfaces.IStringDataOffered;
 
 /**
- * L'interface <code>ISecheCheveuxOffered</code> qui permet à un composant
+ * L'interface <code>ISecheCheveuxOffered</code> qui permet a un composant
  * SecheCheveux d'envoyer des messages
  * 
  * <p>

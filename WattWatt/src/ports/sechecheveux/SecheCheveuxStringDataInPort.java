@@ -5,7 +5,7 @@ import ports.StringDataInPort;
 
 /**
  * La classe <code>SecheCheveuxStringDataInPort</code> qui represente le port du
- * Seche cheveux par lequel vont etre envoyer des message de type StringData
+ * Seche cheveux par lequel vont etre envoyees des message de type StringData
  * 
  * <p>
  * Created on : 2019-11-06

@@ -1,7 +1,7 @@
 package interfaces;
 
 /**
- * L'interface <code>IControleurOffered</code> qui permet à un composant
+ * L'interface <code>IControleurOffered</code> qui permet a un composant
  * Controleur d'envoyer des messages
  * <p>
  * Created on : 2019-10-19

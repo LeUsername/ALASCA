@@ -10,7 +10,7 @@ import interfaces.ICompteurRequired;
 
 /**
  * La classe <code>CompteurStringDataOutPort</code> qui represente le port du
- * Compteur par lequel vont etre recu des message de type StringData
+ * Compteur par lequel vont etre recues des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19

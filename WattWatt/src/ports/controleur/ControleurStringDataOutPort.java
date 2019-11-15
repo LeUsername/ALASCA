@@ -11,7 +11,7 @@ import interfaces.IControleurRequired;
 
 /**
  * La classe <code>ControleurStringDataOutPort</code> qui represente le port du
- * Controleur par lequel vont etre recu des message de type StringData
+ * Controleur par lequel vont etre recues des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19

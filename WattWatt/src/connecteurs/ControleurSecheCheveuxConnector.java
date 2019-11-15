@@ -7,7 +7,7 @@ import interfaces.IControleurOffered;
 import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
 
 /**
- * La classe <code>ControleurSecheCheveuxConnector</code> qui creer une connexion du Controleur au Seche Cheveux
+ * La classe <code>ControleurSecheCheveuxConnector</code> qui cree une connexion du Controleur au Seche cheveux
  * 
  * <p>
  * Created on : 2019-11-06

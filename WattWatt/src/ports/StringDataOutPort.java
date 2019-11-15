@@ -10,7 +10,7 @@ import interfaces.IStringDataRequired;
 
 /**
  * La classe <code>StringDataOutPort</code> qui represente le port par lequel
- * vont etre recu des message de type StringData
+ * vont etre recues des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19

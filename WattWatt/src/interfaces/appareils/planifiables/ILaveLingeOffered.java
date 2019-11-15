@@ -3,7 +3,7 @@ package interfaces.appareils.planifiables;
 import interfaces.IStringDataOffered;
 
 /**
- * L'interface <code>ILaveLingeOffered</code> qui permet à un composant
+ * L'interface <code>ILaveLingeOffered</code> qui permet a un composant
  * LaveLinge d'envoyer des messages
  * 
  * <p>

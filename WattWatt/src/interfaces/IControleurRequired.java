@@ -1,7 +1,7 @@
 package interfaces;
 
 /**
- * L'interface <code>IControleurRequired</code> qui permet à un composant
+ * L'interface <code>IControleurRequired</code> qui permet a un composant
  * Controleur de recuperer des messages
  * <p>
  * Created on : 2019-10-09

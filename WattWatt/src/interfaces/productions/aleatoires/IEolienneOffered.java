@@ -3,7 +3,7 @@ package interfaces.productions.aleatoires;
 import interfaces.IStringDataOffered;
 
 /**
- * L'interface <code>IEolienneOffered</code> qui permet à un composant
+ * L'interface <code>IEolienneOffered</code> qui permet a un composant
  * eolienne de recevoir des messages
  * 
  * <p>

@@ -8,7 +8,7 @@ import interfaces.appareils.planifiables.ILaveLingeOffered;
 
 /**
  * La classe <code>LaveLingeStringDataInPort</code> qui represente le port du
- * lave linge par lequel vont etre envoyer des message de type StringData
+ * lave linge par lequel vont etre envoyees des message de type StringData
  * 
  * <p>
  * Created on : 2019-11-07

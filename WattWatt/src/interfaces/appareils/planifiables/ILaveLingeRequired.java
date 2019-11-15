@@ -3,7 +3,7 @@ package interfaces.appareils.planifiables;
 import interfaces.IStringDataRequired;
 
 /**
- * L'interface <code>ILaveLingeRequired</code> qui permet à un composant
+ * L'interface <code>ILaveLingeRequired</code> qui permet a un composant
  * LaveLinge de recuperer des messages
  * 
  * <p>

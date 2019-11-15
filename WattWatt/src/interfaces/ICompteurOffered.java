@@ -1,7 +1,7 @@
 package interfaces;
 
 /**
- * L'interface <code>ICompteurOffered</code> qui permet à un composant
+ * L'interface <code>ICompteurOffered</code> qui permet a un composant
  * Compteur d'envoyer des messages
  * <p>
  * Created on : 2019-10-19

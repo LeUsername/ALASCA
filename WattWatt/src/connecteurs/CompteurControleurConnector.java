@@ -8,7 +8,7 @@ import interfaces.IControleurRequired;
 
 
 /**
- * La classe <code>CompteurControleurConnector</code> qui creer une connexion du Compteur au Controleur
+ * La classe <code>CompteurControleurConnector</code> qui cree une connexion du Compteur au Controleur
  * 
  * <p>
  * Created on : 2019-10-19

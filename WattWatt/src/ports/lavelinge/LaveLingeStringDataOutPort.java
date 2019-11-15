@@ -10,7 +10,7 @@ import interfaces.appareils.planifiables.ILaveLingeRequired;
 
 /**
  * La classe <code>LaveLingeStringDataOutPort</code> qui represente le port du
- * lave linge par lequel vont etre recu des message de type StringData
+ * lave linge par lequel vont etre recues des message de type StringData
  * 
  * <p>
  * Created on : 2019-11-07

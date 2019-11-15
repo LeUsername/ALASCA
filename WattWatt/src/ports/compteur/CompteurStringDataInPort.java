@@ -8,7 +8,7 @@ import interfaces.ICompteurOffered;
 
 /**
  * La classe <code>CompteurStringDataInPort</code> qui represente le port du
- * Compteur par lequel vont etre envoyer des message de type StringData
+ * Compteur par lequel vont etre envoyees des message de type StringData
  * 
  * <p>
  * Created on : 2019-10-19

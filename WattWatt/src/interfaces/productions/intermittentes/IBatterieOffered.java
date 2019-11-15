@@ -3,7 +3,7 @@ package interfaces.productions.intermittentes;
 import interfaces.IStringDataOffered;
 
 /**
- * L'interface <code>IBatterieOffered</code> qui permet à un composant
+ * L'interface <code>IBatterieOffered</code> qui permet a un composant
  * batterie de recevoir des messages
  * 
  * <p>

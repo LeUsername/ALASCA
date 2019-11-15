@@ -13,7 +13,7 @@ import ports.lavelinge.LaveLingeStringDataOutPort;
 
 
 /**
- * La classe <code>Eolienne</code>
+ * La classe <code>Lave linge</code>
  * 
  * <p>
  * Created on : 2019-11-09

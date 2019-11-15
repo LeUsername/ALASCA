@@ -4,7 +4,7 @@ import data.StringData;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
 
 /**
- * L'interface <code>IAppareil</code>
+ * L'interface <code>IStringDataOffered</code> qui permet l'envoi de messages
  * 
  * <p>
  * Created on : 2019-10-02

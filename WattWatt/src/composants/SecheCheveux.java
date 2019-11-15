@@ -12,7 +12,7 @@ import ports.sechecheveux.SecheCheveuxStringDataInPort;
 import ports.sechecheveux.SecheCheveuxStringDataOutPort;
 
 /**
- * La classe <code>SecheCheveux</code>
+ * La classe <code>Seche cheveux</code>
  * 
  * <p>
  * Created on : 2019-11-09

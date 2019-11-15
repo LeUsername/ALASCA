@@ -3,7 +3,7 @@ package interfaces.productions.intermittentes;
 import interfaces.IStringDataRequired;
 
 /**
- * L'interface <code>IBatterieRequired</code> qui permet à un composant
+ * L'interface <code>IBatterieRequired</code> qui permet a un composant
  * batterie d'envoyer des messages
  * 
  * <p>

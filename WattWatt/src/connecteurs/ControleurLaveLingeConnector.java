@@ -7,7 +7,7 @@ import interfaces.IControleurOffered;
 import interfaces.appareils.planifiables.ILaveLingeRequired;
 
 /**
- * La classe <code>ControleurLaveLingeConnector</code> qui creer une connexion du Controleur au Lave Linge
+ * La classe <code>ControleurLaveLingeConnector</code> qui cree une connexion du Controleur au Lave linge
  * 
  * <p>
  * Created on : 2019-11-07

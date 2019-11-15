@@ -3,7 +3,7 @@ package interfaces.appareils.incontrolables;
 import interfaces.IStringDataRequired;
 
 /**
- * L'interface <code>ISecheCheveuxRequired</code> qui permet à un composant
+ * L'interface <code>ISecheCheveuxRequired</code> qui permet a un composant
  * Seche cheveux de recuperer des messages
  * 
  * <p>

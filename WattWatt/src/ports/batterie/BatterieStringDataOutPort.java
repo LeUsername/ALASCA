@@ -1,8 +1,19 @@
 package ports.batterie;
 
 import fr.sorbonne_u.components.ComponentI;
-import ports.StringDataOutPort;
 
+import ports.StringDataOutPort;
+/**
+ * La classe <code>BatterieStringDataOutPort</code> qui represente le port de la batterie
+ * par lequel vont etre recues des message de type StringData
+ * 
+ * <p>
+ * Created on : 2019-11-15
+ * </p>
+ * 
+ * @author 3408625
+ *
+ */
 public class BatterieStringDataOutPort extends StringDataOutPort {
 
 	/**

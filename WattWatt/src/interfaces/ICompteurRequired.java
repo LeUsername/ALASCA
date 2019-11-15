@@ -1,7 +1,7 @@
 package interfaces;
 
 /**
- * L'interface <code>ICompteurRequired</code> qui permet à un composant Compteur
+ * L'interface <code>ICompteurRequired</code> qui permet a un composant Compteur
  * de recuperer des messages
  * 
  * <p>
