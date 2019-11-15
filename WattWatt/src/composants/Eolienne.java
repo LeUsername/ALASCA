@@ -140,6 +140,7 @@ public class Eolienne extends AbstractComponent implements IEolienneRequired, IS
 	@Override
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Eolienne shutdown");
+		timer.cancel();
 		try {
 			stringDataOutPort.unpublishPort();
 			stringDataInPort.unpublishPort();
