@@ -46,7 +46,7 @@ import connecteurs.StringDataConnector;
 
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
-// a modifier pour adpater au nouveau constructeur
+// a modifier pour adapter au nouveau constructeur
 public class CVM extends AbstractCVM {
 	/**
 	 * URI of the reflection inbound port of the concurrent map component.

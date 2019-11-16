@@ -30,7 +30,7 @@ import ports.StringDataOutPort;
  * @author Zheng Pascal - Bah Thierno
  *
  */
-public class Controleur extends AbstractComponent implements IStringDataOffered, IStringDataRequired{
+public class Controleur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
 	/**
 	 * Les ports par lesquels le controleur envoie des donnees representees par la
@@ -65,7 +65,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	protected Vector<String> uris;
 
 	/**
-	 * Cet entier vas servir a stocker les informations recues du compteur
+	 * Cet entier va servir a stocker les informations recues du compteur
 	 */
 	public int consommation = 0;
 
@@ -87,6 +87,32 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		updateURI();
 	}
 
+	/**
+	 * create a passive component if both <code>nbThreads</code> and
+	 * <code>nbSchedulableThreads</code> are both zero, and an active one with
+	 * <code>nbThreads</code> non schedulable thread and
+	 * <code>nbSchedulableThreads</code> schedulable threads otherwise.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	reflectionInboundPortURI != null
+	 * pre	nbThreads &gt;= 0
+	 * pre	nbSchedulableThreads &gt;= 0
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
+	 * @throws Exception
+	 */
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
 		this.stringDataInPort = new HashMap<>();
@@ -188,6 +214,28 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		super.finalise();
 	}
 
+	/**
+	 * Creer une connexion entre <code> uriCible </code> et l'appareil
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uriCible != null
+	 * pre	in != null
+	 * pre	out != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
+	 * @throws Exception
+	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
 		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
 		this.addPort(stringDataInPort.get(uriCible));
@@ -217,6 +265,15 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 
 	}
 
+	/**
+	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
+	 * 
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message à envoyer
+	 * @throws Exception
+	 */
 	public void envoieString(String uri, String msg) throws Exception {
 		StringData m = new StringData();
 		m.setMessage(msg);
@@ -233,6 +290,11 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		return m;
 	}
 
+	/**
+	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
+	 * 
+	 * @throws Exception
+	 */
 	public void updateURI() throws Exception {
 		for (String appareilURI : uris) {
 			String randomURIPort = java.util.UUID.randomUUID().toString();

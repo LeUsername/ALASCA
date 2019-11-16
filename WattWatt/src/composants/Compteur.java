@@ -17,17 +17,18 @@ import ports.StringDataInPort;
 import ports.StringDataOutPort;
 
 /**
- * La classe <code>Compteur</code> qui reprensente le compteur electrique
+ * La classe <code>Compteur</code> qui represente le compteur electrique. Cette
+ * classe de recuperer la consommation electrique totale du manoir.
  * 
  * <p>
  * Created on : 2019-10-17
  * </p>
  * 
- * @author 3408625
+ * @author Thierno BAH, Pascal ZHENG
  *
  */
 
-public class Compteur extends AbstractComponent implements IStringDataOffered, IStringDataRequired{
+public class Compteur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
 	/**
 	 * Les ports par lesquels le compteur envoie des donnees representees par la
@@ -71,6 +72,32 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	 */
 	int val = 0;
 
+	/**
+	 * create a passive component if both <code>nbThreads</code> and
+	 * <code>nbSchedulableThreads</code> are both zero, and an active one with
+	 * <code>nbThreads</code> non schedulable thread and
+	 * <code>nbSchedulableThreads</code> schedulable threads otherwise.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	reflectionInboundPortURI != null
+	 * pre	nbThreads &gt;= 0
+	 * pre	nbSchedulableThreads &gt;= 0
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
+	 * @throws Exception
+	 */
 	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 		URI = reflectionInboundPortURI;
@@ -122,6 +149,28 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		super.finalise();
 	}
 
+	/**
+	 * Creer une connexion entre <code> uriCible </code> et l'appareil
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uriCible != null
+	 * pre	in != null
+	 * pre	out != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
+	 * @throws Exception
+	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
 		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
 		this.addPort(stringDataInPort.get(uriCible));
@@ -143,6 +192,15 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		}
 	}
 
+	/**
+	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
+	 * 
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message à envoyer
+	 * @throws Exception
+	 */
 	public void envoieString(String uri, String msg) throws Exception {
 		StringData m = new StringData();
 		m.setMessage(msg);
@@ -159,6 +217,18 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		return m;
 	}
 
+	/**
+	 * Classe permettant d'envoyer a intervalles reguliers la consommation
+	 * electrique de la propriete. Elle herite donc de TimerTask pour simuler ces
+	 * intervalles.
+	 * 
+	 * <p>
+	 * Created on : 2019-11-16
+	 * </p>
+	 * 
+	 * @author Thierno BAH, Pascal ZHENG
+	 *
+	 */
 	class CompteurInformationTask extends TimerTask {
 		Compteur v;
 
