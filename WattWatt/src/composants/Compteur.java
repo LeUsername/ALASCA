@@ -1,23 +1,23 @@
 package composants;
 
-import interfaces.ICompteurOffered;
-import interfaces.ICompteurRequired;
-
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ports.compteur.CompteurStringDataInPort;
-import ports.compteur.CompteurStringDataOutPort;
 import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import interfaces.IStringDataOffered;
+import interfaces.IStringDataRequired;
+import ports.StringDataInPort;
+import ports.StringDataOutPort;
 
 /**
- * La classe <code>Compteur</code>
+ * La classe <code>Compteur</code> qui reprensente le compteur electrique
  * 
  * <p>
  * Created on : 2019-10-17
@@ -27,22 +27,19 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
  *
  */
 
-public class Compteur extends AbstractComponent implements ICompteurOffered,
-		ICompteurRequired {
-
-	int val = 0;
+public class Compteur extends AbstractComponent implements IStringDataOffered, IStringDataRequired{
 
 	/**
-	 * Le port par lequel le compteur recoit des donnees representees par la
+	 * Les ports par lesquels le compteur envoie des donnees representees par la
 	 * classe StringData
 	 */
-	public CompteurStringDataOutPort stringDataOutPort;
+	public HashMap<String, StringDataInPort> stringDataInPort;
 
 	/**
-	 * Les ports par lesquels on envoie des messages: on fait la difference
-	 * entre StringData et CompteurData pour le moment
+	 * Les ports par lesquels le compteur recoit des donnees representees par la
+	 * classe StringData
 	 */
-	public CompteurStringDataInPort stringDataInPort;
+	public HashMap<String, StringDataOutPort> stringDataOutPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -54,44 +51,38 @@ public class Compteur extends AbstractComponent implements ICompteurOffered,
 	 */
 	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
 
+	/**
+	 * URI du composant
+	 */
+	public String URI;
+
+	/**
+	 * Objet permettant de declencher un comportement
+	 */
 	protected Timer timer = new Timer();
+
+	/**
+	 * Pour l'instant la valeur du compteur est decider aléatoirement
+	 */
 	protected Random rand = new Random();
 
-	public Compteur(String reflectionInboundPortURI, int nbThreads,
-			int nbSchedulableThreads) throws Exception {
+	/**
+	 * Represente la consomation electrique actuel
+	 */
+	int val = 0;
+
+	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-		String randomURI = java.util.UUID.randomUUID().toString();
-
-		stringDataOutPort = new CompteurStringDataOutPort(randomURI, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new CompteurStringDataInPort(randomURI, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
-
-	}
-
-	public Compteur(String reflectionInboundPortURI, int nbThreads,
-			int nbSchedulableThreads, String in, String out) throws Exception {
-		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-		stringDataOutPort = new CompteurStringDataOutPort(out, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		stringDataInPort = new CompteurStringDataInPort(in, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
+		URI = reflectionInboundPortURI;
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
 	}
 
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
+		this.logMessage("Compteur starting");
 		val = 900 + rand.nextInt(1000);
-
 	}
 
 	@Override
@@ -100,42 +91,16 @@ public class Compteur extends AbstractComponent implements ICompteurOffered,
 	}
 
 	@Override
-	public void getMessage(StringData msg) throws Exception {
-		messages_recus.add(msg);
-		this.logMessage(" Compteur recoit : "
-				+ messages_recus.remove(0).getMessage());
-		switch (msg.getMessage()) {
-		case "value":
-			String message = "compteur" + ":total:" + this.val;
-			StringData sD = new StringData();
-			sD.setMessage(message);
-			messages_envoyes.put("controleur", new Vector<StringData>());
-			messages_envoyes.get("controleur").add(sD);
-			try {
-				sendMessage("controleur");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-
-	}
-
-	@Override
-	public StringData sendMessage(String uri) throws Exception {
-		StringData m = messages_envoyes.get(uri).get(0);
-		messages_envoyes.get(uri).remove(m);
-		this.stringDataInPort.send(m);
-		return m;
-	}
-
-	@Override
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Compteur shutdown");
 		timer.cancel();
 		try {
-			stringDataOutPort.unpublishPort();
-			stringDataInPort.unpublishPort();
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -144,9 +109,54 @@ public class Compteur extends AbstractComponent implements ICompteurOffered,
 
 	@Override
 	public void finalise() throws Exception {
-		stringDataInPort.unpublishPort();
-		stringDataOutPort.unpublishPort();
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		super.finalise();
+	}
+
+	public void plug(String uriCible, String in, String out) throws Exception {
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+
+	@Override
+	public void getMessage(StringData msg) throws Exception {
+		messages_recus.add(msg);
+		this.logMessage(" Compteur recoit : " + messages_recus.remove(0).getMessage());
+		switch (msg.getMessage()) {
+		case "value":
+			String message = "compteur" + ":total:" + this.val;
+			envoieString("controleur", message);
+			break;
+		}
+	}
+
+	public void envoieString(String uri, String msg) throws Exception {
+		StringData m = new StringData();
+		m.setMessage(msg);
+		messages_envoyes.put(uri, new Vector<StringData>());
+		messages_envoyes.get(uri).add(m);
+		sendMessage(uri);
+	}
+
+	@Override
+	public StringData sendMessage(String uri) throws Exception {
+		StringData m = messages_envoyes.get(uri).get(0);
+		messages_envoyes.get(uri).remove(m);
+		this.stringDataInPort.get(uri).send(m);
+		return m;
 	}
 
 	class CompteurInformationTask extends TimerTask {
@@ -157,18 +167,12 @@ public class Compteur extends AbstractComponent implements ICompteurOffered,
 		}
 
 		public void run() {
-
 			String message = "compteur" + ":total:" + this.v.val;
 			this.v.val = 900 + rand.nextInt(1000);
-
-			StringData sD = new StringData();
-			sD.setMessage(message);
-			messages_envoyes.put("controleur", new Vector<StringData>());
-			messages_envoyes.get("controleur").add(sD);
 			try {
-				v.sendMessage("controleur");
-			} catch (Exception e) {
-				e.printStackTrace();
+				this.v.envoieString("controleur", message);
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 		}
 	}

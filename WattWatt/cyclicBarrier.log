@@ -1,113 +1,78 @@
-1573855358357|DCVM Cyclic Barrier up and running!
-1573855368974|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855368976|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855381928|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855381929|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855394725|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855394726|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855406834|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855406835|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855426318|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855426319|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855439221|All connected!
-1573855439226|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855439229|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855439229|DCVM Cyclic Barrier releases 6 sites.
-1573855439293|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855439294|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855439355|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855439356|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855439373|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855439377|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855439379|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855439386|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855439388|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855439390|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855439391|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855439399|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855439399|DCVM Cyclic Barrier releases 6 sites.
-1573855442396|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855442397|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855442401|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855442407|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855442413|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855442414|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855442416|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855442417|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855442448|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855442449|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855442821|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855442822|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855442822|DCVM Cyclic Barrier releases 6 sites.
-1573855443045|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855443046|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855443121|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855443122|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855443311|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855443313|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855443321|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855443322|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855443462|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855443463|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855443620|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855443621|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855443621|DCVM Cyclic Barrier releases 6 sites.
-1573855443630|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855443631|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855443633|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855443634|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855443635|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855443635|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855443637|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855443638|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855443670|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855443671|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855443688|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855443689|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855443689|DCVM Cyclic Barrier releases 6 sites.
-1573855493739|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855493740|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855493746|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855493746|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855493768|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855493769|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855493785|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855493786|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855493793|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855493793|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855493848|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855493851|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855493851|DCVM Cyclic Barrier releases 6 sites.
-1573855494148|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855494149|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855494150|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855494151|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855494157|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855494157|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855494159|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855494161|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855494161|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855494162|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855494818|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855494819|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855494819|DCVM Cyclic Barrier releases 6 sites.
-1573855494876|DCVM Cyclic Barrier accepts: batterie localhost 57987
-1573855494877|DCVM Cyclic Barrier has received 1 out of 6 expected.
-1573855494881|DCVM Cyclic Barrier accepts: eolienne localhost 57985
-1573855494882|DCVM Cyclic Barrier accepts: secheCheveux localhost 57983
-1573855494885|DCVM Cyclic Barrier has received 2 out of 6 expected.
-1573855494893|DCVM Cyclic Barrier has received 3 out of 6 expected.
-1573855494903|DCVM Cyclic Barrier accepts: laveLinge localhost 57984
-1573855494905|DCVM Cyclic Barrier has received 4 out of 6 expected.
-1573855494910|DCVM Cyclic Barrier accepts: compteur localhost 57982
-1573855494911|DCVM Cyclic Barrier has received 5 out of 6 expected.
-1573855494952|DCVM Cyclic Barrier accepts: controleur localhost 57986
-1573855494953|DCVM Cyclic Barrier has received 6 out of 6 expected.
-1573855494953|DCVM Cyclic Barrier releases 6 sites.
-1573855494961|DCVMCyclicBarrier.run() finished.
-1573855494961|DCVMCyclicBarrier.run() finished.
-1573855494961|DCVMCyclicBarrier.run() finished.
-1573855494961|DCVMCyclicBarrier.run() finished.
-1573855494961|DCVMCyclicBarrier.run() finished.
-1573855494962|DCVMCyclicBarrier.run() finished.
-1573855494962|DCVM Cyclic Barrier shuts down!
+1573907899317|DCVM Cyclic Barrier up and running!
+1573907912904|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907912905|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907922338|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907922339|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907934032|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907934033|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907943281|All connected!
+1573907943282|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907943283|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907943283|DCVM Cyclic Barrier releases 4 sites.
+1573907943287|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907943288|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907943306|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907943307|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907943307|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907943308|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907943347|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907943347|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907943347|DCVM Cyclic Barrier releases 4 sites.
+1573907944107|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907944107|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907944127|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907944128|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907944151|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907944151|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907944339|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907944339|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907944339|DCVM Cyclic Barrier releases 4 sites.
+1573907944521|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907944521|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907944608|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907944609|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907944696|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907944697|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907944963|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907944963|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907944963|DCVM Cyclic Barrier releases 4 sites.
+1573907944967|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907944968|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907944969|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907944969|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907944975|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907944976|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907945023|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907945023|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907945023|DCVM Cyclic Barrier releases 4 sites.
+1573907995068|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907995068|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907995068|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907995069|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907995070|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907995111|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907995111|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907995111|DCVM Cyclic Barrier releases 4 sites.
+1573907995419|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907995419|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907995423|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907995423|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907995423|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907995424|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907995823|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907995823|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907995823|DCVM Cyclic Barrier releases 4 sites.
+1573907995867|DCVM Cyclic Barrier accepts: eolienne localhost 53674
+1573907995868|DCVM Cyclic Barrier has received 1 out of 4 expected.
+1573907995868|DCVM Cyclic Barrier accepts: compteur localhost 53670
+1573907995869|DCVM Cyclic Barrier has received 2 out of 4 expected.
+1573907995873|DCVM Cyclic Barrier accepts: batterie localhost 53672
+1573907995873|DCVM Cyclic Barrier has received 3 out of 4 expected.
+1573907995915|DCVM Cyclic Barrier accepts: controleur localhost 53668
+1573907995915|DCVM Cyclic Barrier has received 4 out of 4 expected.
+1573907995915|DCVM Cyclic Barrier releases 4 sites.
+1573907995916|DCVMCyclicBarrier.run() finished.
+1573907995916|DCVMCyclicBarrier.run() finished.
+1573907995916|DCVMCyclicBarrier.run() finished.
+1573907995917|DCVMCyclicBarrier.run() finished.
+1573907995917|DCVM Cyclic Barrier shuts down!

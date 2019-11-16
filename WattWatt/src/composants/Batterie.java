@@ -1,5 +1,6 @@
 package composants;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -9,93 +10,72 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import interfaces.productions.intermittentes.IBatterieOffered;
-import interfaces.productions.intermittentes.IBatterieRequired;
-import ports.batterie.BatterieStringDataInPort;
-import ports.batterie.BatterieStringDataOutPort;
+import interfaces.IStringDataOffered;
+import interfaces.IStringDataRequired;
+import ports.StringDataInPort;
+import ports.StringDataOutPort;
 
 /**
- * La classe <code>Batterie</code>
+ * La classe <code>Batterie</code> represente dans notre application une source
+ * d'energie fiable mais limitee par sa capacite
  * 
  * <p>
  * Created on : 2019-10-17
  * </p>
  * 
- * @author 3408625
+ * @author Thierno BAH, Pascal ZHENG
  *
  */
 
-public class Batterie extends AbstractComponent implements IBatterieOffered, IBatterieRequired {
+public class Batterie extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
+	/**
+	 * Les ports par lesquels la Batterie envoie des donnees representees par la
+	 * classe StringData
+	 */
+	public HashMap<String, StringDataInPort> stringDataInPort;
+
+	/**
+	 * Les ports par lesquels la Batterie recoit des donnees representees par la
+	 * classe StringData
+	 */
+	public HashMap<String, StringDataOutPort> stringDataOutPort;
+
+	/**
+	 * La liste des messages recues, representees par la classe StringData
+	 */
+	protected Vector<StringData> messages_recus = new Vector<>();
+
+	/**
+	 * La liste des messages a envoyer, representees par la classe StringData.
+	 */
+	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
 
 	/**
 	 * URI du composant
 	 */
 	public String URI;
-	
-	/**
-	 * Le port par lequel la batterie recoit des donnees representees par la classe
-	 * StringData
-	 */
-	public BatterieStringDataOutPort stringDataOutPort;
 
 	/**
-	 * Les ports par lesquels on envoie des messages
-	 */
-	public BatterieStringDataInPort stringDataInPort;
-
-	/**
-	 * La liste des messages recues, representees par la classe StringData.
-	 */
-	protected Vector<StringData> messages_recus = new Vector<>();
-
-	/**
-	 * La liste des messages a envoyer
-	 */
-	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
-
-	/**
-	 * Variables representant les capacites actuelle et maximale de la batterie
+	 * Variables representant les capacites actuelles et maximales de la batterie,
+	 * ainsi que son activite
 	 */
 	protected int quantite;
 	protected int quantiteMax;
-	protected Timer timer = new Timer();
 	protected boolean isOn;
+
+	/**
+	 * Objet permettant de declencher un comportement
+	 */
+	protected Timer timer = new Timer();
 
 	public Batterie(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, int quantiteMax)
 			throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
+
 		URI = reflectionInboundPortURI;
 
-		String randomURI = java.util.UUID.randomUUID().toString();
-
-		stringDataOutPort = new BatterieStringDataOutPort(randomURI, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new BatterieStringDataInPort(randomURI, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
-
-		this.quantite = 0;
-		this.quantiteMax = quantiteMax;
-	}
-
-	public Batterie(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, int quantiteMax, String in,
-			String out) throws Exception {
-		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
-		URI = reflectionInboundPortURI;
-		
-		stringDataOutPort = new BatterieStringDataOutPort(out, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		stringDataInPort = new BatterieStringDataInPort(in, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
-		
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
 		this.quantite = 0;
 		this.quantiteMax = quantiteMax;
 	}
@@ -103,11 +83,11 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.logMessage("Batterie started");
+		this.logMessage("Batterie starting");
 		this.runTask(new AbstractTask() {
 			public void run() {
 				try {
-					Thread.sleep(500);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -121,7 +101,48 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		super.execute();
 	}
 
-	public void print() {
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Batterie shutdown");
+		timer.cancel();
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+
+	@Override
+	public void finalise() throws Exception {
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.finalise();
+	}
+
+	public void plug(String uriCible, String in, String out) throws Exception {
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+
+	public void printValue() {
 		this.logMessage(String.valueOf(quantite));
 	}
 
@@ -139,16 +160,12 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		case "discharge":
 			isOn = false;
 			this.logMessage("La batterie est éteinte");
-			timer.schedule(new DechargeTask(this), 0, 1000);
+			timer.schedule(new DechargeTask(this), 0, 5000);
 			break;
 		case "value":
 			String message = "Batterie à :" + quantite + " sur " + quantiteMax;
-			StringData sD = new StringData();
-			sD.setMessage(message);
-			messages_envoyes.put("controleur", new Vector<StringData>());
-			messages_envoyes.get("controleur").add(sD);
 			this.logMessage(message);
-			this.sendMessage("controleur");
+			envoieString("controleur", message);
 			break;
 		case "shutdown":
 			shutdown();
@@ -157,32 +174,20 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		}
 	}
 
+	public void envoieString(String uri, String msg) throws Exception {
+		StringData m = new StringData();
+		m.setMessage(msg);
+		messages_envoyes.put(uri, new Vector<StringData>());
+		messages_envoyes.get(uri).add(m);
+		sendMessage(uri);
+	}
+
 	@Override
 	public StringData sendMessage(String uri) throws Exception {
 		StringData m = messages_envoyes.get(uri).get(0);
 		messages_envoyes.get(uri).remove(m);
-		this.stringDataInPort.send(m);
+		this.stringDataInPort.get(uri).send(m);
 		return m;
-	}
-
-	@Override
-	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Batterie shutdown");
-		try {
-			stringDataOutPort.unpublishPort();
-			stringDataInPort.unpublishPort();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.shutdown();
-	}
-	
-	@Override
-	public void finalise() throws Exception {
-		stringDataInPort.unpublishPort();
-		stringDataOutPort.unpublishPort();
-
-		super.finalise();
 	}
 
 	class ChargeTask extends TimerTask {
@@ -195,18 +200,13 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		public void run() {
 			if (v.isOn && v.quantite < v.quantiteMax) {
 				v.quantite++;
-				v.print();
+				v.printValue();
 			}
 			if (v.quantite == v.quantiteMax) {
 				String message = URI + ":charge:100";
-				StringData sD = new StringData();
-				sD.setMessage(message);
-				messages_envoyes.put("controleur", new Vector<StringData>());
-				messages_envoyes.get("controleur").add(sD);
 				try {
-					v.sendMessage("controleur");
+					v.envoieString("controleur", message);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -223,7 +223,7 @@ public class Batterie extends AbstractComponent implements IBatterieOffered, IBa
 		public void run() {
 			if (v.quantite > 0) {
 				v.quantite--;
-				v.print();
+				v.printValue();
 			}
 		}
 	}

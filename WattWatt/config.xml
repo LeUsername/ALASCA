@@ -23,13 +23,5 @@
         rmiRegistryCreator="false"
         hostname="localhost"
         mainclass="src.tests.DistributedCVM"/>
-      <jvm2hostname jvmuri="laveLinge"
-        rmiRegistryCreator="false"
-        hostname="localhost"
-        mainclass="src.tests.DistributedCVM"/>
-      <jvm2hostname jvmuri="secheCheveux"
-        rmiRegistryCreator="false"
-        hostname="localhost"
-        mainclass="src.tests.DistributedCVM"/>
   </jvms2hostnames>
 </deployment>

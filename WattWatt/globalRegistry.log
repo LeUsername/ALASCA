@@ -1,97 +1,58 @@
-1573855352000|Registry up and running!
-1573855440656|GlobalRegistry processing put controleur rmi=localhost
-1573855440770|GlobalRegistry processing put batterie rmi=localhost
-1573855440800|GlobalRegistry processing put eolienne rmi=localhost
-1573855440804|GlobalRegistry processing put inPortCont rmi=localhost
-1573855440852|GlobalRegistry processing put compteur rmi=localhost
-1573855440870|GlobalRegistry processing put laveLinge rmi=localhost
-1573855440907|All connected!
-1573855440917|GlobalRegistry processing put secheCheveux rmi=localhost
-1573855440924|GlobalRegistry processing put outPortCont rmi=localhost
-1573855440948|GlobalRegistry processing put outPortBat rmi=localhost
-1573855440965|GlobalRegistry processing put outPortEol rmi=localhost
-1573855440980|GlobalRegistry processing put inPortCont2 rmi=localhost
-1573855441033|GlobalRegistry processing put outPortCpt rmi=localhost
-1573855441044|GlobalRegistry processing put outPortLav rmi=localhost
-1573855441064|GlobalRegistry processing put outPortCont2 rmi=localhost
-1573855441081|GlobalRegistry processing put outPortSec rmi=localhost
-1573855441144|GlobalRegistry processing put inPortBat rmi=localhost
-1573855441152|GlobalRegistry processing put inPortLav rmi=localhost
-1573855441181|GlobalRegistry processing put inPortCpt rmi=localhost
-1573855441195|GlobalRegistry processing put inPortSec rmi=localhost
-1573855441324|GlobalRegistry processing put outPortCont3 rmi=localhost
-1573855441341|GlobalRegistry processing put inPortEol rmi=localhost
-1573855441416|GlobalRegistry processing put inPortCont4 rmi=localhost
-1573855441499|GlobalRegistry processing put outPortCont4 rmi=localhost
-1573855441589|GlobalRegistry processing put inPortCont5 rmi=localhost
-1573855441668|GlobalRegistry processing put outPortCont5 rmi=localhost
-1573855442141|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-58078bba-52e5-40a7-8b65-b98f4a91e8ea rmi=localhost
-1573855442240|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-4b7880c1-61af-464f-a04b-2fea80a85e30 rmi=localhost
-1573855442257|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-50fd4e48-b979-43fd-9bbe-b43b02d602b5 rmi=localhost
-1573855442268|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-710d24c5-3da1-4bba-b4aa-7c116d61f705 rmi=localhost
-1573855442279|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-eaed6d61-cee1-4498-990e-0ff949748e21 rmi=localhost
-1573855442293|GlobalRegistry processing put eolienne-dcc rmi=localhost
-1573855442349|GlobalRegistry processing put batterie-dcc rmi=localhost
-1573855442409|GlobalRegistry processing put compteur-dcc rmi=localhost
-1573855442413|GlobalRegistry processing put laveLinge-dcc rmi=localhost
-1573855442713|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-cecb7621-a501-4d72-a7a1-ec4de2f2b742 rmi=localhost
-1573855442776|GlobalRegistry processing put controleur-dcc rmi=localhost
-1573855442832|GlobalRegistry processing lookup outPortCont2
-1573855442872|GlobalRegistry processing lookup outPortCont4
-1573855442872|GlobalRegistry processing lookup outPortCont5
-1573855442872|GlobalRegistry processing lookup outPortCont3
-1573855442878|GlobalRegistry processing lookup outPortCont
-1573855442895|GlobalRegistry processing lookup outPortCpt
-1573855442980|GlobalRegistry processing lookup inPortSec
-1573855442992|GlobalRegistry processing lookup inPortCont
-1573855443077|GlobalRegistry processing lookup inPortLav
-1573855443156|GlobalRegistry processing lookup inPortBat
-1573855443244|GlobalRegistry processing lookup inPortEol
-1573855443328|GlobalRegistry processing lookup outPortEol
-1573855443413|GlobalRegistry processing lookup inPortCpt
-1573855443417|GlobalRegistry processing lookup inPortCont2
-1573855443492|GlobalRegistry processing lookup outPortBat
-1573855443573|GlobalRegistry processing lookup inPortCont3
-1573855493900|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-cecb7621-a501-4d72-a7a1-ec4de2f2b742
-1573855493900|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-58078bba-52e5-40a7-8b65-b98f4a91e8ea
-1573855493905|GlobalRegistry processing remove inPortSec
-1573855493905|GlobalRegistry processing remove inPortCpt
-1573855493908|GlobalRegistry processing remove inPortLav
-1573855493909|GlobalRegistry processing remove inPortBat
-1573855493944|GlobalRegistry processing remove outPortSec
-1573855493944|GlobalRegistry processing remove inPortEol
-1573855493945|GlobalRegistry processing remove outPortCpt
-1573855493948|GlobalRegistry processing remove outPortLav
-1573855493948|GlobalRegistry processing remove outPortBat
-1573855493948|GlobalRegistry processing remove outPortCont4
-1573855494024|GlobalRegistry processing remove secheCheveux
-1573855494024|GlobalRegistry processing remove compteur
-1573855494029|GlobalRegistry processing remove laveLinge
-1573855494032|GlobalRegistry processing remove outPortCont
-1573855494033|GlobalRegistry processing remove batterie
-1573855494108|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-710d24c5-3da1-4bba-b4aa-7c116d61f705
-1573855494108|GlobalRegistry processing remove eolienne
-1573855494108|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-50fd4e48-b979-43fd-9bbe-b43b02d602b5
-1573855494108|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-eaed6d61-cee1-4498-990e-0ff949748e21
-1573855494118|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-4b7880c1-61af-464f-a04b-2fea80a85e30
-1573855494119|GlobalRegistry processing remove outPortCont5
-1573855494204|GlobalRegistry processing remove outPortCont2
-1573855494284|GlobalRegistry processing remove outPortCont3
-1573855494364|GlobalRegistry processing remove inPortCont4
-1573855494449|GlobalRegistry processing remove inPortCont
-1573855494529|GlobalRegistry processing remove inPortCont5
-1573855494613|GlobalRegistry processing remove inPortCont2
-1573855494692|GlobalRegistry processing remove inPortCont3
-1573855494777|GlobalRegistry processing remove controleur
-1573855494869|GlobalRegistry processing remove controleur-dcc
-1573855494872|GlobalRegistry processing remove batterie-dcc
-1573855494880|GlobalRegistry processing remove secheCheveux-dcc
-1573855494892|GlobalRegistry processing remove laveLinge-dcc
-1573855494897|GlobalRegistry processing remove compteur-dcc
-1573855494998|GlobalRegistry processing shutdown
-1573855494999|GlobalRegistry processing shutdown
-1573855495001|GlobalRegistry processing shutdown
-1573855495001|GlobalRegistry processing shutdown
-1573855495002|GlobalRegistry processing shutdown
-1573855495011|GlobalRegistry processing shutdown
-1573855495020|Global registry shuts down!
+1573907897589|Registry up and running!
+1573907943524|GlobalRegistry processing put controleur rmi=localhost
+1573907943595|GlobalRegistry processing put inPortCont rmi=localhost
+1573907943612|GlobalRegistry processing put eolienne rmi=localhost
+1573907943612|GlobalRegistry processing put compteur rmi=localhost
+1573907943612|All connected!
+1573907943612|GlobalRegistry processing put batterie rmi=localhost
+1573907943671|GlobalRegistry processing put inPortBat rmi=localhost
+1573907943675|GlobalRegistry processing put inPortCpt rmi=localhost
+1573907943691|GlobalRegistry processing put outPortCont rmi=localhost
+1573907943775|GlobalRegistry processing put outPortEol rmi=localhost
+1573907943778|GlobalRegistry processing put inPortCont2 rmi=localhost
+1573907943783|GlobalRegistry processing put outPortBat rmi=localhost
+1573907943791|GlobalRegistry processing put outPortCpt rmi=localhost
+1573907943867|GlobalRegistry processing put outPortCont2 rmi=localhost
+1573907943955|GlobalRegistry processing put inPortCont3 rmi=localhost
+1573907943999|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-1ed22adb-400d-40d7-940d-54cd5026e62d rmi=localhost
+1573907944003|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-27e50d63-5f48-4949-b205-cddb82536cb5 rmi=localhost
+1573907944027|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-a83095bc-6cbe-47cf-9159-639bf2540c19 rmi=localhost
+1573907944043|GlobalRegistry processing put outPortCont3 rmi=localhost
+1573907944063|GlobalRegistry processing put batterie-dcc rmi=localhost
+1573907944063|GlobalRegistry processing put eolienne-dcc rmi=localhost
+1573907944079|GlobalRegistry processing put compteur-dcc rmi=localhost
+1573907944247|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-129297c5-932e-4be5-be50-f36b9640baad rmi=localhost
+1573907944295|GlobalRegistry processing put controleur-dcc rmi=localhost
+1573907944387|GlobalRegistry processing lookup outPortCpt
+1573907944387|GlobalRegistry processing lookup outPortCont3
+1573907944474|GlobalRegistry processing lookup inPortEol
+1573907944483|GlobalRegistry processing lookup inPortCont
+1573907944563|GlobalRegistry processing lookup inPortCpt
+1573907944651|GlobalRegistry processing lookup inPortBat
+1573907944739|GlobalRegistry processing lookup outPortEol
+1573907944827|GlobalRegistry processing lookup inPortCont2
+1573907944871|GlobalRegistry processing lookup outPortBat
+1573907944915|GlobalRegistry processing lookup inPortCont3
+1573907995155|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-1ed22adb-400d-40d7-940d-54cd5026e62d
+1573907995155|GlobalRegistry processing remove outPortCpt
+1573907995155|GlobalRegistry processing remove outPortEol
+1573907995199|GlobalRegistry processing remove inPortCpt
+1573907995199|GlobalRegistry processing remove inPortEol
+1573907995203|GlobalRegistry processing remove outPortCont
+1573907995286|GlobalRegistry processing remove compteur
+1573907995286|GlobalRegistry processing remove eolienne
+1573907995290|GlobalRegistry processing remove inPortBat
+1573907995295|GlobalRegistry processing remove outPortCont2
+1573907995375|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-a83095bc-6cbe-47cf-9159-639bf2540c19
+1573907995378|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-27e50d63-5f48-4949-b205-cddb82536cb5
+1573907995378|GlobalRegistry processing remove batterie
+1573907995382|GlobalRegistry processing remove outPortCont3
+1573907995471|GlobalRegistry processing remove inPortCont
+1573907995559|GlobalRegistry processing remove inPortCont2
+1573907995647|GlobalRegistry processing remove inPortCont3
+1573907995735|GlobalRegistry processing remove controleur
+1573907995867|GlobalRegistry processing remove batterie-dcc
+1573907995867|GlobalRegistry processing remove controleur-dcc
+1573907995959|GlobalRegistry processing shutdown
+1573907995963|GlobalRegistry processing shutdown
+1573907995963|Global registry shuts down!

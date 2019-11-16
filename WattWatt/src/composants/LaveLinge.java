@@ -7,10 +7,10 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import interfaces.appareils.planifiables.ILaveLingeOffered;
-import interfaces.appareils.planifiables.ILaveLingeRequired;
-import ports.lavelinge.LaveLingeStringDataInPort;
-import ports.lavelinge.LaveLingeStringDataOutPort;
+import interfaces.IStringDataOffered;
+import interfaces.IStringDataRequired;
+import ports.StringDataInPort;
+import ports.StringDataOutPort;
 
 
 /**
@@ -24,19 +24,19 @@ import ports.lavelinge.LaveLingeStringDataOutPort;
  *
  */
 
-public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, ILaveLingeOffered {
+public class LaveLinge extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
 	/**
 	 * Le port par lequel le lave linge recoit des donnees representees par la
 	 * classe StringData
 	 */
-	public LaveLingeStringDataOutPort stringDataOutPort;
+	public StringDataOutPort stringDataOutPort;
 
 	/**
 	 * Les ports par lesquels on envoie des messages: on fait la difference entre
 	 * StringData et CompteurData pour le moment
 	 */
-	public LaveLingeStringDataInPort stringDataInPort;
+	public StringDataInPort stringDataInPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -53,12 +53,12 @@ public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, 
 
 		String randomURI = java.util.UUID.randomUUID().toString();
 
-		stringDataOutPort = new LaveLingeStringDataOutPort(randomURI, this);
+		stringDataOutPort = new StringDataOutPort(randomURI, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
 
 		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new LaveLingeStringDataInPort(randomURI, this);
+		stringDataInPort = new StringDataInPort(randomURI, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 
@@ -68,11 +68,11 @@ public class LaveLinge extends AbstractComponent implements ILaveLingeRequired, 
 			throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
-		stringDataOutPort = new LaveLingeStringDataOutPort(out, this);
+		stringDataOutPort = new StringDataOutPort(out, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
 
-		stringDataInPort = new LaveLingeStringDataInPort(in, this);
+		stringDataInPort = new StringDataInPort(in, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 	}

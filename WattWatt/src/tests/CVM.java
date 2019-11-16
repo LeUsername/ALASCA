@@ -46,6 +46,7 @@ import connecteurs.StringDataConnector;
 
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
+// a modifier pour adpater au nouveau constructeur
 public class CVM extends AbstractCVM {
 	/**
 	 * URI of the reflection inbound port of the concurrent map component.
@@ -87,7 +88,7 @@ public class CVM extends AbstractCVM {
 		uris.add(BATTERIE_URI);
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0, uris);
-		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);
+		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);	
 		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
 		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
 		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0);
@@ -108,8 +109,8 @@ public class CVM extends AbstractCVM {
 		this.toggleTracing(BATTERIE_URI);
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(COMPTEUR_URI).getPortURI(),
-				this.cpt.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.getPortURI(),
+				this.cpt.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(COMPTEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
@@ -126,14 +127,14 @@ public class CVM extends AbstractCVM {
 				StringDataConnector.class.getCanonicalName());
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(EOLIENNE_URI).getPortURI(),
-				this.eolienne.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-		this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort.getPortURI(),
+				this.eolienne.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(EOLIENNE_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(BATTERIE_URI).getPortURI(),
-				this.batterie.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-		this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort.getPortURI(),
+				this.batterie.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(BATTERIE_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 

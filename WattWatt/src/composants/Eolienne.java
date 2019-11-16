@@ -1,5 +1,7 @@
 package composants;
 
+import java.util.HashMap;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -9,13 +11,13 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
-import interfaces.productions.aleatoires.IEolienneRequired;
-import ports.eolienne.EolienneStringDataInPort;
-import ports.eolienne.EolienneStringDataOutPort;
+import interfaces.IStringDataOffered;
+import interfaces.IStringDataRequired;
+import ports.StringDataInPort;
+import ports.StringDataOutPort;
 
 /**
- * La classe <code>Eolienne</code>
+ * La classe <code>Eolienne</code> qui represente le composant Eolienne
  * 
  * <p>
  * Created on : 2019-11-09
@@ -25,18 +27,18 @@ import ports.eolienne.EolienneStringDataOutPort;
  *
  */
 
-public class Eolienne extends AbstractComponent implements IEolienneRequired, ISecheCheveuxOffered {
+public class Eolienne extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 	/**
-	 * Le port par lequel l'eolienne recoit des donnees representees par la classe
-	 * StringData
+	 * Les ports par lesquels l'eolienne envoie des donnees representees par la
+	 * classe StringData
 	 */
-	public EolienneStringDataOutPort stringDataOutPort;
+	public HashMap<String, StringDataInPort> stringDataInPort;
 
 	/**
-	 * Les ports par lesquels on recoit des messages
+	 * Les ports par lesquels l'eolienne recoit des donnees representees par la
+	 * classe StringData
 	 */
-	public EolienneStringDataInPort stringDataInPort;
-
+	public HashMap<String, StringDataOutPort> stringDataOutPort;
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
 	 */
@@ -48,60 +50,83 @@ public class Eolienne extends AbstractComponent implements IEolienneRequired, IS
 	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
 
 	/**
-	 * 
+	 * URI du composant
 	 */
-	protected boolean isOn = false;
+	public String URI;
+
 	protected Timer timer = new Timer();
+	protected boolean isOn = false;
+	protected int val = 0;
+	protected Random rand = new Random();
 
 	public Eolienne(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-		String randomURI = java.util.UUID.randomUUID().toString();
-
-		stringDataOutPort = new EolienneStringDataOutPort(randomURI, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new EolienneStringDataInPort(randomURI, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
-
-	}
-
-	public Eolienne(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out)
-			throws Exception {
-		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-		stringDataOutPort = new EolienneStringDataOutPort(out, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		stringDataInPort = new EolienneStringDataInPort(in, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
+		URI = reflectionInboundPortURI;
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
 	}
 
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
+		this.logMessage("Eolienne starting");
 		this.runTask(new AbstractTask() {
 			public void run() {
 				try {
-					Thread.sleep(10);
-					System.out.println("ici");
-					String msg = "hello je suis EOLIENNE";
-					StringData m = new StringData();
-					m.setMessage(msg);
-					messages_envoyes.put("controleur", new Vector<StringData>());
-					messages_envoyes.get("controleur").add(m);
-					sendMessage("controleur");
-					Thread.sleep(10);
+					Thread.sleep(100);
+					String msg = "hello je suis eolienne";
+					envoieString("controleur", msg);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+
+	@Override
+	public void execute() throws Exception {
+		super.execute();
+	}
+
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Eolienne shutdown");
+		timer.cancel();
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+
+	@Override
+	public void finalise() throws Exception {
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.finalise();
+	}
+
+	public void plug(String uriCible, String in, String out) throws Exception {
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
 	@Override
@@ -129,38 +154,26 @@ public class Eolienne extends AbstractComponent implements IEolienneRequired, IS
 		}
 	}
 
+	public void envoieString(String uri, String msg) throws Exception {
+		StringData m = new StringData();
+		m.setMessage(msg);
+		messages_envoyes.put(uri, new Vector<StringData>());
+		messages_envoyes.get(uri).add(m);
+		sendMessage(uri);
+	}
+
 	@Override
 	public StringData sendMessage(String uri) throws Exception {
 		StringData m = messages_envoyes.get(uri).get(0);
 		messages_envoyes.get(uri).remove(m);
-		this.stringDataInPort.send(m);
+		this.stringDataInPort.get(uri).send(m);
 		return m;
-	}
-
-	@Override
-	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Eolienne shutdown");
-		timer.cancel();
-		try {
-			stringDataOutPort.unpublishPort();
-			stringDataInPort.unpublishPort();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.shutdown();
-	}
-	
-	@Override
-	public void finalise() throws Exception {
-		stringDataInPort.unpublishPort();
-		stringDataOutPort.unpublishPort();
-
-		super.finalise();
 	}
 
 	public void print() {
 		// Il faut faire un truc de prod plus realiste
-		this.logMessage("Eolienne tourne: production de X kW");
+		this.val += rand.nextInt(10);
+		this.logMessage("Eolienne tourne: production de " + this.val + " kW");
 	}
 
 	class ProductionTask extends TimerTask {

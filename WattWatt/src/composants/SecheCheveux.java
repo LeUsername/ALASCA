@@ -7,10 +7,10 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import interfaces.appareils.incontrolables.ISecheCheveuxOffered;
-import interfaces.appareils.incontrolables.ISecheCheveuxRequired;
-import ports.sechecheveux.SecheCheveuxStringDataInPort;
-import ports.sechecheveux.SecheCheveuxStringDataOutPort;
+import interfaces.IStringDataOffered;
+import interfaces.IStringDataRequired;
+import ports.StringDataInPort;
+import ports.StringDataOutPort;
 
 /**
  * La classe <code>Seche cheveux</code>
@@ -23,19 +23,19 @@ import ports.sechecheveux.SecheCheveuxStringDataOutPort;
  *
  */
 
-public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequired, ISecheCheveuxOffered {
+public class SecheCheveux extends AbstractComponent implements IStringDataOffered, IStringDataRequired{
 
 	/**
 	 * Le port par lequel le compteur recoit des donnees representees par la classe
 	 * StringData
 	 */
-	public SecheCheveuxStringDataOutPort stringDataOutPort;
+	public StringDataOutPort stringDataOutPort;
 
 	/**
 	 * Les ports par lesquels on envoie des messages: on fait la difference entre
 	 * StringData et CompteurData pour le moment
 	 */
-	public SecheCheveuxStringDataInPort stringDataInPort;
+	public StringDataInPort stringDataInPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -52,12 +52,12 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 
 		String randomURI = java.util.UUID.randomUUID().toString();
 
-		stringDataOutPort = new SecheCheveuxStringDataOutPort(randomURI, this);
+		stringDataOutPort = new StringDataOutPort(randomURI, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
 
 		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new SecheCheveuxStringDataInPort(randomURI, this);
+		stringDataInPort = new StringDataInPort(randomURI, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 	}
@@ -66,11 +66,11 @@ public class SecheCheveux extends AbstractComponent implements ISecheCheveuxRequ
 			throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
-		stringDataOutPort = new SecheCheveuxStringDataOutPort(out, this);
+		stringDataOutPort = new StringDataOutPort(out, this);
 		this.addPort(stringDataOutPort);
 		stringDataOutPort.publishPort();
 
-		stringDataInPort = new SecheCheveuxStringDataInPort(in, this);
+		stringDataInPort = new StringDataInPort(in, this);
 		this.addPort(stringDataInPort);
 		stringDataInPort.publishPort();
 	}
