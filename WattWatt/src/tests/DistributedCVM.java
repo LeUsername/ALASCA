@@ -58,7 +58,8 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	int quantiteMaxBatterie = 10;
 
-	public DistributedCVM(String[] args, int xLayout, int yLayout) throws Exception {
+	public DistributedCVM(String[] args, int xLayout, int yLayout)
+			throws Exception {
 		super(args, xLayout, yLayout);
 		uris.add(COMPTEUR_URI);
 		uris.add(EOLIENNE_URI);
@@ -94,18 +95,21 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.toggleTracing(EOLIENNE_URI);
 
 		} else if (thisJVMURI.equals(BATTERIE_URI)) {
-			this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie);
+			this.batterie = new Batterie(BATTERIE_URI, 1, 0,
+					quantiteMaxBatterie);
 			this.batterie.plug(CONTROLLEUR_URI, inportBat, outportBat);
 			this.addDeployedComponent(BATTERIE_URI, batterie);
 			this.toggleTracing(BATTERIE_URI);
 
 		} else if (thisJVMURI.equals(LAVE_LINGE_URI)) {
 			this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
+			this.laveLinge.plug(CONTROLLEUR_URI, inportLav, outportLav);
 			this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
 			this.toggleTracing(LAVE_LINGE_URI);
 
 		} else if (thisJVMURI.equals(REFRIGERATEUR_URI)) {
 			this.refrigerateur = new Refrigerateur(REFRIGERATEUR_URI, 1, 0);
+			this.refrigerateur.plug(CONTROLLEUR_URI, inportRef, outportRef);
 			this.addDeployedComponent(REFRIGERATEUR_URI, refrigerateur);
 			this.toggleTracing(REFRIGERATEUR_URI);
 
@@ -134,35 +138,45 @@ public class DistributedCVM extends AbstractDistributedCVM {
 		assert this.isIntantiatedAndPublished();
 
 		if (thisJVMURI.equals(CONTROLLEUR_URI)) {
-			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(COMPTEUR_URI).getPortURI(),
-					this.outportCpt, StringDataConnector.class.getCanonicalName());
-			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(EOLIENNE_URI).getPortURI(),
-					this.outportEol, StringDataConnector.class.getCanonicalName());
-			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(BATTERIE_URI).getPortURI(),
-					this.outportBat, StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort
+					.get(COMPTEUR_URI).getPortURI(), this.outportCpt,
+					StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort
+					.get(EOLIENNE_URI).getPortURI(), this.outportEol,
+					StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort
+					.get(BATTERIE_URI).getPortURI(), this.outportBat,
+					StringDataConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(COMPTEUR_URI)) {
-			this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
-					this.outportCont, StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(
+					COMPTEUR_URI,
+					this.cpt.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
+					this.outportCont,
+					StringDataConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(EOLIENNE_URI)) {
-			this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
-					this.outportCont2, StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort
+					.get(CONTROLLEUR_URI).getPortURI(), this.outportCont2,
+					StringDataConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(BATTERIE_URI)) {
-			this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
-					this.outportCont3, StringDataConnector.class.getCanonicalName());
+			this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort
+					.get(CONTROLLEUR_URI).getPortURI(), this.outportCont3,
+					StringDataConnector.class.getCanonicalName());
 
-		}
-		else if (thisJVMURI.equals(LAVE_LINGE_URI)) {
-			this.doPortConnection(LAVE_LINGE_URI, this.laveLinge.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(), this.outportCont4,
+		} else if (thisJVMURI.equals(LAVE_LINGE_URI)) {
+			this.doPortConnection(LAVE_LINGE_URI,
+					this.laveLinge.stringDataInPort.get(CONTROLLEUR_URI)
+							.getPortURI(), this.outportCont4,
 					StringDataConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(REFRIGERATEUR_URI)) {
-			this.doPortConnection(REFRIGERATEUR_URI, this.refrigerateur.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(), this.outportCont5,
+			this.doPortConnection(REFRIGERATEUR_URI,
+					this.refrigerateur.stringDataInPort.get(CONTROLLEUR_URI)
+							.getPortURI(), this.outportCont5,
 					StringDataConnector.class.getCanonicalName());
-		}
-		else {
+		} else {
 
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 

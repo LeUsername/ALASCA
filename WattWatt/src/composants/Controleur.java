@@ -216,7 +216,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		tasks.add(laveLingeTask);
 		tasks.add(frigoTask);
 
-		ExecutorService threads = Executors.newFixedThreadPool(3);
+		ExecutorService threads = Executors.newFixedThreadPool(5);
 		for (Runnable t : tasks)
 			threads.execute(t);
 	}
