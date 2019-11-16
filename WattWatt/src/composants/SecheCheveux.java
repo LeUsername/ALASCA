@@ -138,4 +138,23 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 
 		super.finalise();
 	}
+	
+	/**
+	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
+	 * 
+	 * @throws Exception
+	 */
+	public void updateURI() throws Exception {
+		for (String appareilURI : uris) {
+			String randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataInPort.put(appareilURI, new StringDataInPort(randomURIPort, this));
+			this.addPort(stringDataInPort.get(appareilURI));
+			this.stringDataInPort.get(appareilURI).publishPort();
+
+			randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataOutPort.put(appareilURI, new StringDataOutPort(randomURIPort, this));
+			this.addPort(stringDataOutPort.get(appareilURI));
+			this.stringDataOutPort.get(appareilURI).publishPort();
+		}
+	}
 }

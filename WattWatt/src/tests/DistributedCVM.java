@@ -176,7 +176,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 		try {
 			DistributedCVM da = new DistributedCVM(args, 2, 5);
 			da.startStandardLifeCycle(50000L);
-			Thread.sleep(75000L);
+			Thread.sleep(50000L);
 			System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

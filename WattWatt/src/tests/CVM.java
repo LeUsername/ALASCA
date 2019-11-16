@@ -59,6 +59,7 @@ public class CVM extends AbstractCVM {
 	protected String BATTERIE_URI = "batterie";
 
 	protected Vector<String> uris = new Vector<>();
+	protected Vector<String> uris2 = new Vector<>();
 
 	Controleur cont;
 	Compteur cpt;
@@ -83,28 +84,30 @@ public class CVM extends AbstractCVM {
 		// --------------------------------------------------------------------
 		uris.add(COMPTEUR_URI);
 		uris.add(EOLIENNE_URI);
-		uris.add(LAVE_LINGE_URI);
-		uris.add(SECHE_CHEVEUX_URI);
+//		uris.add(LAVE_LINGE_URI);
+//		uris.add(SECHE_CHEVEUX_URI);
 		uris.add(BATTERIE_URI);
+		
+		uris2.add(CONTROLLEUR_URI);
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0, uris);
-		this.cpt = new Compteur(COMPTEUR_URI, 1, 0);	
-		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
-		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
-		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0);
-		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie);
+		this.cpt = new Compteur(COMPTEUR_URI, 1, 0,uris2);	
+//		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
+//		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
+		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0,uris2);
+		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie,uris2);
 
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);
-		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
-		this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
+//		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
+//		this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
 		this.addDeployedComponent(EOLIENNE_URI, eolienne);
 		this.addDeployedComponent(BATTERIE_URI, batterie);
 
 		this.toggleTracing(CONTROLLEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
-		this.toggleTracing(SECHE_CHEVEUX_URI);
-		this.toggleTracing(LAVE_LINGE_URI);
+//		this.toggleTracing(SECHE_CHEVEUX_URI);
+//		this.toggleTracing(LAVE_LINGE_URI);
 		this.toggleTracing(EOLIENNE_URI);
 		this.toggleTracing(BATTERIE_URI);
 
@@ -114,17 +117,17 @@ public class CVM extends AbstractCVM {
 				this.cont.stringDataOutPort.get(COMPTEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
-		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(SECHE_CHEVEUX_URI).getPortURI(),
-				this.secheCheveux.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-		this.doPortConnection(SECHE_CHEVEUX_URI, this.secheCheveux.stringDataInPort.getPortURI(),
-				this.cont.stringDataOutPort.get(SECHE_CHEVEUX_URI).getPortURI(),
-				StringDataConnector.class.getCanonicalName());
-
-		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(LAVE_LINGE_URI).getPortURI(),
-				this.laveLinge.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-		this.doPortConnection(LAVE_LINGE_URI, this.laveLinge.stringDataInPort.getPortURI(),
-				this.cont.stringDataOutPort.get(LAVE_LINGE_URI).getPortURI(),
-				StringDataConnector.class.getCanonicalName());
+//		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(SECHE_CHEVEUX_URI).getPortURI(),
+//				this.secheCheveux.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
+//		this.doPortConnection(SECHE_CHEVEUX_URI, this.secheCheveux.stringDataInPort.getPortURI(),
+//				this.cont.stringDataOutPort.get(SECHE_CHEVEUX_URI).getPortURI(),
+//				StringDataConnector.class.getCanonicalName());
+//
+//		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(LAVE_LINGE_URI).getPortURI(),
+//				this.laveLinge.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
+//		this.doPortConnection(LAVE_LINGE_URI, this.laveLinge.stringDataInPort.getPortURI(),
+//				this.cont.stringDataOutPort.get(LAVE_LINGE_URI).getPortURI(),
+//				StringDataConnector.class.getCanonicalName());
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(EOLIENNE_URI).getPortURI(),
 				this.eolienne.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());

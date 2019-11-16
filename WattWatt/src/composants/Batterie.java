@@ -10,6 +10,7 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IStringDataOffered;
 import interfaces.IStringDataRequired;
 import ports.StringDataInPort;
@@ -62,6 +63,11 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 	protected int quantite;
 	protected int quantiteMax;
 	protected boolean isOn;
+	
+	/**
+	 * Liste des uris
+	 */
+	protected Vector<String> uris;
 
 	/**
 	 * Objet permettant de declencher un comportement
@@ -107,6 +113,19 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataOutPort = new HashMap<>();
 		this.quantite = 0;
 		this.quantiteMax = quantiteMax;
+	}
+	
+	public Batterie(String uri, int nbThreads, int nbSchedulableThreads, int quantiteMax,Vector<String> uris) throws Exception {
+		super(uri, nbThreads, nbSchedulableThreads);
+		this.URI = uri;
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
+		this.uris = uris;
+		this.quantite = 0;
+		this.quantiteMax = quantiteMax;
+		updateURI();
 	}
 
 	@Override
@@ -251,6 +270,25 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		messages_envoyes.get(uri).remove(m);
 		this.stringDataInPort.get(uri).send(m);
 		return m;
+	}
+	
+	/**
+	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
+	 * 
+	 * @throws Exception
+	 */
+	public void updateURI() throws Exception {
+		for (String appareilURI : uris) {
+			String randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataInPort.put(appareilURI, new StringDataInPort(randomURIPort, this));
+			this.addPort(stringDataInPort.get(appareilURI));
+			this.stringDataInPort.get(appareilURI).publishPort();
+
+			randomURIPort = java.util.UUID.randomUUID().toString();
+			this.stringDataOutPort.put(appareilURI, new StringDataOutPort(randomURIPort, this));
+			this.addPort(stringDataOutPort.get(appareilURI));
+			this.stringDataOutPort.get(appareilURI).publishPort();
+		}
 	}
 
 	/**
