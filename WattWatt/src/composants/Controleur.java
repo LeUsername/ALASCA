@@ -70,11 +70,19 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	public int consommation = 0;
 
 	/**
+	 * Cet entier va servir a stocker les informations recues des unites de
+	 * production
+	 */
+	public int production = 0;
+
+	/**
 	 * Boolean qui permet de verifier si la communication est possible vers les
 	 * composants sous nommés
 	 */
 	public boolean eolienneFonctionne = true;
 	public boolean compteurFonctionne = true;
+	public boolean laveLingeFonctionne = true;
+	public boolean refrigerateurFonctionne = true;
 
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads, Vector<String> uris) throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
@@ -104,13 +112,12 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
@@ -165,9 +172,49 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 			}
 		};
 
+		Runnable laveLingeTask = new Runnable() {
+			public void run() {
+				try {
+					envoieString("laveLinge", "hello from controleur");
+					Random r = new Random();
+					while (laveLingeFonctionne) {
+						int value = r.nextInt(1000);
+						if (value > 950)
+							envoieString("laveLinge", "retard");
+						else if (value < 50)
+							envoieString("laveLinge", "avance");
+						Thread.sleep(25000);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		Runnable frigoTask = new Runnable() {
+			public void run() {
+				try {
+					envoieString("refrigerateur", "switchOn");
+					while (refrigerateurFonctionne) {
+						// Si la consommation est trop elevee
+						if (consommation > production + 100) {
+							envoieString("refrigerateur", "suspend");
+						} else {
+							envoieString("refrigerateur", "resume");
+						}
+						Thread.sleep(5000);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
 		tasks.add(compteurTask);
 		tasks.add(eolienneTask);
 		tasks.add(batterieTask);
+		tasks.add(laveLingeTask);
+		tasks.add(frigoTask);
 
 		ExecutorService threads = Executors.newFixedThreadPool(3);
 		for (Runnable t : tasks)
@@ -185,6 +232,8 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		this.logMessage("Controleur shutdown");
 		eolienneFonctionne = false;
 		compteurFonctionne = false;
+		refrigerateurFonctionne = false;
+		laveLingeFonctionne = false;
 		try {
 			for (String s : stringDataOutPort.keySet()) {
 				stringDataOutPort.get(s).unpublishPort();
@@ -228,12 +277,9 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -261,6 +307,8 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 			if (messageSplit[1].equals("total")) {
 				consommation = Integer.valueOf(messageSplit[2]);
 			}
+		} else if (messageSplit[0].equals("eolienne")) {
+			production = Integer.valueOf(messageSplit[1]);
 		}
 
 	}
@@ -268,10 +316,8 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

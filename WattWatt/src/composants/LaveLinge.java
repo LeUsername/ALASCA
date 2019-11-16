@@ -1,5 +1,8 @@
 package composants;
 
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,11 +10,11 @@ import data.StringData;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.interfaces.DataOfferedI;
 import interfaces.IStringDataOffered;
 import interfaces.IStringDataRequired;
 import ports.StringDataInPort;
 import ports.StringDataOutPort;
-
 
 /**
  * La classe <code>Lave linge</code>
@@ -27,16 +30,16 @@ import ports.StringDataOutPort;
 public class LaveLinge extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
 	/**
-	 * Le port par lequel le lave linge recoit des donnees representees par la
-	 * classe StringData
-	 */
-	public StringDataOutPort stringDataOutPort;
-
-	/**
 	 * Les ports par lesquels on envoie des messages: on fait la difference entre
 	 * StringData et CompteurData pour le moment
 	 */
-	public StringDataInPort stringDataInPort;
+	public HashMap<String, StringDataInPort> stringDataInPort;
+
+	/**
+	 * Les port par lesquels le lave linge recoit des donnees representees par la
+	 * classe StringData
+	 */
+	public HashMap<String, StringDataOutPort> stringDataOutPort;
 
 	/**
 	 * La liste des messages recues, representees par la classe StringData.
@@ -48,33 +51,67 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	 */
 	protected ConcurrentHashMap<String, Vector<StringData>> messages_envoyes = new ConcurrentHashMap<>();
 
+	/**
+	 * URI du composant
+	 */
+	public String URI;
+
+	/**
+	 * Liste des uris
+	 */
+	protected Vector<String> uris;
+
+	/**
+	 * Objet permettant de declencher un comportement
+	 */
+	protected Timer timer = new Timer();
+
+	/**
+	 * Boolean qui permet de savoir si le lave linge
+	 */
+	boolean occupe = false;
+
+	/**
+	 * create a passive component if both <code>nbThreads</code> and
+	 * <code>nbSchedulableThreads</code> are both zero, and an active one with
+	 * <code>nbThreads</code> non schedulable thread and
+	 * <code>nbSchedulableThreads</code> schedulable threads otherwise.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	reflectionInboundPortURI != null
+	 * pre	nbThreads &gt;= 0
+	 * pre	nbSchedulableThreads &gt;= 0
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
+	 * @throws Exception
+	 */
 	public LaveLinge(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-		String randomURI = java.util.UUID.randomUUID().toString();
-
-		stringDataOutPort = new StringDataOutPort(randomURI, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		randomURI = java.util.UUID.randomUUID().toString();
-		stringDataInPort = new StringDataInPort(randomURI, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
-
+		URI = reflectionInboundPortURI;
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
 	}
-	
-	public LaveLinge(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, String in, String out)
-			throws Exception {
-		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
 
-		stringDataOutPort = new StringDataOutPort(out, this);
-		this.addPort(stringDataOutPort);
-		stringDataOutPort.publishPort();
-
-		stringDataInPort = new StringDataInPort(in, this);
-		this.addPort(stringDataInPort);
-		stringDataInPort.publishPort();
+	public LaveLinge(String uri, int nbThreads, int nbSchedulableThreads, Vector<String> uris) throws Exception {
+		super(uri, nbThreads, nbSchedulableThreads);
+		this.URI = uri;
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		this.stringDataInPort = new HashMap<>();
+		this.stringDataOutPort = new HashMap<>();
+		this.uris = uris;
+		updateURI();
 	}
 
 	@Override
@@ -96,42 +133,122 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 				}
 			}
 		});
+		timer.schedule(new LaveLingeTask(this), 5000, 50000);
+	}
+
+	@Override
+	public void execute() throws Exception {
+		super.execute();
+	}
+
+	@Override
+	public void shutdown() throws ComponentShutdownException {
+		this.logMessage("Lave linge shutdown");
+		timer.cancel();
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.shutdown();
+	}
+
+	@Override
+	public void finalise() throws Exception {
+		try {
+			for (String s : stringDataOutPort.keySet()) {
+				stringDataOutPort.get(s).unpublishPort();
+			}
+			for (String s : stringDataInPort.keySet()) {
+				stringDataInPort.get(s).unpublishPort();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		super.finalise();
+	}
+
+	/**
+	 * Creer une connexion entre <code> uriCible </code> et l'appareil
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uriCible != null
+	 * pre	in != null
+	 * pre	out != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
+	 * @throws Exception
+	 */
+	public void plug(String uriCible, String in, String out) throws Exception {
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage("Lave linge recoit : " + messages_recus.remove(0).getMessage());
+		switch (msg.getMessage()) {
+		case "retard":
+			if (!occupe) {
+				this.logMessage("Le lave linge va se lancer dans 5000 ms");
+				Thread.sleep(5000);
+			}
+			break;
+		case "avance":
+			if (!occupe) {
+				occupe = true;
+				timer.cancel();
+				this.logMessage("Le lave linge va se lancer immediatement");
+				timer.schedule(new LaveLingeTask(this), 0, 50000);
+			}
+			break;
+		case "shutdown":
+			shutdown();
+			break;
+		}
+	}
+
+	/**
+	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
+	 * 
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
+	 * @throws Exception
+	 */
+	public void envoieString(String uri, String msg) throws Exception {
+		StringData m = new StringData();
+		m.setMessage(msg);
+		messages_envoyes.put(uri, new Vector<StringData>());
+		messages_envoyes.get(uri).add(m);
+		sendMessage(uri);
 	}
 
 	@Override
 	public StringData sendMessage(String uri) throws Exception {
 		StringData m = messages_envoyes.get(uri).get(0);
 		messages_envoyes.get(uri).remove(m);
-		this.stringDataInPort.send(m);
+		this.stringDataInPort.get(uri).send(m);
 		return m;
 	}
-	
-	@Override
-	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Lave linge shutdown");
-		try {
-			stringDataOutPort.unpublishPort();
-			stringDataInPort.unpublishPort();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		super.shutdown();
-	}
-	
-	@Override
-	public void finalise() throws Exception {
-		stringDataInPort.unpublishPort();
-		stringDataOutPort.unpublishPort();
 
-		super.finalise();
-	}
-	
 	/**
 	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
 	 * 
@@ -148,6 +265,39 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 			this.stringDataOutPort.put(appareilURI, new StringDataOutPort(randomURIPort, this));
 			this.addPort(stringDataOutPort.get(appareilURI));
 			this.stringDataOutPort.get(appareilURI).publishPort();
+		}
+	}
+
+	/**
+	 * Classe permettant de lancer le lave linge a intervalles reguliers. Elle
+	 * herite donc de TimerTask pour simuler ces intervalles.
+	 * 
+	 * <p>
+	 * Created on : 2019-11-16
+	 * </p>
+	 * 
+	 * @author Thierno BAH, Pascal ZHENG
+	 *
+	 */
+	class LaveLingeTask extends TimerTask {
+		LaveLinge l;
+
+		public LaveLingeTask(LaveLinge l) {
+			this.l = l;
+		}
+
+		@Override
+		public void run() {
+			l.occupe = true;
+			try {
+				Thread.sleep(7500);
+				l.logMessage("Le lave linge va tourner encore 7500 ms");
+				Thread.sleep(7500);
+				l.logMessage("Fin de cette machine");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			l.occupe = false;
 		}
 	}
 }

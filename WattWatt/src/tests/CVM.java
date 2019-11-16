@@ -7,6 +7,7 @@ import composants.Compteur;
 import composants.Controleur;
 import composants.Eolienne;
 import composants.LaveLinge;
+import composants.Refrigerateur;
 import composants.SecheCheveux;
 import connecteurs.StringDataConnector;
 
@@ -57,6 +58,7 @@ public class CVM extends AbstractCVM {
 	protected String LAVE_LINGE_URI = "laveLinge";
 	protected String EOLIENNE_URI = "eolienne";
 	protected String BATTERIE_URI = "batterie";
+	protected String REFRIGERATEUR_URI = "refrigerateur";
 
 	protected Vector<String> uris = new Vector<>();
 	protected Vector<String> uris2 = new Vector<>();
@@ -67,7 +69,8 @@ public class CVM extends AbstractCVM {
 	LaveLinge laveLinge;
 	Eolienne eolienne;
 	Batterie batterie;
-	
+	Refrigerateur refrigerateur;
+
 	int quantiteMaxBatterie = 10;
 
 	public CVM() throws Exception {
@@ -84,35 +87,40 @@ public class CVM extends AbstractCVM {
 		// --------------------------------------------------------------------
 		uris.add(COMPTEUR_URI);
 		uris.add(EOLIENNE_URI);
-//		uris.add(LAVE_LINGE_URI);
+		uris.add(LAVE_LINGE_URI);
 //		uris.add(SECHE_CHEVEUX_URI);
 		uris.add(BATTERIE_URI);
-		
+		uris.add(REFRIGERATEUR_URI);
+
 		uris2.add(CONTROLLEUR_URI);
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0, uris);
-		this.cpt = new Compteur(COMPTEUR_URI, 1, 0,uris2);	
+		this.cpt = new Compteur(COMPTEUR_URI, 1, 0, uris2);
 //		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
-//		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
-		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0,uris2);
-		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie,uris2);
+		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0, uris2);
+		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0, uris2);
+		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie, uris2);
+		this.refrigerateur = new Refrigerateur(REFRIGERATEUR_URI, 1, 0, uris2);
 
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);
 //		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
-//		this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
+		this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
 		this.addDeployedComponent(EOLIENNE_URI, eolienne);
 		this.addDeployedComponent(BATTERIE_URI, batterie);
+		this.addDeployedComponent(REFRIGERATEUR_URI, refrigerateur);
 
 		this.toggleTracing(CONTROLLEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
 //		this.toggleTracing(SECHE_CHEVEUX_URI);
-//		this.toggleTracing(LAVE_LINGE_URI);
+		this.toggleTracing(LAVE_LINGE_URI);
 		this.toggleTracing(EOLIENNE_URI);
 		this.toggleTracing(BATTERIE_URI);
+		this.toggleTracing(REFRIGERATEUR_URI);
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(COMPTEUR_URI).getPortURI(),
-				this.cpt.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+				this.cpt.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
 		this.doPortConnection(COMPTEUR_URI, this.cpt.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(COMPTEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
@@ -123,22 +131,32 @@ public class CVM extends AbstractCVM {
 //				this.cont.stringDataOutPort.get(SECHE_CHEVEUX_URI).getPortURI(),
 //				StringDataConnector.class.getCanonicalName());
 //
-//		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(LAVE_LINGE_URI).getPortURI(),
-//				this.laveLinge.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-//		this.doPortConnection(LAVE_LINGE_URI, this.laveLinge.stringDataInPort.getPortURI(),
-//				this.cont.stringDataOutPort.get(LAVE_LINGE_URI).getPortURI(),
-//				StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(LAVE_LINGE_URI).getPortURI(),
+				this.laveLinge.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(LAVE_LINGE_URI, this.laveLinge.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
+				this.cont.stringDataOutPort.get(LAVE_LINGE_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(EOLIENNE_URI).getPortURI(),
-				this.eolienne.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+				this.eolienne.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
 		this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(EOLIENNE_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(BATTERIE_URI).getPortURI(),
-				this.batterie.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(), StringDataConnector.class.getCanonicalName());
+				this.batterie.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
 		this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(BATTERIE_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
+		
+		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(REFRIGERATEUR_URI).getPortURI(),
+				this.refrigerateur.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(REFRIGERATEUR_URI, this.refrigerateur.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
+				this.cont.stringDataOutPort.get(REFRIGERATEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
 		super.deploy();
