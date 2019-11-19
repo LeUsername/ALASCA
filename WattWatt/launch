@@ -1,4 +1,0 @@
-#!/bin/bash
-java -Xms2m -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     src.tests.DistributedCVM config.xml
