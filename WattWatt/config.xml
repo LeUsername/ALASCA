@@ -1,7 +1,7 @@
 <deployment>
 	<hosts>
 		<host name="localhost"
-			dir="/users/Etu5/3408625/Bureau/S3/ALASCA/WattWatt/src/tests" />
+			dir="/users/Etu5/3408625/Bureau/S3/ALASCA/WattWatt/src/wattwatt/tests" />
 	</hosts>
 	<cyclicBarrier hostname="localhost" port="55253" />
 	<globalRegistry hostname="localhost" port="55252" />
