@@ -100,16 +100,21 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI URI of the inbound port offering the
-	 *                                 <code>ReflectionI</code> interface.
-	 * @param nbThreads                number of threads to be created in the
-	 *                                 component pool.
-	 * @param nbSchedulableThreads     number of threads to be created in the
-	 *                                 component schedulable pool.
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
 	 * @throws Exception
 	 */
 	public Refrigerateur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		this.tracer.setRelativePosition(2, 2);
 		URI = reflectionInboundPortURI;
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
@@ -123,23 +128,22 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.uris = uris;
+		this.tracer.setRelativePosition(2, 2);
 		updateURI();
 	}
 
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.logMessage("Refrigirateur starting");
+		this.logMessage("Refrigerateur starting");
 		this.temp = 10;
-		this.runTask(new AbstractTask() {
-			public void run() {
-				try {
-					Thread.sleep(100);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		try {
+			Thread.sleep(10);
+			String msg = "hello je suis refrigerateur";
+			envoieString("controleur", msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -193,9 +197,12 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible uri du composant a connecter
-	 * @param in       nom du DataInPort de uriCible
-	 * @param out      nom du DataOutPort de uriCible
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -246,8 +253,10 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg message Ã  envoyer
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message Ã  envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {
@@ -307,12 +316,12 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 		public void run() {
 			if (e.isOn) {
 				if (e.isWorking) {
-					e.logMessage("working at : " + e.temp + " °C");
+					e.logMessage("working at : " + e.temp + " ï¿½C");
 					if (e.temp > e.MINTemp) {
 						e.temp--;
 					}
 				} else {
-					e.logMessage("suspended : " + e.temp + " °C");
+					e.logMessage("suspended : " + e.temp + " ï¿½C");
 					if (e.temp < e.MAXTemp) {
 						e.temp++;
 					}

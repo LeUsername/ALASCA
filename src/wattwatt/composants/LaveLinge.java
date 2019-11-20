@@ -88,16 +88,21 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI URI of the inbound port offering the
-	 *                                 <code>ReflectionI</code> interface.
-	 * @param nbThreads                number of threads to be created in the
-	 *                                 component pool.
-	 * @param nbSchedulableThreads     number of threads to be created in the
-	 *                                 component schedulable pool.
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
 	 * @throws Exception
 	 */
 	public LaveLinge(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		this.tracer.setRelativePosition(2, 1);
 		URI = reflectionInboundPortURI;
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
@@ -111,28 +116,21 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.uris = uris;
+		this.tracer.setRelativePosition(2, 1);
 		updateURI();
 	}
 
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.runTask(new AbstractTask() {
-			public void run() {
-				try {
-					Thread.sleep(10);
-					String msg = "hello je suis le lave linge";
-					StringData m = new StringData();
-					m.setMessage(msg);
-					messages_envoyes.put("controleur", new Vector<StringData>());
-					messages_envoyes.get("controleur").add(m);
-					sendMessage("controleur");
-					Thread.sleep(10);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		this.logMessage("Lave linge starting");
+		try {
+			Thread.sleep(10);
+			String msg = "hello je suis lave linge";
+			envoieString("controleur", msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		timer.schedule(new LaveLingeTask(this), 5000, 50000);
 	}
 
@@ -187,9 +185,12 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible uri du composant a connecter
-	 * @param in       nom du DataInPort de uriCible
-	 * @param out      nom du DataOutPort de uriCible
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -208,7 +209,7 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 		switch (msg.getMessage()) {
 		case "retard":
 			if (!occupe) {
-				this.logMessage("Le lave linge va se lancer dans 5000 ms");
+				this.logMessage("Le lave linge est retarde de 5000 ms");
 				Thread.sleep(5000);
 			}
 			break;
@@ -229,8 +230,10 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg message à envoyer
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {
@@ -290,6 +293,7 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 		public void run() {
 			l.occupe = true;
 			try {
+				l.logMessage("Le lave linge se lance: il va etre occupe pendant 15000 ms");
 				Thread.sleep(7500);
 				l.logMessage("Le lave linge va tourner encore 7500 ms");
 				Thread.sleep(7500);

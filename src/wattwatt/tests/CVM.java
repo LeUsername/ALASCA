@@ -87,7 +87,7 @@ public class CVM extends AbstractCVM {
 		uris.add(COMPTEUR_URI);
 		uris.add(EOLIENNE_URI);
 		uris.add(LAVE_LINGE_URI);
-//		uris.add(SECHE_CHEVEUX_URI);
+		uris.add(SECHE_CHEVEUX_URI);
 		uris.add(BATTERIE_URI);
 		uris.add(REFRIGERATEUR_URI);
 
@@ -95,7 +95,7 @@ public class CVM extends AbstractCVM {
 
 		this.cont = new Controleur(CONTROLLEUR_URI, 1, 0, uris);
 		this.cpt = new Compteur(COMPTEUR_URI, 1, 0, uris2);
-//		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
+		this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0, uris2);
 		this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0, uris2);
 		this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0, uris2);
 		this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie, uris2);
@@ -103,7 +103,7 @@ public class CVM extends AbstractCVM {
 
 		this.addDeployedComponent(CONTROLLEUR_URI, cont);
 		this.addDeployedComponent(COMPTEUR_URI, cpt);
-//		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
+		this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
 		this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
 		this.addDeployedComponent(EOLIENNE_URI, eolienne);
 		this.addDeployedComponent(BATTERIE_URI, batterie);
@@ -111,7 +111,7 @@ public class CVM extends AbstractCVM {
 
 		this.toggleTracing(CONTROLLEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
-//		this.toggleTracing(SECHE_CHEVEUX_URI);
+		this.toggleTracing(SECHE_CHEVEUX_URI);
 		this.toggleTracing(LAVE_LINGE_URI);
 		this.toggleTracing(EOLIENNE_URI);
 		this.toggleTracing(BATTERIE_URI);
@@ -124,12 +124,13 @@ public class CVM extends AbstractCVM {
 				this.cont.stringDataOutPort.get(COMPTEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
 
-//		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(SECHE_CHEVEUX_URI).getPortURI(),
-//				this.secheCheveux.stringDataOutPort.getPortURI(), StringDataConnector.class.getCanonicalName());
-//		this.doPortConnection(SECHE_CHEVEUX_URI, this.secheCheveux.stringDataInPort.getPortURI(),
-//				this.cont.stringDataOutPort.get(SECHE_CHEVEUX_URI).getPortURI(),
-//				StringDataConnector.class.getCanonicalName());
-//
+		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(SECHE_CHEVEUX_URI).getPortURI(),
+				this.secheCheveux.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
+		this.doPortConnection(SECHE_CHEVEUX_URI, this.secheCheveux.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
+				this.cont.stringDataOutPort.get(SECHE_CHEVEUX_URI).getPortURI(),
+				StringDataConnector.class.getCanonicalName());
+
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(LAVE_LINGE_URI).getPortURI(),
 				this.laveLinge.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
@@ -150,7 +151,7 @@ public class CVM extends AbstractCVM {
 		this.doPortConnection(BATTERIE_URI, this.batterie.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 				this.cont.stringDataOutPort.get(BATTERIE_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());
-		
+
 		this.doPortConnection(CONTROLLEUR_URI, this.cont.stringDataInPort.get(REFRIGERATEUR_URI).getPortURI(),
 				this.refrigerateur.stringDataOutPort.get(CONTROLLEUR_URI).getPortURI(),
 				StringDataConnector.class.getCanonicalName());

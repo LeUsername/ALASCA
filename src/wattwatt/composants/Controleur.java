@@ -74,6 +74,12 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * production
 	 */
 	public int production = 0;
+	
+	/**
+	 * Cet entier va servir a stocker les informations recues des unites de
+	 * production
+	 */
+	public int batterie = 0;
 
 	/**
 	 * Boolean qui permet de verifier si la communication est possible vers les
@@ -92,6 +98,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.uris = uris;
+		this.tracer.setRelativePosition(0, 0);
 		updateURI();
 	}
 
@@ -112,18 +119,23 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI URI of the inbound port offering the
-	 *                                 <code>ReflectionI</code> interface.
-	 * @param nbThreads                number of threads to be created in the
-	 *                                 component pool.
-	 * @param nbSchedulableThreads     number of threads to be created in the
-	 *                                 component schedulable pool.
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
 	 * @throws Exception
 	 */
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
+		this.tracer.setRelativePosition(0, 0);
 	}
 
 	@Override
@@ -164,7 +176,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 							envoieString("eolienne", "switchOff");
 						else
 							envoieString("eolienne", "switchOn");
-						Thread.sleep(1000);
+						Thread.sleep(3000);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -197,12 +209,12 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 					envoieString("refrigerateur", "switchOn");
 					while (refrigerateurFonctionne) {
 						// Si la consommation est trop elevee
-						if (consommation > production + 100) {
+						if (consommation > production + 50) {
 							envoieString("refrigerateur", "suspend");
 						} else {
 							envoieString("refrigerateur", "resume");
 						}
-						Thread.sleep(5000);
+						Thread.sleep(3000);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -277,9 +289,12 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible uri du composant a connecter
-	 * @param in       nom du DataInPort de uriCible
-	 * @param out      nom du DataOutPort de uriCible
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -295,11 +310,11 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		String message = messages_recus.remove(0).getMessage();
-		this.logMessage(" Controleur recoit : " + message);
 		String[] messageSplit = message.split(":");
+		this.logMessage(" Controleur recoit : " + message);
 		if (messageSplit[0].equals("batterie")) {
 			if (messageSplit[1].equals("charge")) {
-				if (messageSplit[2].equals("100")) {
+				if (messageSplit[2].equals("100%")) {
 					envoieString("batterie", "discharge");
 				}
 			}
@@ -309,15 +324,18 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 			}
 		} else if (messageSplit[0].equals("eolienne")) {
 			production = Integer.valueOf(messageSplit[1]);
+		} else if (messageSplit[0].equals("secheCheveux")) {
+			this.logMessage(message);
 		}
-
 	}
 
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg message à envoyer
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

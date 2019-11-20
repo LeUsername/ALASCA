@@ -72,7 +72,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	 * Represente la consomation electrique actuel
 	 */
 	int val = 0;
-	
+
 	/**
 	 * Liste des uris
 	 */
@@ -106,11 +106,16 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	 */
 	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		
 		URI = reflectionInboundPortURI;
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
+		this.tracer.setRelativePosition(0, 1);
 	}
-	
+
 	public Compteur(String uri, int nbThreads, int nbSchedulableThreads, Vector<String> uris) throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
 		this.URI = uri;
@@ -119,6 +124,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.uris = uris;
+		this.tracer.setRelativePosition(0, 1);
 		updateURI();
 	}
 
@@ -126,12 +132,19 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Compteur starting");
+		try {
+			Thread.sleep(10);
+			String msg = "hello je suis le compteur";
+			envoieString("controleur", msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		val = 900 + rand.nextInt(1000);
 	}
 
 	@Override
 	public void execute() {
-		timer.schedule(new CompteurInformationTask(this), 0, 3000);
+		timer.schedule(new CompteurInformationTask(this), 0, 1499);
 	}
 
 	@Override
@@ -233,7 +246,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataInPort.get(uri).send(m);
 		return m;
 	}
-	
+
 	/**
 	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
 	 * 
@@ -274,7 +287,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 
 		public void run() {
 			String message = "compteur" + ":total:" + this.v.val;
-			this.v.val = 900 + rand.nextInt(1000);
+			this.v.val = 1000 + rand.nextInt(800);
 			try {
 				this.v.envoieString("controleur", message);
 			} catch (Exception e1) {

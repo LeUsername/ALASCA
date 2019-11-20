@@ -101,16 +101,21 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI URI of the inbound port offering the
-	 *                                 <code>ReflectionI</code> interface.
-	 * @param nbThreads                number of threads to be created in the
-	 *                                 component pool.
-	 * @param nbSchedulableThreads     number of threads to be created in the
-	 *                                 component schedulable pool.
+	 * @param reflectionInboundPortURI
+	 *            URI of the inbound port offering the <code>ReflectionI</code>
+	 *            interface.
+	 * @param nbThreads
+	 *            number of threads to be created in the component pool.
+	 * @param nbSchedulableThreads
+	 *            number of threads to be created in the component schedulable pool.
 	 * @throws Exception
 	 */
 	public Eolienne(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
+		this.tracer.setRelativePosition(1, 0);
 		URI = reflectionInboundPortURI;
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
@@ -124,6 +129,7 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.uris = uris;
+		this.tracer.setRelativePosition(1, 0);
 		updateURI();
 	}
 
@@ -131,17 +137,13 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Eolienne starting");
-		this.runTask(new AbstractTask() {
-			public void run() {
-				try {
-					Thread.sleep(100);
-					String msg = "hello je suis eolienne";
-					envoieString("controleur", msg);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		try {
+			Thread.sleep(10);
+			String msg = "hello je suis eolienne";
+			envoieString("controleur", msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -195,9 +197,12 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible uri du composant a connecter
-	 * @param in       nom du DataInPort de uriCible
-	 * @param out      nom du DataOutPort de uriCible
+	 * @param uriCible
+	 *            uri du composant a connecter
+	 * @param in
+	 *            nom du DataInPort de uriCible
+	 * @param out
+	 *            nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -219,7 +224,7 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 				isOn = true;
 				this.logMessage("Demarrage de l'eolienne");
 			}
-			timer.schedule(new ProductionTask(this), 0, 3000);
+			timer.schedule(new ProductionTask(this), 0, 1499);
 			break;
 		case "switchOff":
 			if (isOn) {
@@ -237,8 +242,10 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg message à envoyer
+	 * @param uri
+	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg
+	 *            message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {
@@ -259,7 +266,8 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 
 	/**
 	 * Affiche la production de l'eolienne
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	public void print() throws Exception {
 		// Il faut faire un truc de prod plus realiste
@@ -307,7 +315,7 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 		@Override
 		public void run() {
 			if (e.isOn) {
-				this.e.val = 1200 + rand.nextInt(500);
+				this.e.val = 1000 + rand.nextInt(1000);
 				try {
 					e.print();
 				} catch (Exception e1) {

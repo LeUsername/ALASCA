@@ -63,7 +63,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 	protected int quantite;
 	protected int quantiteMax;
 	protected boolean isOn;
-	
+
 	/**
 	 * Liste des uris
 	 */
@@ -106,16 +106,19 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 	public Batterie(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads, int quantiteMax)
 			throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		this.addOfferedInterface(IStringDataOffered.class);
+		this.addOfferedInterface(DataOfferedI.PullI.class);
 
 		URI = reflectionInboundPortURI;
-
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
 		this.quantite = 0;
 		this.quantiteMax = quantiteMax;
+		this.tracer.setRelativePosition(1, 1);
 	}
-	
-	public Batterie(String uri, int nbThreads, int nbSchedulableThreads, int quantiteMax,Vector<String> uris) throws Exception {
+
+	public Batterie(String uri, int nbThreads, int nbSchedulableThreads, int quantiteMax, Vector<String> uris)
+			throws Exception {
 		super(uri, nbThreads, nbSchedulableThreads);
 		this.URI = uri;
 		this.addOfferedInterface(IStringDataOffered.class);
@@ -125,6 +128,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.uris = uris;
 		this.quantite = 0;
 		this.quantiteMax = quantiteMax;
+		this.tracer.setRelativePosition(1, 1);
 		updateURI();
 	}
 
@@ -132,16 +136,13 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Batterie starting");
-		this.runTask(new AbstractTask() {
-			public void run() {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-		});
+		try {
+			Thread.sleep(10);
+			String msg = "hello je suis batterie";
+			envoieString("controleur", msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -271,7 +272,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataInPort.get(uri).send(m);
 		return m;
 	}
-	
+
 	/**
 	 * Methode permettant d'attribuer des DataIn et DataOut aux differentes URI
 	 * 
@@ -315,8 +316,9 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 				v.printValue();
 			}
 			if (v.quantite == v.quantiteMax) {
-				String message = URI + ":charge:100";
+				String message = URI + ":charge:100%";
 				try {
+					v.timer.purge();
 					v.envoieString("controleur", message);
 				} catch (Exception e) {
 					e.printStackTrace();
