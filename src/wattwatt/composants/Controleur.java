@@ -32,6 +32,19 @@ import wattwatt.ports.StringDataOutPort;
  */
 public class Controleur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String COMPTEUR_URI;
+	public String BATTERIE_URI;
+	public String EOLIENNE_URI;
+	public String LAVELINGE_URI;
+	public String REFRIGERATEUR_URI;
+	public String SECHECHEVEUX_URI;
+
+	//
+
 	/**
 	 * Les ports par lesquels le controleur envoie des donnees representees par la
 	 * classe StringData
@@ -74,7 +87,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * production
 	 */
 	public int production = 0;
-	
+
 	/**
 	 * Cet entier va servir a stocker les informations recues des unites de
 	 * production
@@ -119,13 +132,12 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public Controleur(String uri, int nbThreads, int nbSchedulableThreads) throws Exception {
@@ -147,7 +159,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		Runnable compteurTask = new Runnable() {
 			public void run() {
 				try {
-					envoieString("compteur", "hello from controleur");
+					envoieString(COMPTEUR_URI, "hello from controleur");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -157,7 +169,7 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		Runnable batterieTask = new Runnable() {
 			public void run() {
 				try {
-					envoieString("batterie", "charge");
+					envoieString(BATTERIE_URI, Batterie.CHARGE);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -167,15 +179,15 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		Runnable eolienneTask = new Runnable() {
 			public void run() {
 				try {
-					envoieString("eolienne", "switchOn");
+					envoieString(EOLIENNE_URI, Eolienne.SWITCHON);
 					Random r = new Random();
 					while (eolienneFonctionne) {
 						// Pour l'instant on se sert du boolean pour representer les conditions
 						// meteorologique pour l'activation de l'eolienne
 						if (r.nextBoolean())
-							envoieString("eolienne", "switchOff");
+							envoieString(EOLIENNE_URI, Eolienne.SWITCHOFF);
 						else
-							envoieString("eolienne", "switchOn");
+							envoieString(EOLIENNE_URI, Eolienne.SWITCHON);
 						Thread.sleep(3000);
 					}
 				} catch (Exception e) {
@@ -187,14 +199,14 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		Runnable laveLingeTask = new Runnable() {
 			public void run() {
 				try {
-					envoieString("laveLinge", "hello from controleur");
+					envoieString(LAVELINGE_URI, "hello from controleur");
 					Random r = new Random();
 					while (laveLingeFonctionne) {
 						int value = r.nextInt(1000);
 						if (value > 950)
-							envoieString("laveLinge", "retard");
+							envoieString(LAVELINGE_URI, LaveLinge.RETARD);
 						else if (value < 50)
-							envoieString("laveLinge", "avance");
+							envoieString(LAVELINGE_URI, LaveLinge.AVANCE);
 						Thread.sleep(25000);
 					}
 				} catch (Exception e) {
@@ -206,13 +218,13 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		Runnable frigoTask = new Runnable() {
 			public void run() {
 				try {
-					envoieString("refrigerateur", "switchOn");
+					envoieString(REFRIGERATEUR_URI,Refrigerateur.SWITCHON);
 					while (refrigerateurFonctionne) {
 						// Si la consommation est trop elevee
 						if (consommation > production + 50) {
-							envoieString("refrigerateur", "suspend");
+							envoieString(REFRIGERATEUR_URI, Refrigerateur.SUSPEND);
 						} else {
-							envoieString("refrigerateur", "resume");
+							envoieString(REFRIGERATEUR_URI, Refrigerateur.RESUME);
 						}
 						Thread.sleep(3000);
 					}
@@ -289,12 +301,9 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -306,25 +315,87 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugCompteur(String uriCible, String in, String out) throws Exception {
+		this.COMPTEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	
+	public void plugBatterie(String uriCible, String in, String out) throws Exception {
+		this.BATTERIE_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	
+	public void plugEolienne(String uriCible, String in, String out) throws Exception {
+		this.EOLIENNE_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	
+	public void plugLaveLinge(String uriCible, String in, String out) throws Exception {
+		this.LAVELINGE_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	
+	public void plugSecheCheveux(String uriCible, String in, String out) throws Exception {
+		this.SECHECHEVEUX_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	
+	public void plugRefrigerateur(String uriCible, String in, String out) throws Exception {
+		this.REFRIGERATEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		String message = messages_recus.remove(0).getMessage();
 		String[] messageSplit = message.split(":");
 		this.logMessage(" Controleur recoit : " + message);
-		if (messageSplit[0].equals("batterie")) {
-			if (messageSplit[1].equals("charge")) {
+		if (messageSplit[0].equals(BATTERIE_URI)) {
+			if (messageSplit[1].equals(Batterie.CHARGE)) {
 				if (messageSplit[2].equals("100%")) {
-					envoieString("batterie", "discharge");
+					envoieString(BATTERIE_URI, Batterie.DISCHARGE);
 				}
 			}
-		} else if (messageSplit[0].equals("compteur")) {
-			if (messageSplit[1].equals("total")) {
+		} else if (messageSplit[0].equals(COMPTEUR_URI)) {
+			if (messageSplit[1].equals(Compteur.TOTAL)) {
 				consommation = Integer.valueOf(messageSplit[2]);
 			}
-		} else if (messageSplit[0].equals("eolienne")) {
+		} else if (messageSplit[0].equals(EOLIENNE_URI)) {
 			production = Integer.valueOf(messageSplit[1]);
-		} else if (messageSplit[0].equals("secheCheveux")) {
+		} else if (messageSplit[0].equals(SECHECHEVEUX_URI)) {
 			this.logMessage(message);
 		}
 	}
@@ -332,10 +403,8 @@ public class Controleur extends AbstractComponent implements IStringDataOffered,
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

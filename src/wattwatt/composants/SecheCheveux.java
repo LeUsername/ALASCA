@@ -29,6 +29,18 @@ import wattwatt.ports.StringDataOutPort;
 
 public class SecheCheveux extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
+	// Macros
+	static final String SHUTDOWN = "shutdown";
+	//
+
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
+	//
+
 	/**
 	 * Les ports par lesquels l'eolienne envoie des donnees representees par la
 	 * classe StringData
@@ -88,13 +100,12 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public SecheCheveux(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
@@ -120,14 +131,6 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 		updateURI();
 	}
 
-	// public void on() {
-	//
-	// }
-	//
-	// public void off() {
-	//
-	// }
-
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -135,7 +138,7 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 		try {
 			Thread.sleep(10);
 			String msg = "hello je suis seche cheveux";
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -149,7 +152,7 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 				int conso = rand.nextInt(1000) + 1000;
 				this.logMessage("Je consomme " + conso + " kW");
 				String msg = "secheCheveux:consommation:" + conso;
-				envoieString("controleur", msg);
+				envoieString(CONTROLLEUR_URI, msg);
 			}
 			this.logMessage("Je consomme pas");
 			Thread.sleep(rand.nextInt(5000) + 5000);
@@ -202,12 +205,9 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -219,6 +219,18 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
@@ -229,10 +241,8 @@ public class SecheCheveux extends AbstractComponent implements IStringDataOffere
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

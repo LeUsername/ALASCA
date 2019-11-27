@@ -28,6 +28,19 @@ import wattwatt.ports.StringDataOutPort;
  */
 
 public class LaveLinge extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
+	// Macros
+	static final String RETARD = "retard";
+	static final String AVANCE = "avance";
+	static final String SHUTDOWN = "shutdown";
+	//
+
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
+	//
 
 	/**
 	 * Les ports par lesquels on envoie des messages: on fait la difference entre
@@ -88,18 +101,17 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public LaveLinge(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
+
 		this.addOfferedInterface(IStringDataOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
 		this.tracer.setRelativePosition(2, 1);
@@ -127,7 +139,7 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 		try {
 			Thread.sleep(10);
 			String msg = "hello je suis lave linge";
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -185,12 +197,9 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -202,18 +211,30 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage("Lave linge recoit : " + messages_recus.remove(0).getMessage());
 		switch (msg.getMessage()) {
-		case "retard":
+		case RETARD:
 			if (!occupe) {
 				this.logMessage("Le lave linge est retarde de 5000 ms");
 				Thread.sleep(5000);
 			}
 			break;
-		case "avance":
+		case AVANCE:
 			if (!occupe) {
 				occupe = true;
 				timer.cancel();
@@ -221,7 +242,7 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 				timer.schedule(new LaveLingeTask(this), 0, 50000);
 			}
 			break;
-		case "shutdown":
+		case SHUTDOWN:
 			shutdown();
 			break;
 		}
@@ -230,10 +251,8 @@ public class LaveLinge extends AbstractComponent implements IStringDataOffered, 
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

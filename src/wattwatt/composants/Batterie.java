@@ -37,6 +37,13 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 	static final String SHUTDOWN = "shutdown";
 	//
 	
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
+	//
 	
 	/**
 	 * Les ports par lesquels la Batterie envoie des donnees representees par la
@@ -148,7 +155,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		try {
 			Thread.sleep(10);
 			String msg = "hello from "+this.URI;
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -221,6 +228,18 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.addPort(stringDataOutPort.get(uriCible));
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
+	
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
 
 	/**
 	 * Affiche la quantite de batterie disponible a cet instant
@@ -248,7 +267,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		case VALUE:
 			String message = "Batterie a  :" + quantite + " sur " + quantiteMax;
 			this.logMessage(message);
-			envoieString("controleur", message);
+			envoieString(CONTROLLEUR_URI, message);
 			break;
 		case SHUTDOWN:
 			shutdown();
@@ -328,7 +347,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 				String message = URI + ":"+CHARGE+":"+v.quantite;
 				try {
 					v.timer.purge();
-					v.envoieString("controleur", message);
+					v.envoieString(CONTROLLEUR_URI, message);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

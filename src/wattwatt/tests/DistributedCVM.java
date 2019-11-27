@@ -89,37 +89,37 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 		if (thisJVMURI.equals(CONTROLLEUR_URI)) {
 			this.cont = new Controleur(CONTROLLEUR_URI, 1, 0);
-			this.cont.plug(COMPTEUR_URI, inportCont1, outportCont1);
-			this.cont.plug(EOLIENNE_URI, inportCont2, outportCont2);
-			this.cont.plug(BATTERIE_URI, inportCont3, outportCont3);
-			this.cont.plug(LAVE_LINGE_URI, inportCont4, outportCont4);
-			this.cont.plug(REFRIGERATEUR_URI, inportCont5, outportCont5);
-			this.cont.plug(SECHE_CHEVEUX_URI, inportCont6, outportCont6);
+			this.cont.plugCompteur(COMPTEUR_URI, inportCont1, outportCont1);
+			this.cont.plugEolienne(EOLIENNE_URI, inportCont2, outportCont2);
+			this.cont.plugBatterie(BATTERIE_URI, inportCont3, outportCont3);
+			this.cont.plugLaveLinge(LAVE_LINGE_URI, inportCont4, outportCont4);
+			this.cont.plugRefrigerateur(REFRIGERATEUR_URI, inportCont5, outportCont5);
+			this.cont.plugSecheCheveux(SECHE_CHEVEUX_URI, inportCont6, outportCont6);
 
 			this.addDeployedComponent(CONTROLLEUR_URI, cont);
 			this.toggleTracing(CONTROLLEUR_URI);
 
 		} else if (thisJVMURI.equals(COMPTEUR_URI)) {
 			this.cpt = new Compteur(COMPTEUR_URI, 1, 0);
-			this.cpt.plug(CONTROLLEUR_URI, inportCpt, outportCpt);
+			this.cpt.plugControleur(CONTROLLEUR_URI, inportCpt, outportCpt);
 			this.addDeployedComponent(COMPTEUR_URI, cpt);
 			this.toggleTracing(COMPTEUR_URI);
 
 		} else if (thisJVMURI.equals(EOLIENNE_URI)) {
 			this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0);
-			this.eolienne.plug(CONTROLLEUR_URI, inportEol, outportEol);
+			this.eolienne.plugControleur(CONTROLLEUR_URI, inportEol, outportEol);
 			this.addDeployedComponent(EOLIENNE_URI, eolienne);
 			this.toggleTracing(EOLIENNE_URI);
 
 		} else if (thisJVMURI.equals(BATTERIE_URI)) {
 			this.batterie = new Batterie(BATTERIE_URI, 1, 0, quantiteMaxBatterie);
-			this.batterie.plug(CONTROLLEUR_URI, inportBat, outportBat);
+			this.batterie.plugControleur(CONTROLLEUR_URI, inportBat, outportBat);
 			this.addDeployedComponent(BATTERIE_URI, batterie);
 			this.toggleTracing(BATTERIE_URI);
 
 		} else if (thisJVMURI.equals(LAVE_LINGE_URI)) {
 			this.laveLinge = new LaveLinge(LAVE_LINGE_URI, 1, 0);
-			this.laveLinge.plug(CONTROLLEUR_URI, inportLav, outportLav);
+			this.laveLinge.plugControleur(CONTROLLEUR_URI, inportLav, outportLav);
 			this.addDeployedComponent(LAVE_LINGE_URI, laveLinge);
 			this.toggleTracing(LAVE_LINGE_URI);
 
@@ -131,10 +131,10 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 		} else if (thisJVMURI.equals(SECHE_CHEVEUX_URI)) {
 			this.secheCheveux = new SecheCheveux(SECHE_CHEVEUX_URI, 1, 0);
-			this.secheCheveux.plug(CONTROLLEUR_URI, inportSec, outportSec);
+			this.secheCheveux.plugControleur(CONTROLLEUR_URI, inportSec, outportSec);
 			this.addDeployedComponent(SECHE_CHEVEUX_URI, secheCheveux);
 			this.toggleTracing(SECHE_CHEVEUX_URI);
-			//		} else if (thisJVMURI.equals(APPAREILS_URI)) {
+			// } else if (thisJVMURI.equals(APPAREILS_URI)) {
 //
 //			this.eolienne = new Eolienne(EOLIENNE_URI, 1, 0);
 //			this.eolienne.plug(CONTROLLEUR_URI, inportEol, outportEol);
@@ -222,7 +222,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.doPortConnection(SECHE_CHEVEUX_URI,
 					this.secheCheveux.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(), this.outportCont6,
 					StringDataConnector.class.getCanonicalName());
-			//		} else if (thisJVMURI.equals(APPAREILS_URI)) {
+			// } else if (thisJVMURI.equals(APPAREILS_URI)) {
 //
 //			this.doPortConnection(EOLIENNE_URI, this.eolienne.stringDataInPort.get(CONTROLLEUR_URI).getPortURI(),
 //					this.outportCont2, StringDataConnector.class.getCanonicalName());

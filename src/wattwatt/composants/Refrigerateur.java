@@ -11,6 +11,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
+import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.SwitchOn;
 import wattwatt.data.StringData;
 import wattwatt.interfaces.IStringDataOffered;
 import wattwatt.interfaces.IStringDataRequired;
@@ -29,6 +30,23 @@ import wattwatt.ports.StringDataOutPort;
  */
 
 public class Refrigerateur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
+
+	// Macros
+	static final String SWITCHON = "retard";
+	static final String SWITCHOFF = "avance";
+	static final String SHUTDOWN = "shutdown";
+	static final String SUSPEND = "suspend";
+	static final String RESUME = "resume";
+	static final String TEMP = "temp";
+	//
+
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
+	//
 
 	/**
 	 * Les ports par lesquels l'eolienne envoie des donnees representees par la
@@ -100,18 +118,17 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public Refrigerateur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
+
 		this.addOfferedInterface(IStringDataOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
 		this.tracer.setRelativePosition(2, 2);
@@ -140,7 +157,7 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 		try {
 			Thread.sleep(10);
 			String msg = "hello je suis refrigerateur";
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -197,12 +214,9 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -214,38 +228,50 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage("Refrigerateur recoit : " + messages_recus.remove(0).getMessage());
 		switch (msg.getMessage()) {
-		case "switchOn":
+		case SWITCHON:
 			if (!isOn) {
 				isOn = true;
 				this.logMessage("Demarrage du refrigerateur");
 			}
 			timer.schedule(new RefriTask(this), 0, 5000);
 			break;
-		case "switchOff":
+		case SWITCHOFF:
 			if (isOn) {
 				isOn = false;
 				this.logMessage("Arret du refrigerateur");
 			}
 			timer.purge();
 			break;
-		case "shutdown":
+		case SHUTDOWN:
 			shutdown();
 			break;
-		case "suspend":
+		case SUSPEND:
 			isWorking = false;
 			break;
-		case "resume":
+		case RESUME:
 			isWorking = true;
 			break;
-		case "temp":
+		case TEMP:
 			String message = "refrigerateur:temp:" + temp;
 			this.logMessage(message);
-			envoieString("controleur", message);
+			envoieString(CONTROLLEUR_URI, message);
 			break;
 		}
 	}
@@ -253,10 +279,8 @@ public class Refrigerateur extends AbstractComponent implements IStringDataOffer
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {

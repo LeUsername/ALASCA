@@ -32,6 +32,20 @@ import wattwatt.ports.StringDataOutPort;
 
 public class Eolienne extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
 
+	// Macros
+	static final String SWITCHON = "switchOn";
+	static final String SWITCHOFF = "switchOff";
+	static final String SHUTDOWN = "shutdown";
+	//
+
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
+	//
+
 	/**
 	 * Les ports par lesquels l'eolienne envoie des donnees representees par la
 	 * classe StringData
@@ -101,18 +115,17 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public Eolienne(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
+
 		this.addOfferedInterface(IStringDataOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
 		this.tracer.setRelativePosition(1, 0);
@@ -140,7 +153,7 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 		try {
 			Thread.sleep(10);
 			String msg = "hello je suis eolienne";
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -197,12 +210,9 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -214,26 +224,38 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage("Eolienne recoit : " + messages_recus.remove(0).getMessage());
 		switch (msg.getMessage()) {
-		case "switchOn":
+		case SWITCHON:
 			if (!isOn) {
 				isOn = true;
 				this.logMessage("Demarrage de l'eolienne");
 			}
 			timer.schedule(new ProductionTask(this), 0, 1499);
 			break;
-		case "switchOff":
+		case SWITCHOFF:
 			if (isOn) {
 				isOn = false;
 				this.logMessage("Arret de l'eolienne");
 			}
 			timer.purge();
 			break;
-		case "shutdown":
+		case SHUTDOWN:
 			shutdown();
 			break;
 		}
@@ -242,10 +264,8 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {
@@ -272,7 +292,7 @@ public class Eolienne extends AbstractComponent implements IStringDataOffered, I
 	public void print() throws Exception {
 		// Il faut faire un truc de prod plus realiste
 		this.logMessage("Eolienne tourne: production de " + this.val + " kW");
-		envoieString("controleur", "eolienne:" + this.val);
+		envoieString(CONTROLLEUR_URI, "eolienne:" + this.val);
 	}
 
 	/**

@@ -30,10 +30,18 @@ import wattwatt.ports.StringDataOutPort;
  */
 
 public class Compteur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
-	
-	// Macros 
+
+	// Macros
 	static final String VALUE = "value";
 	static final String TOTAL = "total";
+	//
+
+	// Ajouts du 27/11 Uri et des new methodes plugs
+	/**
+	 * URI du composant
+	 */
+	public String CONTROLLEUR_URI;
+
 	//
 
 	/**
@@ -100,21 +108,20 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param reflectionInboundPortURI
-	 *            URI of the inbound port offering the <code>ReflectionI</code>
-	 *            interface.
-	 * @param nbThreads
-	 *            number of threads to be created in the component pool.
-	 * @param nbSchedulableThreads
-	 *            number of threads to be created in the component schedulable pool.
+	 * @param reflectionInboundPortURI URI of the inbound port offering the
+	 *                                 <code>ReflectionI</code> interface.
+	 * @param nbThreads                number of threads to be created in the
+	 *                                 component pool.
+	 * @param nbSchedulableThreads     number of threads to be created in the
+	 *                                 component schedulable pool.
 	 * @throws Exception
 	 */
 	public Compteur(String reflectionInboundPortURI, int nbThreads, int nbSchedulableThreads) throws Exception {
 		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-		
+
 		this.addOfferedInterface(IStringDataOffered.class);
 		this.addOfferedInterface(DataOfferedI.PullI.class);
-		
+
 		URI = reflectionInboundPortURI;
 		this.stringDataInPort = new HashMap<>();
 		this.stringDataOutPort = new HashMap<>();
@@ -140,7 +147,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		try {
 			Thread.sleep(10);
 			String msg = "hello je suis le compteur";
-			envoieString("controleur", msg);
+			envoieString(CONTROLLEUR_URI, msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -198,12 +205,9 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	 * post	true			// no postcondition.
 	 * </pre>
 	 * 
-	 * @param uriCible
-	 *            uri du composant a connecter
-	 * @param in
-	 *            nom du DataInPort de uriCible
-	 * @param out
-	 *            nom du DataOutPort de uriCible
+	 * @param uriCible uri du composant a connecter
+	 * @param in       nom du DataInPort de uriCible
+	 * @param out      nom du DataOutPort de uriCible
 	 * @throws Exception
 	 */
 	public void plug(String uriCible, String in, String out) throws Exception {
@@ -215,14 +219,26 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		this.stringDataOutPort.get(uriCible).publishPort();
 	}
 
+	// ajout du 27/11
+	public void plugControleur(String uriCible, String in, String out) throws Exception {
+		this.CONTROLLEUR_URI = uriCible;
+		this.stringDataInPort.put(uriCible, new StringDataInPort(in, this));
+		this.addPort(stringDataInPort.get(uriCible));
+		this.stringDataInPort.get(uriCible).publishPort();
+		this.stringDataOutPort.put(uriCible, new StringDataOutPort(out, this));
+		this.addPort(stringDataOutPort.get(uriCible));
+		this.stringDataOutPort.get(uriCible).publishPort();
+	}
+	//
+
 	@Override
 	public void getMessage(StringData msg) throws Exception {
 		messages_recus.add(msg);
 		this.logMessage(" Compteur recoit : " + messages_recus.remove(0).getMessage());
 		switch (msg.getMessage()) {
 		case VALUE:
-			String message = "compteur" + ":"+TOTAL+":" + this.val;
-			envoieString("controleur", message);
+			String message = "compteur" + ":" + TOTAL + ":" + this.val;
+			envoieString(CONTROLLEUR_URI, message);
 			break;
 		}
 	}
@@ -230,10 +246,8 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 	/**
 	 * Envoie le message <code>msg</code> sur le composant d'URI <code>uri</code>
 	 * 
-	 * @param uri
-	 *            URI du composant vers lequel on veut envoyer <code>msg</code>
-	 * @param msg
-	 *            message à envoyer
+	 * @param uri URI du composant vers lequel on veut envoyer <code>msg</code>
+	 * @param msg message à envoyer
 	 * @throws Exception
 	 */
 	public void envoieString(String uri, String msg) throws Exception {
@@ -291,10 +305,10 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		}
 
 		public void run() {
-			String message = v.URI + ":"+TOTAL+":" + this.v.val;
+			String message = v.URI + ":" + TOTAL + ":" + this.v.val;
 			this.v.val = 1000 + rand.nextInt(800);
 			try {
-				this.v.envoieString("controleur", message);
+				this.v.envoieString(CONTROLLEUR_URI, message);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
