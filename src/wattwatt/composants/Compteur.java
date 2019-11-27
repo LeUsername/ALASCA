@@ -30,6 +30,11 @@ import wattwatt.ports.StringDataOutPort;
  */
 
 public class Compteur extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
+	
+	// Macros 
+	static final String VALUE = "value";
+	static final String TOTAL = "total";
+	//
 
 	/**
 	 * Les ports par lesquels le compteur envoie des donnees representees par la
@@ -215,8 +220,8 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		messages_recus.add(msg);
 		this.logMessage(" Compteur recoit : " + messages_recus.remove(0).getMessage());
 		switch (msg.getMessage()) {
-		case "value":
-			String message = "compteur" + ":total:" + this.val;
+		case VALUE:
+			String message = "compteur" + ":"+TOTAL+":" + this.val;
 			envoieString("controleur", message);
 			break;
 		}
@@ -286,7 +291,7 @@ public class Compteur extends AbstractComponent implements IStringDataOffered, I
 		}
 
 		public void run() {
-			String message = "compteur" + ":total:" + this.v.val;
+			String message = v.URI + ":"+TOTAL+":" + this.v.val;
 			this.v.val = 1000 + rand.nextInt(800);
 			try {
 				this.v.envoieString("controleur", message);

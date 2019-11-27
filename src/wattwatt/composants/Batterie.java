@@ -29,6 +29,15 @@ import wattwatt.ports.StringDataOutPort;
  */
 
 public class Batterie extends AbstractComponent implements IStringDataOffered, IStringDataRequired {
+	
+	// Macros 
+	static final String VALUE = "value";
+	static final String CHARGE = "charge";
+	static final String DISCHARGE = "discharge";
+	static final String SHUTDOWN = "shutdown";
+	//
+	
+	
 	/**
 	 * Les ports par lesquels la Batterie envoie des donnees representees par la
 	 * classe StringData
@@ -138,7 +147,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.logMessage("Batterie starting");
 		try {
 			Thread.sleep(10);
-			String msg = "hello je suis batterie";
+			String msg = "hello from "+this.URI;
 			envoieString("controleur", msg);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -226,22 +235,22 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 		this.logMessage("Batterie recoit : " + messages_recus.remove(0).getMessage());
 		timer.purge();
 		switch (msg.getMessage()) {
-		case "charge":
+		case CHARGE:
 			isOn = true;
-			this.logMessage("La batterie est allumée");
+			this.logMessage("La batterie est allumer");
 			timer.schedule(new ChargeTask(this), 0, 300);
 			break;
-		case "discharge":
+		case DISCHARGE:
 			isOn = false;
-			this.logMessage("La batterie est éteinte");
+			this.logMessage("La batterie est eteinte");
 			timer.schedule(new DechargeTask(this), 0, 5000);
 			break;
-		case "value":
-			String message = "Batterie à :" + quantite + " sur " + quantiteMax;
+		case VALUE:
+			String message = "Batterie a� :" + quantite + " sur " + quantiteMax;
 			this.logMessage(message);
 			envoieString("controleur", message);
 			break;
-		case "shutdown":
+		case SHUTDOWN:
 			shutdown();
 			break;
 
@@ -316,7 +325,7 @@ public class Batterie extends AbstractComponent implements IStringDataOffered, I
 				v.printValue();
 			}
 			if (v.quantite == v.quantiteMax) {
-				String message = URI + ":charge:100%";
+				String message = URI + ":"+CHARGE+":"+v.quantite;
 				try {
 					v.timer.purge();
 					v.envoieString("controleur", message);
