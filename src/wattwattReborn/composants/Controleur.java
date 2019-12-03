@@ -9,6 +9,7 @@ import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.ports.PortI;
+import wattwattReborn.connecteurs.CompteurConnector;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.compteur.CompteurInPort;
@@ -22,14 +23,17 @@ public class Controleur extends AbstractComponent {
 	
 	protected String CONTROLEUR_URI;
 	
+	protected CompteurInPort cptin;
+	protected CompteurOutPort cptout;
+	
 	public Controleur(String uri,String compteurIn, String compteurOut) throws Exception {
 		super(uri, 1,1);
 		CONTROLEUR_URI = uri;
 		
-		ControleurInPort cptin =  new ControleurInPort(compteurIn, this);
+		cptin =  new CompteurInPort(compteurIn, this);
 		cptin.publishPort();
 
-		ControleurOutPort cptout = new ControleurOutPort(compteurOut, this);
+		cptout = new CompteurOutPort(compteurOut, this);
 		cptout.publishPort();
 		
 		this.tracer.setRelativePosition(0, 1);
@@ -50,6 +54,11 @@ public class Controleur extends AbstractComponent {
 		super.start();
 		this.logMessage("Controleur starting");
 		try {
+			this.doPortConnection( this.cptout.getPortURI(), this.cptin.getPortURI(),CompteurConnector.class.getCanonicalName());
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		try {
 			Thread.sleep(10);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,7 +66,14 @@ public class Controleur extends AbstractComponent {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws Exception {
+		super.execute();
+		try {
+			Thread.sleep(1000);
+			this.logMessage("consomation : "+this.cptout.getAllConso());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -65,12 +81,25 @@ public class Controleur extends AbstractComponent {
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Controleur shutdown");
 		// unpublish les ports
+		try {
+			this.cptin.unpublishPort();
+			this.cptout.unpublishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		super.shutdown();
 	}
 
 	@Override
 	public void finalise() throws Exception {
 		// unpublish les ports
+		try {
+			this.cptin.unpublishPort();
+			this.cptout.unpublishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		super.finalise();
 	}
 

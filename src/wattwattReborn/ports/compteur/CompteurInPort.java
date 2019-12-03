@@ -18,7 +18,7 @@ public class CompteurInPort extends AbstractInboundPort implements ICompteur{
 
 	@Override
 	public int getAllConso() throws Exception {
-		return this.getOwner().handleRequestSync(owner ->((Compteur)owner).getAllConso());
+		return this.getOwner().handleRequestSync(owner ->((Compteur)owner).getConso());
 	}
 
 }

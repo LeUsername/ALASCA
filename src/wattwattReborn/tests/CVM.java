@@ -20,9 +20,6 @@ public class CVM extends AbstractCVM {
 	protected String compteurUri;
 	protected String controleurUri;
 
-	protected Controleur cont;
-	protected Compteur cpt;
-
 	public CVM() throws Exception {
 		super();
 	}
@@ -42,10 +39,12 @@ public class CVM extends AbstractCVM {
 		this.toggleLogging(COMPTEUR_URI);
 		this.toggleTracing(COMPTEUR_URI);
 
-		this.doPortConnection(this.controleurUri, this.COMPTEUR_OUT_URI, this.COMPTEUR_IN_URI,
-				CompteurConnector.class.getCanonicalName());
-		this.doPortConnection(this.compteurUri, CONTROLLEUR_OUT_URI, CONTROLLEUR_IN_URI,
-				ControleurConnector.class.getCanonicalName());
+		//ici c'est pour faire une archi static on peut les faires dans les starts
+//		this.doPortConnection(this.controleurUri, this.COMPTEUR_OUT_URI, this.COMPTEUR_IN_URI,
+//				CompteurConnector.class.getCanonicalName());
+//		this.doPortConnection(this.compteurUri, CONTROLLEUR_OUT_URI, CONTROLLEUR_IN_URI,
+//				ControleurConnector.class.getCanonicalName());
+		
 		super.deploy();
 	}
 
