@@ -1,15 +1,14 @@
-package wattwattReborn.connecteurs;
+package wattwattReborn.connecteurs.appareils.suspensible.refrigerateur;
 
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
-import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 
-public class ControleurCompteurConnector extends AbstractConnector implements IControleur {
+public class ControleurRefrigerateurConnector extends AbstractConnector implements IControleur {
 
 	@Override
 	public int getAllConso() throws Exception {
-		return ((ICompteur)this.offering).giveAllConso();
+		return 0;
 	}
 
 	@Override
@@ -26,24 +25,24 @@ public class ControleurCompteurConnector extends AbstractConnector implements IC
 
 	@Override
 	public void refriSuspend() throws Exception {
-		((IRefrigerateur)this.offering).suspend();
+		((IRefrigerateur) this.offering).suspend();
 		
 	}
 
 	@Override
 	public void refriResume() throws Exception {
-		((IRefrigerateur)this.offering).resume();
+		((IRefrigerateur) this.offering).resume();
 		
 	}
 
 	@Override
 	public double refriTempH() throws Exception {
-		return ((IRefrigerateur)this.offering).getTempHaut();
+		return ((IRefrigerateur) this.offering).getTempHaut();
 	}
 
 	@Override
 	public double refriTempB() throws Exception {
-		return ((IRefrigerateur)this.offering).getTempBas();
+		return ((IRefrigerateur) this.offering).getTempBas();
 	}
 
 	@Override
