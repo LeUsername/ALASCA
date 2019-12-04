@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="jars/BCM-17092019.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/jfreechart-1.6.0-snapshot.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/jing.jar"/>
 	<classpathentry kind="lib" path="jars/BCM-CyPhy-Components-26112019.jar"/>
 	<classpathentry kind="lib" path="jars/Simulation-26112019.jar"/>
 	<classpathentry kind="lib" path="jars/commons-math3-3.5.jar"/>
-	<classpathentry kind="lib" path="jars/BCM4Java-03122019-src.tar"/>
+	<classpathentry kind="lib" path="jars/BCM-03122019.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
