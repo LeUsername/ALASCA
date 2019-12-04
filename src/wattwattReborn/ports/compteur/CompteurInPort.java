@@ -14,11 +14,12 @@ public class CompteurInPort extends AbstractInboundPort implements ICompteur{
 
 	public CompteurInPort(String uri, ComponentI owner) throws Exception {
 		super(uri,ICompteur.class, owner);
+		
 	}
 
 	@Override
-	public int getAllConso() throws Exception {
-		return this.getOwner().handleRequestSync(owner ->((Compteur)owner).getConso());
+	public int giveAllConso() throws Exception {
+		return this.getOwner().handleRequestSync(owner ->((Compteur)owner).giveConso());
 	}
 
 }

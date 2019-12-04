@@ -16,9 +16,8 @@ public class CompteurOutPort extends AbstractOutboundPort implements ICompteur{
 	}
 
 	@Override
-	public int getAllConso() throws Exception {
-		
-		return ((ICompteur)this.connector).getAllConso();
+	public int giveAllConso() throws Exception {
+		return ((ICompteur)this.connector).giveAllConso();
 	}
 
 }

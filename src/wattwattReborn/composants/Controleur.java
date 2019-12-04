@@ -1,42 +1,32 @@
 package wattwattReborn.composants;
 
-import java.util.HashMap;
-import java.util.Vector;
-
 import fr.sorbonne_u.components.AbstractComponent;
-import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import fr.sorbonne_u.components.ports.PortI;
-import wattwattReborn.connecteurs.CompteurConnector;
+import wattwattReborn.connecteurs.ControleurCompteurConnector;
 import wattwattReborn.interfaces.compteur.ICompteur;
-import wattwattReborn.interfaces.controleur.IControleur;
-import wattwattReborn.ports.compteur.CompteurInPort;
-import wattwattReborn.ports.compteur.CompteurOutPort;
-import wattwattReborn.ports.controleur.ControleurInPort;
 import wattwattReborn.ports.controleur.ControleurOutPort;
 
-@OfferedInterfaces(offered = IControleur.class)
 @RequiredInterfaces(required = ICompteur.class)
 public class Controleur extends AbstractComponent {
 	
 	protected String CONTROLEUR_URI;
 	
-	protected CompteurInPort cptin;
-	protected CompteurOutPort cptout;
+	protected String cptin;
 	
-	public Controleur(String uri,String compteurIn, String compteurOut) throws Exception {
+	protected ControleurOutPort contout;
+	
+	public Controleur(String uri,String controleurOut, String compteurIn) throws Exception {
 		super(uri, 1,1);
 		CONTROLEUR_URI = uri;
 		
-		cptin =  new CompteurInPort(compteurIn, this);
-		cptin.publishPort();
+		cptin =  compteurIn;
 
-		cptout = new CompteurOutPort(compteurOut, this);
-		cptout.publishPort();
+		contout = new ControleurOutPort(controleurOut, this);
+		contout.publishPort();
 		
-		this.tracer.setRelativePosition(0, 1);
+		this.tracer.setRelativePosition(0, 0);
 	}
 	
 	
@@ -45,16 +35,13 @@ public class Controleur extends AbstractComponent {
 		return CONTROLEUR_URI;
 	}
 	
-	public int getAllConso() {
-		return 0;
-	}
 	
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Controleur starting");
 		try {
-			this.doPortConnection( this.cptout.getPortURI(), this.cptin.getPortURI(),CompteurConnector.class.getCanonicalName());
+			this.doPortConnection( this.contout.getPortURI(), this.cptin,ControleurCompteurConnector.class.getCanonicalName());
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -70,7 +57,7 @@ public class Controleur extends AbstractComponent {
 		super.execute();
 		try {
 			Thread.sleep(1000);
-			this.logMessage("consomation : "+this.cptout.getAllConso());
+			this.logMessage("Consomation : "+this.contout.getAllConso());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -82,8 +69,7 @@ public class Controleur extends AbstractComponent {
 		this.logMessage("Controleur shutdown");
 		// unpublish les ports
 		try {
-			this.cptin.unpublishPort();
-			this.cptout.unpublishPort();
+			this.contout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -95,8 +81,7 @@ public class Controleur extends AbstractComponent {
 	public void finalise() throws Exception {
 		// unpublish les ports
 		try {
-			this.cptin.unpublishPort();
-			this.cptout.unpublishPort();
+			this.contout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

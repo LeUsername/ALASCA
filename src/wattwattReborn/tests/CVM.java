@@ -4,8 +4,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import wattwattReborn.composants.Compteur;
 import wattwattReborn.composants.Controleur;
-import wattwattReborn.connecteurs.CompteurConnector;
-import wattwattReborn.connecteurs.ControleurConnector;
+import wattwattReborn.connecteurs.ControleurCompteurConnector;
 
 public class CVM extends AbstractCVM {
 
@@ -28,10 +27,10 @@ public class CVM extends AbstractCVM {
 	public void deploy() throws Exception {
 
 		this.controleurUri = AbstractComponent.createComponent(Controleur.class.getCanonicalName(),
-				new Object[] { CONTROLLEUR_URI, COMPTEUR_IN_URI, COMPTEUR_OUT_URI });
+				new Object[] { CONTROLLEUR_URI, CONTROLLEUR_OUT_URI, COMPTEUR_IN_URI });
 
 		this.compteurUri = AbstractComponent.createComponent(Compteur.class.getCanonicalName(),
-				new Object[] { COMPTEUR_URI, CONTROLLEUR_IN_URI, CONTROLLEUR_OUT_URI });
+				new Object[] { COMPTEUR_URI, COMPTEUR_IN_URI});
 
 		this.toggleLogging(CONTROLLEUR_URI);
 		this.toggleTracing(CONTROLLEUR_URI);
@@ -40,10 +39,7 @@ public class CVM extends AbstractCVM {
 		this.toggleTracing(COMPTEUR_URI);
 
 		//ici c'est pour faire une archi static on peut les faires dans les starts
-//		this.doPortConnection(this.controleurUri, this.COMPTEUR_OUT_URI, this.COMPTEUR_IN_URI,
-//				CompteurConnector.class.getCanonicalName());
-//		this.doPortConnection(this.compteurUri, CONTROLLEUR_OUT_URI, CONTROLLEUR_IN_URI,
-//				ControleurConnector.class.getCanonicalName());
+		
 		
 		super.deploy();
 	}

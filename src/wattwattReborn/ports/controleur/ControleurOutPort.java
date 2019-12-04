@@ -15,9 +15,10 @@ public class ControleurOutPort extends AbstractOutboundPort implements IControle
 		super(uri, IControleur.class, owner);
 	}
 
-//	@Override
-//	public int getAllConso() throws Exception {
-//		return ((IControleur)this.connector).getAllConso();
-//	}
+	@Override
+	public int getAllConso() throws Exception {
+		return ((IControleur)this.connector).getAllConso() ;
+	}
+
 
 }

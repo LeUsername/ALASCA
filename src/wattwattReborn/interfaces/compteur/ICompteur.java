@@ -5,5 +5,5 @@ import fr.sorbonne_u.components.interfaces.RequiredI;
 
 public interface ICompteur extends OfferedI, RequiredI{
 
-	public int getAllConso() throws Exception;
+	public int giveAllConso() throws Exception;
 }
