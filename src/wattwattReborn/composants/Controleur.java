@@ -5,8 +5,7 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import wattwattReborn.connecteurs.ControleurCompteurConnector;
-import wattwattReborn.connecteurs.appareils.suspensible.refrigerateur.ControleurRefrigerateurConnector;
+import wattwattReborn.connecteurs.ControleurConnector;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.controleur.ControleurOutPort;
@@ -50,10 +49,10 @@ public class Controleur extends AbstractComponent {
 		this.logMessage("Controleur starting");
 		try {
 			this.doPortConnection(this.contout.getPortURI(), this.cptin,
-					ControleurCompteurConnector.class.getCanonicalName());
+					ControleurConnector.class.getCanonicalName());
 
 			this.doPortConnection(this.contout2.getPortURI(), this.refrin,
-					ControleurRefrigerateurConnector.class.getCanonicalName());
+					ControleurConnector.class.getCanonicalName());
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -77,12 +76,12 @@ public class Controleur extends AbstractComponent {
 				this.logMessage("Consomation : " + cons);
 				if (cons > 1220) { // a changer la
 					this.contout2.refriSuspend();
-					this.logMessage("SUSPEND Refri>> Temp en Haut : [" + this.contout2.refriTempH()
+					this.logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + this.contout2.refriTempH()
 							+ " ] Temp en Bas : [" + this.contout2.refriTempB() + " ] Conso depuis le debut : ["
 							+ this.contout2.refriConso() + " ]");
 				} else {
 					this.contout2.refriResume();
-					this.logMessage("RESUME Refri>> Temp en Haut : [" + this.contout2.refriTempH()
+					this.logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + this.contout2.refriTempH()
 							+ " ] Temp en Bas : [" + this.contout2.refriTempB() + " ] Conso depuis le debut : ["
 							+ this.contout2.refriConso() + " ]");
 				}

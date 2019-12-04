@@ -16,24 +16,24 @@ public class Refrigerateur extends AbstractComponent {
 	protected final double TEMP_B_MAX = 12;
 
 	protected final String REFRIGERATEUR_URI;
-	
+
 	protected RefrigerateurInPort refrin;
 
 	protected double tempH;
 	protected double tempB;
-	
+
 	protected boolean isOn;
 	protected int conso;
 	protected boolean isWorking;
 
 	protected Refrigerateur(String uri, String refriIn) throws Exception {
-		super(uri,1,1);
+		super(uri, 1, 1);
 
 		REFRIGERATEUR_URI = uri;
-		
+
 		refrin = new RefrigerateurInPort(refriIn, this);
 		refrin.publishPort();
-		
+
 		this.tempH = 3.0;
 		this.tempB = 8.0;
 
@@ -47,25 +47,26 @@ public class Refrigerateur extends AbstractComponent {
 	public double getTempBas() {
 		return tempB;
 	}
-	
+
 	public void suspend() {
-		if(isOn) {
+		if (isOn) {
 			isWorking = false;
 		}
-		
+
 	}
+
 	public void resume() {
-		if(isOn) {
+		if (isOn) {
 			isWorking = true;
 		}
-		
+
 	}
-	
+
 	public void on() {
 		isOn = true;
 		isWorking = true;
 	}
-	
+
 	public void off() {
 		isOn = false;
 		isWorking = false;
@@ -74,7 +75,7 @@ public class Refrigerateur extends AbstractComponent {
 	public void regule() {
 		if (this.isOn) {
 			if (this.isWorking) {
-				
+
 				if (this.tempH > this.TEMP_H_MIN) {
 					this.tempH--;
 				}
@@ -125,12 +126,15 @@ public class Refrigerateur extends AbstractComponent {
 				Random rand = new Random();
 				try {
 					while (true) {
-						((Refrigerateur) this.getTaskOwner()).logMessage("Refri");
 						((Refrigerateur) this.getTaskOwner()).regule();
 						Thread.sleep(500);
 						if (rand.nextInt(100) > 90) {
 							((Refrigerateur) this.getTaskOwner()).off();
-							Thread.sleep(500 + rand.nextInt(1000));
+							for(int tick = 0; tick<5; tick++) {
+								Thread.sleep(500 + rand.nextInt(1000));
+								((Refrigerateur) this.getTaskOwner()).regule();
+							}
+							
 							((Refrigerateur) this.getTaskOwner()).on();
 						}
 					}

@@ -64,9 +64,7 @@ public class Compteur extends AbstractComponent {
 			public void run() {
 				try {
 					while (true) {
-						
 						((Compteur) this.getTaskOwner()).majConso();
-						((Compteur) this.getTaskOwner()).logMessage("Compteur");
 						Thread.sleep(1000);
 					}
 				} catch (Exception e) {

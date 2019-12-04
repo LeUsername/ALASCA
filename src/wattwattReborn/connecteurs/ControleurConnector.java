@@ -5,7 +5,7 @@ import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerat
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 
-public class ControleurCompteurConnector extends AbstractConnector implements IControleur {
+public class ControleurConnector extends AbstractConnector implements IControleur {
 
 	@Override
 	public int getAllConso() throws Exception {
