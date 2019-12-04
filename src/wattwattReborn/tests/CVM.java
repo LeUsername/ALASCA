@@ -13,11 +13,13 @@ public class CVM extends AbstractCVM {
 	protected final String REFRIGERATEUR_URI = "refri";
 
 	protected final String COMPTEUR_IN_URI = "compteurIn";
-	protected final String CONTROLLEUR_IN_URI = "controleurIn";
+	protected final String COMPTEUR_OUT_URI = "compteurOut";
+	
 	protected final String REFRIGERATEUR_IN_URI = "refriIn";
+	protected final String REFRIGERATEUR_OUT_URI = "refriOut";
 
-	protected final String CONTROLLEUR_COMPTEUR_OUT_URI = "controleurOut";
-	protected final String CONTROLLEUR_REFRIGERATEUR_OUT_URI = "controleurOut2";
+	
+	
 
 	protected String compteurUri;
 	protected String controleurUri;
@@ -31,8 +33,7 @@ public class CVM extends AbstractCVM {
 	public void deploy() throws Exception {
 
 		this.controleurUri = AbstractComponent.createComponent(Controleur.class.getCanonicalName(),
-				new Object[] { CONTROLLEUR_URI, CONTROLLEUR_COMPTEUR_OUT_URI, CONTROLLEUR_REFRIGERATEUR_OUT_URI,
-						COMPTEUR_IN_URI, REFRIGERATEUR_IN_URI });
+				new Object[] { CONTROLLEUR_URI, COMPTEUR_IN_URI, COMPTEUR_OUT_URI, REFRIGERATEUR_IN_URI, REFRIGERATEUR_OUT_URI });
 
 		this.compteurUri = AbstractComponent.createComponent(Compteur.class.getCanonicalName(),
 				new Object[] { COMPTEUR_URI, COMPTEUR_IN_URI });

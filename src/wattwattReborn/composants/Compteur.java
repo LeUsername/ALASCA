@@ -18,14 +18,14 @@ public class Compteur extends AbstractComponent {
 
 	protected String COMPTEUR_URI;
 
-	protected int consomation = 150;
-
 	protected CompteurInPort cptin;
+	
+	protected int consomation;
 
 	public Compteur(String uri, String compteurIn) throws Exception {
 		super(uri, 1, 1);
+		
 		COMPTEUR_URI = uri;
-
 		cptin = new CompteurInPort(compteurIn, this);
 		cptin.publishPort();
 
@@ -59,6 +59,7 @@ public class Compteur extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
+		
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
@@ -71,13 +72,12 @@ public class Compteur extends AbstractComponent {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 1000, TimeUnit.MILLISECONDS);
+		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Compteur shutdown");
-		// unpublish les ports
 		try {
 			this.cptin.unpublishPort();
 		} catch (Exception e) {
@@ -88,7 +88,6 @@ public class Compteur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		// unpublish les ports
 		try {
 			this.cptin.unpublishPort();
 		} catch (Exception e) {

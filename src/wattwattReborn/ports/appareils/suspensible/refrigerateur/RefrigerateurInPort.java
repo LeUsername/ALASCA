@@ -66,7 +66,7 @@ public class RefrigerateurInPort extends AbstractInboundPort implements IRefrige
 	}
 
 	@Override
-	public int giveConsommation() throws Exception {
+	public int getConso() throws Exception {
 		return this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).giveConso());
 	}
 

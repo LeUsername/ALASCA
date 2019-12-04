@@ -4,20 +4,25 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
+import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurInPort;
 
+@OfferedInterfaces(offered = IRefrigerateur.class)
+@RequiredInterfaces(required = IControleur.class)
 public class Refrigerateur extends AbstractComponent {
 
+	protected final String REFRIGERATEUR_URI;
+	protected RefrigerateurInPort refrin;
+	
 	protected final double TEMP_H_MIN = 2;
 	protected final double TEMP_B_MIN = 8;
 	protected final double TEMP_H_MAX = 6;
 	protected final double TEMP_B_MAX = 12;
-
-	protected final String REFRIGERATEUR_URI;
-
-	protected RefrigerateurInPort refrin;
 
 	protected double tempH;
 	protected double tempB;
@@ -142,13 +147,12 @@ public class Refrigerateur extends AbstractComponent {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 1000, TimeUnit.MILLISECONDS);
+		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Compteur shutdown");
-		// unpublish les ports
 		try {
 			this.refrin.unpublishPort();
 		} catch (Exception e) {
@@ -159,7 +163,6 @@ public class Refrigerateur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		// unpublish les ports
 		try {
 			this.refrin.unpublishPort();
 		} catch (Exception e) {

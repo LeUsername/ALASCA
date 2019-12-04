@@ -1,17 +1,22 @@
 package wattwattReborn.composants;
 
+import java.util.concurrent.TimeUnit;
+
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import wattwattReborn.connecteurs.ControleurConnector;
+import wattwattReborn.connecteurs.CompteurConnector;
+import wattwattReborn.connecteurs.RefrigerateurConnector;
+import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
-import wattwattReborn.ports.controleur.ControleurOutPort;
+import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOutPort;
+import wattwattReborn.ports.compteur.CompteurOutPort;
 
 @OfferedInterfaces(offered = IControleur.class)
-@RequiredInterfaces(required = ICompteur.class)
+@RequiredInterfaces(required = {ICompteur.class, IRefrigerateur.class})
 public class Controleur extends AbstractComponent {
 
 	protected String CONTROLEUR_URI;
@@ -19,22 +24,23 @@ public class Controleur extends AbstractComponent {
 	protected String cptin;
 	protected String refrin;
 
-	protected ControleurOutPort contout;
-	protected ControleurOutPort contout2;
+	protected CompteurOutPort cptout;
+	protected RefrigerateurOutPort refriout;
 
-	public Controleur(String uri, String controleurOut, String controleurOut2, String compteurIn, String refriIn)
+	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut)
 			throws Exception {
 		super(uri, 1, 1);
+		
 		CONTROLEUR_URI = uri;
 
 		cptin = compteurIn;
 		refrin = refriIn;
 
-		contout = new ControleurOutPort(controleurOut, this);
-		contout.publishPort();
+		cptout = new CompteurOutPort(compteurOut, this);
+		cptout.publishPort();
 
-		contout2 = new ControleurOutPort(controleurOut2, this);
-		contout2.publishPort();
+		refriout = new RefrigerateurOutPort(refriOut, this);
+		refriout.publishPort();
 
 		this.tracer.setRelativePosition(0, 0);
 	}
@@ -47,12 +53,13 @@ public class Controleur extends AbstractComponent {
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Controleur starting");
+		
 		try {
-			this.doPortConnection(this.contout.getPortURI(), this.cptin,
-					ControleurConnector.class.getCanonicalName());
+			this.doPortConnection(this.cptout.getPortURI(), this.cptin,
+					CompteurConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.contout2.getPortURI(), this.refrin,
-					ControleurConnector.class.getCanonicalName());
+			this.doPortConnection(this.refriout.getPortURI(), this.refrin,
+					RefrigerateurConnector.class.getCanonicalName());
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -68,36 +75,41 @@ public class Controleur extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		int cons = 0;
-		try {
-			this.contout2.refriOn();
-			while (true) {
-				cons = this.contout.getAllConso();
-				this.logMessage("Consomation : " + cons);
-				if (cons > 1220) { // a changer la
-					this.contout2.refriSuspend();
-					this.logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + this.contout2.refriTempH()
-							+ " ] Temp en Bas : [" + this.contout2.refriTempB() + " ] Conso depuis le debut : ["
-							+ this.contout2.refriConso() + " ]");
-				} else {
-					this.contout2.refriResume();
-					this.logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + this.contout2.refriTempH()
-							+ " ] Temp en Bas : [" + this.contout2.refriTempB() + " ] Conso depuis le debut : ["
-							+ this.contout2.refriConso() + " ]");
+		
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				int cons = 0;
+				try {
+					((Controleur) this.getTaskOwner()).refriout.On();
+					while (true) {
+						cons =((Controleur) this.getTaskOwner()).cptout.getAllConso();
+						((Controleur) this.getTaskOwner()).logMessage("Consomation : " + cons);
+						if (cons > 1220) {
+							((Controleur) this.getTaskOwner()).refriout.suspend();
+							((Controleur) this.getTaskOwner()).logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + ((Controleur) this.getTaskOwner()).refriout.getTempHaut()
+									+ " ] Temp en Bas : [" + ((Controleur) this.getTaskOwner()).refriout.getTempBas() + " ] Conso depuis le debut : ["
+									+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
+						} else {
+							((Controleur) this.getTaskOwner()).refriout.resume();
+							((Controleur) this.getTaskOwner()).logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + ((Controleur) this.getTaskOwner()).refriout.getTempHaut()
+									+ " ] Temp en Bas : [" + ((Controleur) this.getTaskOwner()).refriout.getTempBas() + " ] Conso depuis le debut : ["
+									+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
+						}
+						Thread.sleep(1000);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-				Thread.sleep(1000);
 			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
 		this.logMessage("Controleur shutdown");
-		// unpublish les ports
 		try {
-			this.contout.unpublishPort();
+			this.cptout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -107,9 +119,8 @@ public class Controleur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		// unpublish les ports
 		try {
-			this.contout.unpublishPort();
+			this.cptout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -5,6 +5,9 @@ import fr.sorbonne_u.components.interfaces.RequiredI;
 
 public interface IControleur extends OfferedI, RequiredI {
 	
+	
+	// PAS BESOIN DE CELUI LA 
+	
 	public int getAllConso() throws Exception;
 	
 	// Refrigerateur
