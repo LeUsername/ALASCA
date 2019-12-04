@@ -15,8 +15,8 @@ public class DistributedCVM extends AbstractDistributedCVM {
 	protected String controleurUri;
 	protected String refriUri;
 
-	public DistributedCVM(String[] args, int xLayout, int yLayout) throws Exception {
-		super(args, xLayout, yLayout);
+	public DistributedCVM(String[] args) throws Exception {
+		super(args);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	public static void main(String[] args) {
 		try {
-			DistributedCVM da = new DistributedCVM(args, 2, 5);
+			DistributedCVM da = new DistributedCVM(args);
 			da.startStandardLifeCycle(50000L);
 			Thread.sleep(50000L);
 			System.exit(0);

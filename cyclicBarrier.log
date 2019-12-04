@@ -1,0 +1,62 @@
+1575500888333|DCVM Cyclic Barrier up and running!
+1575500935576|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575500935578|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575500950533|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575500950544|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575500961986|All connected!
+1575500961987|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575500961988|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575500961988|DCVM Cyclic Barrier releases 3 sites.
+1575500961994|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575500962004|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575500962054|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575500962055|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575500962084|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575500962085|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575500962085|DCVM Cyclic Barrier releases 3 sites.
+1575500963418|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575500963420|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575500963442|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575500963457|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575500963642|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575500963643|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575500963643|DCVM Cyclic Barrier releases 3 sites.
+1575500963647|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575500963648|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575500963688|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575500963689|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575500963794|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575500963795|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575500963795|DCVM Cyclic Barrier releases 3 sites.
+1575500963859|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575500963860|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575500963870|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575500963870|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575500964118|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575500964119|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575500964119|DCVM Cyclic Barrier releases 3 sites.
+1575501014169|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575501014169|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575501014169|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575501014171|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575501014173|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575501014181|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575501014181|DCVM Cyclic Barrier releases 3 sites.
+1575501014347|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575501014347|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575501014354|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575501014354|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575501014355|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575501014355|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575501014356|DCVM Cyclic Barrier releases 3 sites.
+1575501014539|DCVM Cyclic Barrier accepts: refri localhost 46668
+1575501014539|DCVM Cyclic Barrier has received 1 out of 3 expected.
+1575501014542|DCVM Cyclic Barrier accepts: compteur localhost 46664
+1575501014544|DCVM Cyclic Barrier has received 2 out of 3 expected.
+1575501014614|DCVM Cyclic Barrier accepts: controleur localhost 46665
+1575501014615|DCVM Cyclic Barrier has received 3 out of 3 expected.
+1575501014615|DCVM Cyclic Barrier releases 3 sites.
+1575501014617|DCVMCyclicBarrier.run() finished.
+1575501014618|DCVMCyclicBarrier.run() finished.
+1575501014618|DCVMCyclicBarrier.run() finished.
+1575501014618|DCVM Cyclic Barrier shuts down!

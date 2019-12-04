@@ -1,0 +1,34 @@
+1575500879092|Registry up and running!
+1575500962603|GlobalRegistry processing put controleur rmi=localhost
+1575500962650|GlobalRegistry processing put refri rmi=localhost
+1575500962687|GlobalRegistry processing put compteurOut rmi=localhost
+1575500962725|All connected!
+1575500962728|GlobalRegistry processing put compteur rmi=localhost
+1575500962758|GlobalRegistry processing put refriIn rmi=localhost
+1575500962782|GlobalRegistry processing put refriOut rmi=localhost
+1575500962846|GlobalRegistry processing put compteurIn rmi=localhost
+1575500963253|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-855c3498-1308-4c27-9bad-fa62f12bc13d rmi=localhost
+1575500963346|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-8675c7c2-221f-4723-bd9b-767636d2b4b9 rmi=localhost
+1575500963368|GlobalRegistry processing put refri-dcc rmi=localhost
+1575500963399|GlobalRegistry processing put controleur-dcc rmi=localhost
+1575500963494|GlobalRegistry processing put fr.sorbonne_u.components.reflection.interfaces.ReflectionI-905fbbd6-13a7-446d-9055-3a6d7a8373be rmi=localhost
+1575500963562|GlobalRegistry processing put compteur-dcc rmi=localhost
+1575500963686|GlobalRegistry processing lookup compteurIn
+1575500963750|GlobalRegistry processing lookup refriIn
+1575500963855|GlobalRegistry processing lookup compteurIn
+1575500963938|GlobalRegistry processing lookup refriIn
+1575501014226|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-855c3498-1308-4c27-9bad-fa62f12bc13d
+1575501014226|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-8675c7c2-221f-4723-bd9b-767636d2b4b9
+1575501014230|GlobalRegistry processing remove fr.sorbonne_u.components.reflection.interfaces.ReflectionI-905fbbd6-13a7-446d-9055-3a6d7a8373be
+1575501014266|GlobalRegistry processing remove refri
+1575501014267|GlobalRegistry processing remove controleur
+1575501014271|GlobalRegistry processing remove compteur
+1575501014398|GlobalRegistry processing remove refri-dcc
+1575501014399|GlobalRegistry processing remove controleur-dcc
+1575501014409|GlobalRegistry processing remove compteur-dcc
+1575501014450|GlobalRegistry processing remove compteurOut
+1575501014458|GlobalRegistry processing remove refriIn
+1575501014530|GlobalRegistry processing remove refriOut
+1575501014654|GlobalRegistry processing shutdown
+1575501014658|GlobalRegistry processing shutdown
+1575501014660|Global registry shuts down!

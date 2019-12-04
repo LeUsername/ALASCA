@@ -1,0 +1,7 @@
+#!/bin/bash
+
+java bin.wattwattReborn.main.DistributedCVM controleur config.xml &
+
+java bin.wattwattReborn.main.DistributedCVM compteur config.xml &
+
+java bin.wattwattReborn.main.DistributedCVM refri config.xml &
