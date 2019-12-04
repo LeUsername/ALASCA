@@ -118,12 +118,6 @@ public class Controleur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		try {
-			this.doPortDisconnection(this.cptout.getPortURI()) ;
-			this.doPortDisconnection(this.refriout.getPortURI()) ;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		super.finalise();
 	}
 
