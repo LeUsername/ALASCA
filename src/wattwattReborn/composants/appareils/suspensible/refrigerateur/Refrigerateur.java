@@ -77,6 +77,10 @@ public class Refrigerateur extends AbstractComponent {
 		return this.isOn;
 	}
 
+	public int giveConso() {
+		return conso;
+	}
+	
 	public void regule() {
 		if (this.isOn) {
 			if (this.isWorking) {
@@ -163,16 +167,8 @@ public class Refrigerateur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		try {
-			this.refrin.unpublishPort();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		super.finalise();
 	}
 
-	public int giveConso() {
-		return conso;
-	}
-
+	
 }

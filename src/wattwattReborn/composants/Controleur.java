@@ -14,6 +14,7 @@ import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOutPort;
 import wattwattReborn.ports.compteur.CompteurOutPort;
+import wattwattReborn.tools.controleur.ControleurReglage;
 
 @OfferedInterfaces(offered = IControleur.class)
 @RequiredInterfaces(required = { ICompteur.class, IRefrigerateur.class })
@@ -93,7 +94,7 @@ public class Controleur extends AbstractComponent {
 										+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
 							}
 						}
-						Thread.sleep(1000);
+						Thread.sleep(ControleurReglage.MAJ_RATE);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -107,6 +108,7 @@ public class Controleur extends AbstractComponent {
 		this.logMessage("Controleur shutdown");
 		try {
 			this.cptout.unpublishPort();
+			this.refriout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -117,7 +119,8 @@ public class Controleur extends AbstractComponent {
 	@Override
 	public void finalise() throws Exception {
 		try {
-			this.cptout.unpublishPort();
+			this.doPortDisconnection(this.cptout.getPortURI()) ;
+			this.doPortDisconnection(this.refriout.getPortURI()) ;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

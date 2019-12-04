@@ -11,20 +11,21 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.compteur.CompteurInPort;
+import wattwattReborn.tools.compteur.CompteurReglage;
 
 @OfferedInterfaces(offered = ICompteur.class)
 @RequiredInterfaces(required = IControleur.class)
 public class Compteur extends AbstractComponent {
 
 	protected CompteurInPort cptin;
-	
+
 	protected int consomation;
 
 	public Compteur(String uri, String compteurIn) throws Exception {
 		super(uri, 1, 1);
-		
-		cptin = new CompteurInPort(compteurIn, this);
-		cptin.publishPort();
+
+		this.cptin = new CompteurInPort(compteurIn, this);
+		this.cptin.publishPort();
 
 		this.tracer.setRelativePosition(0, 1);
 	}
@@ -35,7 +36,8 @@ public class Compteur extends AbstractComponent {
 
 	public void majConso() {
 		Random rand = new Random();
-		this.consomation = 1000 + rand.nextInt(300);
+		this.consomation = CompteurReglage.MIN_THR_HOUSE_CONSOMMATION
+				+ rand.nextInt(CompteurReglage.MAX_THR_HOUSE_CONSOMMATION - CompteurReglage.MIN_THR_HOUSE_CONSOMMATION);
 	}
 
 	@Override
@@ -52,14 +54,14 @@ public class Compteur extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		
+
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
 					while (true) {
 						((Compteur) this.getTaskOwner()).majConso();
-						Thread.sleep(1000);
+						Thread.sleep(CompteurReglage.MAJ_RATE);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -81,11 +83,7 @@ public class Compteur extends AbstractComponent {
 
 	@Override
 	public void finalise() throws Exception {
-		try {
-			this.cptin.unpublishPort();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+
 		super.finalise();
 	}
 
