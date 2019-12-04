@@ -42,4 +42,14 @@ public class RefrigerateurConnector extends AbstractConnector implements IRefrig
 		return ((IRefrigerateur)this.offering).getTempBas();
 	}
 
+	@Override
+	public boolean isWorking() throws Exception {
+		return ((IRefrigerateur)this.offering).isWorking();
+	}
+
+	@Override
+	public boolean isOn() throws Exception {
+		return ((IRefrigerateur)this.offering).isOn();
+	}
+
 }

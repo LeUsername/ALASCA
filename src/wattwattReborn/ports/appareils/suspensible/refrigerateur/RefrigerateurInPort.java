@@ -80,4 +80,14 @@ public class RefrigerateurInPort extends AbstractInboundPort implements IRefrige
 		return this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).getTempBas());
 	}
 
+	@Override
+	public boolean isWorking() throws Exception {
+		return  this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).isWorking());
+	}
+
+	@Override
+	public boolean isOn() throws Exception {
+		return this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).isOn());
+	}
+
 }

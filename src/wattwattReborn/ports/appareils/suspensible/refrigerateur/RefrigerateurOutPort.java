@@ -54,4 +54,14 @@ public class RefrigerateurOutPort extends AbstractOutboundPort implements IRefri
 		return ((IRefrigerateur)this.connector).getTempBas();
 	}
 
+	@Override
+	public boolean isWorking() throws Exception {
+		return ((IRefrigerateur)this.connector).isWorking();
+	}
+
+	@Override
+	public boolean isOn() throws Exception {
+		return ((IRefrigerateur)this.connector).isOn();
+	}
+
 }

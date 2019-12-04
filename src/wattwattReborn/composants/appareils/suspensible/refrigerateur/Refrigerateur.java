@@ -11,102 +11,102 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurInPort;
+import wattwattReborn.tools.refrigerateur.RefrigerateurReglage;
 
 @OfferedInterfaces(offered = IRefrigerateur.class)
 @RequiredInterfaces(required = IControleur.class)
 public class Refrigerateur extends AbstractComponent {
 
-	protected final String REFRIGERATEUR_URI;
 	protected RefrigerateurInPort refrin;
-	
-	protected final double TEMP_H_MIN = 2;
-	protected final double TEMP_B_MIN = 8;
-	protected final double TEMP_H_MAX = 6;
-	protected final double TEMP_B_MAX = 12;
 
 	protected double tempH;
 	protected double tempB;
 
 	protected boolean isOn;
-	protected int conso;
 	protected boolean isWorking;
+	protected int conso;
 
 	protected Refrigerateur(String uri, String refriIn) throws Exception {
 		super(uri, 1, 1);
 
-		REFRIGERATEUR_URI = uri;
+		this.refrin = new RefrigerateurInPort(refriIn, this);
+		this.refrin.publishPort();
 
-		refrin = new RefrigerateurInPort(refriIn, this);
-		refrin.publishPort();
-
-		this.tempH = 3.0;
-		this.tempB = 8.0;
+		this.tempH = RefrigerateurReglage.TEMP_H_INIT;
+		this.tempB = RefrigerateurReglage.TEMP_B_INIT;
 
 		this.tracer.setRelativePosition(1, 0);
 	}
 
 	public double getTempHaut() {
-		return tempH;
+		return this.tempH;
 	}
 
 	public double getTempBas() {
-		return tempB;
+		return this.tempB;
 	}
 
 	public void suspend() {
-		if (isOn) {
-			isWorking = false;
-		}
-
+		this.isWorking = false;
 	}
 
 	public void resume() {
-		if (isOn) {
-			isWorking = true;
+		if (this.isOn) {
+			this.isWorking = true;
+		} else {
+			this.isWorking = false;
 		}
 
 	}
 
 	public void on() {
-		isOn = true;
-		isWorking = true;
+		this.isOn = true;
+		this.isWorking = true;
 	}
 
 	public void off() {
-		isOn = false;
-		isWorking = false;
+		this.isOn = false;
+		this.isWorking = false;
+	}
+
+	public boolean isWorking() {
+		return this.isWorking;
+	}
+
+	public boolean isOn() {
+		return this.isOn;
 	}
 
 	public void regule() {
 		if (this.isOn) {
 			if (this.isWorking) {
 
-				if (this.tempH > this.TEMP_H_MIN) {
+				if (this.tempH > RefrigerateurReglage.TEMP_H_MIN) {
 					this.tempH--;
 				}
-				if (this.tempB > this.TEMP_B_MIN) {
+				if (this.tempB > RefrigerateurReglage.TEMP_B_MIN) {
 					this.tempB--;
 				}
-				this.conso += 100; // a enlever ca
+				this.conso += RefrigerateurReglage.CONSOMMATION_ACTIVE;
 			} else {
-				if (this.tempH < this.TEMP_H_MAX) {
+				if (this.tempH < RefrigerateurReglage.TEMP_H_MAX) {
 					this.tempH++;
 				}
-				if (this.tempB < this.TEMP_B_MAX) {
+				if (this.tempB < RefrigerateurReglage.TEMP_B_MAX) {
 					this.tempB++;
 				}
-				if (this.conso - 50 <= 0) {
+				if (this.conso - RefrigerateurReglage.CONSOMMATION_PASSIVE <= 0) {
 					this.conso = 0;
 				} else {
-					this.conso -= 50; // a enlever ca
+					this.conso -= RefrigerateurReglage.CONSOMMATION_PASSIVE;
 				}
 
 			}
 		} else {
-			if (this.conso - 50 <= 0) {
+			if (this.conso - RefrigerateurReglage.CONSOMMATION_PASSIVE <= 0) {
 				this.conso = 0;
 			} else {
-				this.conso -= 50; // a enlever ca
+				this.conso -= RefrigerateurReglage.CONSOMMATION_PASSIVE;
 			}
 		}
 	}
@@ -132,14 +132,14 @@ public class Refrigerateur extends AbstractComponent {
 				try {
 					while (true) {
 						((Refrigerateur) this.getTaskOwner()).regule();
-						Thread.sleep(500);
+						Thread.sleep(RefrigerateurReglage.REGUL_RATE);
 						if (rand.nextInt(100) > 90) {
 							((Refrigerateur) this.getTaskOwner()).off();
-							for(int tick = 0; tick<5; tick++) {
-								Thread.sleep(500 + rand.nextInt(1000));
+							for (int tick = 0; tick < 5; tick++) {
+								Thread.sleep(RefrigerateurReglage.REGUL_RATE);
 								((Refrigerateur) this.getTaskOwner()).regule();
 							}
-							
+
 							((Refrigerateur) this.getTaskOwner()).on();
 						}
 					}

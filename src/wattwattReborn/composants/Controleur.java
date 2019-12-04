@@ -16,11 +16,8 @@ import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOut
 import wattwattReborn.ports.compteur.CompteurOutPort;
 
 @OfferedInterfaces(offered = IControleur.class)
-@RequiredInterfaces(required = {ICompteur.class, IRefrigerateur.class})
+@RequiredInterfaces(required = { ICompteur.class, IRefrigerateur.class })
 public class Controleur extends AbstractComponent {
-
-	protected String CONTROLEUR_URI;
-
 	protected String cptin;
 	protected String refrin;
 
@@ -30,33 +27,26 @@ public class Controleur extends AbstractComponent {
 	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut)
 			throws Exception {
 		super(uri, 1, 1);
-		
-		CONTROLEUR_URI = uri;
 
-		cptin = compteurIn;
-		refrin = refriIn;
+		this.cptin = compteurIn;
+		this.refrin = refriIn;
 
-		cptout = new CompteurOutPort(compteurOut, this);
-		cptout.publishPort();
+		this.cptout = new CompteurOutPort(compteurOut, this);
+		this.cptout.publishPort();
 
-		refriout = new RefrigerateurOutPort(refriOut, this);
-		refriout.publishPort();
+		this.refriout = new RefrigerateurOutPort(refriOut, this);
+		this.refriout.publishPort();
 
 		this.tracer.setRelativePosition(0, 0);
-	}
-
-	public String getCONTROLEUR_URI() {
-		return CONTROLEUR_URI;
 	}
 
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Controleur starting");
-		
+
 		try {
-			this.doPortConnection(this.cptout.getPortURI(), this.cptin,
-					CompteurConnector.class.getCanonicalName());
+			this.doPortConnection(this.cptout.getPortURI(), this.cptin, CompteurConnector.class.getCanonicalName());
 
 			this.doPortConnection(this.refriout.getPortURI(), this.refrin,
 					RefrigerateurConnector.class.getCanonicalName());
@@ -75,7 +65,7 @@ public class Controleur extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		
+
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
@@ -83,18 +73,25 @@ public class Controleur extends AbstractComponent {
 				try {
 					((Controleur) this.getTaskOwner()).refriout.On();
 					while (true) {
-						cons =((Controleur) this.getTaskOwner()).cptout.getAllConso();
+						cons = ((Controleur) this.getTaskOwner()).cptout.getAllConso();
 						((Controleur) this.getTaskOwner()).logMessage("Consomation : " + cons);
-						if (cons > 1220) {
+						if (cons > 1220 && ((Controleur) this.getTaskOwner()).refriout.isWorking()) {
 							((Controleur) this.getTaskOwner()).refriout.suspend();
-							((Controleur) this.getTaskOwner()).logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + ((Controleur) this.getTaskOwner()).refriout.getTempHaut()
-									+ " ] Temp en Bas : [" + ((Controleur) this.getTaskOwner()).refriout.getTempBas() + " ] Conso depuis le debut : ["
+							((Controleur) this.getTaskOwner()).logMessage("Refri>> SUSPEND : Temp en Haut : ["
+									+ ((Controleur) this.getTaskOwner()).refriout.getTempHaut() + " ] Temp en Bas : ["
+									+ ((Controleur) this.getTaskOwner()).refriout.getTempBas()
+									+ " ] Conso depuis le debut : ["
 									+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
 						} else {
-							((Controleur) this.getTaskOwner()).refriout.resume();
-							((Controleur) this.getTaskOwner()).logMessage("Refri>> suspend : [ .. ] Temp en Haut : [" + ((Controleur) this.getTaskOwner()).refriout.getTempHaut()
-									+ " ] Temp en Bas : [" + ((Controleur) this.getTaskOwner()).refriout.getTempBas() + " ] Conso depuis le debut : ["
-									+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
+							if (!((Controleur) this.getTaskOwner()).refriout.isWorking()) {
+								((Controleur) this.getTaskOwner()).refriout.resume();
+								((Controleur) this.getTaskOwner()).logMessage("Refri>> RESUME : Temp en Haut : ["
+										+ ((Controleur) this.getTaskOwner()).refriout.getTempHaut()
+										+ " ] Temp en Bas : ["
+										+ ((Controleur) this.getTaskOwner()).refriout.getTempBas()
+										+ " ] Conso depuis le debut : ["
+										+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
+							}
 						}
 						Thread.sleep(1000);
 					}

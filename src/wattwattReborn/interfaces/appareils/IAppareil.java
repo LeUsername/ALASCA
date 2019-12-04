@@ -8,5 +8,6 @@ public interface IAppareil extends OfferedI, RequiredI{
 	public void On() throws Exception;
 	public void Off() throws Exception;
 	public int getConso() throws Exception;
+	public boolean isOn() throws Exception;
 
 }

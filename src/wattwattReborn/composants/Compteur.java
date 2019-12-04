@@ -16,8 +16,6 @@ import wattwattReborn.ports.compteur.CompteurInPort;
 @RequiredInterfaces(required = IControleur.class)
 public class Compteur extends AbstractComponent {
 
-	protected String COMPTEUR_URI;
-
 	protected CompteurInPort cptin;
 	
 	protected int consomation;
@@ -25,15 +23,10 @@ public class Compteur extends AbstractComponent {
 	public Compteur(String uri, String compteurIn) throws Exception {
 		super(uri, 1, 1);
 		
-		COMPTEUR_URI = uri;
 		cptin = new CompteurInPort(compteurIn, this);
 		cptin.publishPort();
 
 		this.tracer.setRelativePosition(0, 1);
-	}
-
-	public String getCOMPTEUR_URI() {
-		return COMPTEUR_URI;
 	}
 
 	public int giveConso() throws Exception {
