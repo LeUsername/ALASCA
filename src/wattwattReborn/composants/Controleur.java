@@ -8,7 +8,7 @@ import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import wattwattReborn.connecteurs.CompteurConnector;
-import wattwattReborn.connecteurs.RefrigerateurConnector;
+import wattwattReborn.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;

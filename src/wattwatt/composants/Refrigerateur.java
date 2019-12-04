@@ -11,7 +11,6 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.interfaces.DataOfferedI;
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.SwitchOn;
 import wattwatt.data.StringData;
 import wattwatt.interfaces.IStringDataOffered;
 import wattwatt.interfaces.IStringDataRequired;
