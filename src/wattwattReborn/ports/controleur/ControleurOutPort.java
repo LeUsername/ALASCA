@@ -14,6 +14,12 @@ public class ControleurOutPort extends AbstractOutboundPort implements IControle
 	public ControleurOutPort(String uri, ComponentI owner) throws Exception {
 		super(uri, IControleur.class, owner);
 	}
+	
+	/// test dynamic
+	public ControleurOutPort(ComponentI owner) throws Exception {
+		super(IControleur.class, owner);
+	}
+	//
 
 	@Override
 	public int getAllConso() throws Exception {

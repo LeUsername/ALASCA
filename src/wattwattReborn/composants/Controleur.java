@@ -40,6 +40,8 @@ public class Controleur extends AbstractComponent {
 
 		this.tracer.setRelativePosition(0, 0);
 	}
+	
+	
 
 	@Override
 	public void start() throws ComponentStartException {

@@ -6,8 +6,10 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.ports.PortI;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.ports.compteur.CompteurInPort;
@@ -22,11 +24,22 @@ public class Compteur extends AbstractComponent {
 	protected int consomation;
 
 	public Compteur(String uri, String compteurIn) throws Exception {
-		super(uri, 1, 1);
+		super(1,1);
+//		super(uri, 1, 1);
 
-		this.cptin = new CompteurInPort(compteurIn, this);
+//		this.cptin = new CompteurInPort(compteurIn, this);
+		this.cptin = new CompteurInPort(this);
 		this.cptin.publishPort();
-
+		
+		/////////
+		if (AbstractCVM.isDistributed) {
+			this.executionLog.setDirectory(System.getProperty("user.dir")) ;
+		} else {
+			this.executionLog.setDirectory(System.getProperty("user.home")) ;
+		}
+		this.tracer.setTitle("compteur dynamic") ;
+		/////////
+		
 		this.tracer.setRelativePosition(0, 1);
 	}
 
@@ -79,6 +92,18 @@ public class Compteur extends AbstractComponent {
 			e.printStackTrace();
 		}
 		super.shutdown();
+	}
+	
+	@Override
+	public void			shutdownNow() throws ComponentShutdownException
+	{
+		try {
+			PortI[] p = this.findPortsFromInterface(ICompteur.class) ;
+			p[0].unpublishPort() ;
+		} catch (Exception e) {
+			throw new ComponentShutdownException(e);
+		}
+		super.shutdownNow();
 	}
 
 	@Override

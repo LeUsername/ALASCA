@@ -16,6 +16,13 @@ public class CompteurInPort extends AbstractInboundPort implements ICompteur{
 		super(uri,ICompteur.class, owner);
 		
 	}
+	
+	/// tenta dynamique
+	public CompteurInPort(ComponentI owner) throws Exception {
+		super(ICompteur.class, owner);
+		
+	}
+	////
 
 	@Override
 	public int getAllConso() throws Exception {
