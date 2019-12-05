@@ -7,11 +7,10 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import wattwattReborn.connecteurs.CompteurConnector;
-import wattwattReborn.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
+import wattwattReborn.ports.appareils.incontrolable.sechecheveux.SecheCheveuxOutPort;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOutPort;
 import wattwattReborn.ports.compteur.CompteurOutPort;
 import wattwattReborn.tools.controleur.ControleurReglage;
@@ -21,22 +20,28 @@ import wattwattReborn.tools.controleur.ControleurReglage;
 public class Controleur extends AbstractComponent {
 	protected String cptin;
 	protected String refrin;
+	protected String sechin;
 
 	protected CompteurOutPort cptout;
 	protected RefrigerateurOutPort refriout;
+	protected SecheCheveuxOutPort sechout;
 
-	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut)
+	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin, String sechOut)
 			throws Exception {
 		super(uri, 1, 1);
 
 		this.cptin = compteurIn;
 		this.refrin = refriIn;
+		this.sechin = sechin;
 
 		this.cptout = new CompteurOutPort(compteurOut, this);
 		this.cptout.publishPort();
 
 		this.refriout = new RefrigerateurOutPort(refriOut, this);
 		this.refriout.publishPort();
+		
+		this.sechout = new SecheCheveuxOutPort(sechOut, this);
+		this.sechout.publishPort();
 
 		this.tracer.setRelativePosition(0, 0);
 	}
@@ -45,22 +50,6 @@ public class Controleur extends AbstractComponent {
 	public void start() throws ComponentStartException {
 		super.start();
 		this.logMessage("Controleur starting");
-
-		try {
-			this.doPortConnection(this.cptout.getPortURI(), this.cptin, CompteurConnector.class.getCanonicalName());
-
-			this.doPortConnection(this.refriout.getPortURI(), this.refrin,
-					RefrigerateurConnector.class.getCanonicalName());
-
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-
-		try {
-			Thread.sleep(100);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -94,6 +83,9 @@ public class Controleur extends AbstractComponent {
 										+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ]");
 							}
 						}
+						if(((Controleur) this.getTaskOwner()).sechout.isOn()) {
+							((Controleur) this.getTaskOwner()).logMessage("SecheCheveux>> ON Conso : [ "+((Controleur) this.getTaskOwner()).sechout.getConso()+" ] : ");
+						}
 						Thread.sleep(ControleurReglage.MAJ_RATE);
 					}
 				} catch (Exception e) {
@@ -109,6 +101,7 @@ public class Controleur extends AbstractComponent {
 		try {
 			this.cptout.unpublishPort();
 			this.refriout.unpublishPort();
+			this.sechout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
