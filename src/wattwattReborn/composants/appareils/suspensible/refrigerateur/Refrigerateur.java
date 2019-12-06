@@ -80,11 +80,10 @@ public class Refrigerateur extends AbstractComponent {
 	public int giveConso() {
 		return conso;
 	}
-	
+
 	public void regule() {
 		if (this.isOn) {
 			if (this.isWorking) {
-
 				if (this.tempH > RefrigerateurReglage.TEMP_H_MIN) {
 					this.tempH--;
 				}
@@ -115,6 +114,12 @@ public class Refrigerateur extends AbstractComponent {
 		}
 	}
 
+	public void printState() {
+		this.logMessage(">>> isOn : [" + this.isOn + "] Working : [" + this.isWorking + "] Temp Haut : ["
+				+ this.getTempHaut() + " ] Temp Bas : [" + this.getTempBas() + " ] \n>>> Conso depuis le debut : ["
+				+ this.giveConso() + " ]\n");
+	}
+
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -136,14 +141,15 @@ public class Refrigerateur extends AbstractComponent {
 				try {
 					while (true) {
 						((Refrigerateur) this.getTaskOwner()).regule();
+						((Refrigerateur) this.getTaskOwner()).printState();
 						Thread.sleep(RefrigerateurReglage.REGUL_RATE);
 						if (rand.nextInt(100) > 90) {
 							((Refrigerateur) this.getTaskOwner()).off();
 							for (int tick = 0; tick < 5; tick++) {
 								Thread.sleep(RefrigerateurReglage.REGUL_RATE);
 								((Refrigerateur) this.getTaskOwner()).regule();
+								((Refrigerateur) this.getTaskOwner()).printState();
 							}
-
 							((Refrigerateur) this.getTaskOwner()).on();
 						}
 					}
@@ -170,5 +176,4 @@ public class Refrigerateur extends AbstractComponent {
 		super.finalise();
 	}
 
-	
 }

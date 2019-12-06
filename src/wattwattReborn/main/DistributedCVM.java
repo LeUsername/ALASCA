@@ -6,9 +6,11 @@ import wattwattReborn.composants.Compteur;
 import wattwattReborn.composants.Controleur;
 import wattwattReborn.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
 import wattwattReborn.composants.appareils.suspensible.refrigerateur.Refrigerateur;
+import wattwattReborn.composants.sources.aleatoire.eolienne.Eolienne;
 import wattwattReborn.connecteurs.CompteurConnector;
 import wattwattReborn.connecteurs.appareils.incontrolable.sechecheveux.SecheCheveuxConnector;
 import wattwattReborn.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
+import wattwattReborn.connecteurs.sources.aleatoire.eolienne.EolienneConnector;
 import wattwattReborn.tools.URIS;
 
 public class DistributedCVM extends AbstractDistributedCVM {
@@ -17,6 +19,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 	protected String controleurUri;
 	protected String refriUri;
 	protected String secheUri;
+	protected String eolUri;
 
 	public DistributedCVM(String[] args) throws Exception {
 		super(args);
@@ -65,6 +68,15 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.toggleTracing(this.secheUri);
 			this.toggleLogging(this.secheUri);
 
+		} else if (thisJVMURI.equals(URIS.EOLIENNE_URI)) {
+
+			this.eolUri = AbstractComponent.createComponent(Eolienne.class.getCanonicalName(),
+					new Object[] { URIS.EOLIENNE_URI, URIS.EOLIENNE_IN_URI });
+			assert this.isDeployedComponent(this.eolUri);
+			assert this.isDeployedComponent(this.eolUri);
+			this.toggleTracing(this.eolUri);
+			this.toggleLogging(this.eolUri);
+
 		} else {
 
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
@@ -86,6 +98,9 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 			this.doPortConnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
 					SecheCheveuxConnector.class.getCanonicalName());
+			
+			this.doPortConnection(this.controleurUri, URIS.EOLIENNE_OUT_URI, URIS.EOLIENNE_IN_URI,
+					EolienneConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
 

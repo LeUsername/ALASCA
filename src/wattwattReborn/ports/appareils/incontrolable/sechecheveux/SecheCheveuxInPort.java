@@ -6,7 +6,7 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwattReborn.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
 import wattwattReborn.interfaces.appareils.incontrolable.sechecheveux.ISecheCheveux;
 
-public class SecheCheveuxInPort extends AbstractInboundPort implements ISecheCheveux{
+public class SecheCheveuxInPort extends AbstractInboundPort implements ISecheCheveux {
 
 	/**
 	 * 
@@ -19,81 +19,73 @@ public class SecheCheveuxInPort extends AbstractInboundPort implements ISecheChe
 
 	@Override
 	public void On() throws Exception {
-		this.owner.handleRequestAsync(
-				new AbstractComponent.AbstractService<Void>() {
-					@Override
-					public Void call() throws Exception {
-						((SecheCheveux)this.getServiceOwner()).on() ;
-						return null;
-					}
-				}) ;
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((SecheCheveux) this.getServiceOwner()).on();
+				return null;
+			}
+		});
 	}
 
 	@Override
 	public void Off() throws Exception {
-		this.owner.handleRequestAsync(
-				new AbstractComponent.AbstractService<Void>() {
-					@Override
-					public Void call() throws Exception {
-						((SecheCheveux)this.getServiceOwner()).off() ;
-						return null;
-					}
-				}) ;
-		
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((SecheCheveux) this.getServiceOwner()).off();
+				return null;
+			}
+		});
+
 	}
 
 	@Override
 	public int getConso() throws Exception {
-		return this.getOwner().handleRequestSync(owner ->((SecheCheveux)owner).giveConso());
+		return this.getOwner().handleRequestSync(owner -> ((SecheCheveux) owner).giveConso());
 
 	}
 
 	@Override
 	public boolean isOn() throws Exception {
-		return this.getOwner().handleRequestSync(owner ->((SecheCheveux)owner).isOn());
+		return this.getOwner().handleRequestSync(owner -> ((SecheCheveux) owner).isOn());
 
 	}
 
 	@Override
 	public void switchMode() throws Exception {
-		this.owner.handleRequestAsync(
-				new AbstractComponent.AbstractService<Void>() {
-					@Override
-					public Void call() throws Exception {
-						((SecheCheveux)this.getServiceOwner()).switchMode() ;
-						return null;
-					}
-				}) ;
-		
-		
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((SecheCheveux) this.getServiceOwner()).switchMode();
+				return null;
+			}
+		});
+
 	}
 
 	@Override
 	public void increasePower() throws Exception {
-		this.owner.handleRequestAsync(
-				new AbstractComponent.AbstractService<Void>() {
-					@Override
-					public Void call() throws Exception {
-						((SecheCheveux)this.getServiceOwner()).increasePower() ;
-						return null;
-					}
-				}) ;
-		
-		
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((SecheCheveux) this.getServiceOwner()).increasePower();
+				return null;
+			}
+		});
+
 	}
 
 	@Override
 	public void decreasePower() throws Exception {
-		this.owner.handleRequestAsync(
-				new AbstractComponent.AbstractService<Void>() {
-					@Override
-					public Void call() throws Exception {
-						((SecheCheveux)this.getServiceOwner()).decreasePower() ;
-						return null;
-					}
-				}) ;
-		
-		
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((SecheCheveux) this.getServiceOwner()).decreasePower();
+				return null;
+			}
+		});
+
 	}
 
 }

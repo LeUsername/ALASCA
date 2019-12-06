@@ -89,7 +89,7 @@ public class SecheCheveux extends AbstractComponent {
 	}
 
 	public void behave(Random rand) {
-		if (isOn) {
+		if (this.isOn) {
 			if (rand.nextBoolean()) {
 				this.switchMode();
 				if (rand.nextBoolean()) {
@@ -133,13 +133,12 @@ public class SecheCheveux extends AbstractComponent {
 						if (rand.nextInt(100) > 98 && useTime == 0) {
 							((SecheCheveux) this.getTaskOwner()).on();
 							useTime = SecheCheveuxReglage.MIN_USE_TIME + rand.nextInt(SecheCheveuxReglage.MAX_USE_TIME);
-							((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux ON for : "+useTime);
-						}else {
+							((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux ON for : " + useTime);
+						} else {
 							((SecheCheveux) this.getTaskOwner()).behave(rand);
-							if(useTime - 1 <= 0) {
+							if (useTime - 1 <= 0) {
 								useTime = 0;
-							}
-							else {
+							} else {
 								useTime--;
 							}
 							Thread.sleep(SecheCheveuxReglage.REGUL_RATE);
@@ -148,7 +147,7 @@ public class SecheCheveux extends AbstractComponent {
 								((SecheCheveux) this.getTaskOwner()).off();
 							}
 						}
-						
+
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -159,7 +158,7 @@ public class SecheCheveux extends AbstractComponent {
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Compteur shutdown");
+		this.logMessage("Eolienne shutdown");
 		try {
 			this.sechin.unpublishPort();
 		} catch (Exception e) {

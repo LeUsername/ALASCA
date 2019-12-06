@@ -15,5 +15,9 @@ java -ea -cp 'jars/*' -Djava.security.manager \
 java -ea -cp 'jars/*' -Djava.security.manager \
      -Djava.security.policy=dcvm.policy \
      distributedcvm.DistributedCVM seche config.xml &
+     
+java -ea -cp 'jars/*' -Djava.security.manager \
+     -Djava.security.policy=dcvm.policy \
+     distributedcvm.DistributedCVM eolienne config.xml &
 
 

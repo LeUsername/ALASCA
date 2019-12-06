@@ -13,7 +13,9 @@
 			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
 		<jvm2hostname jvmuri="refri" rmiRegistryCreator="false"
 			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
-			<jvm2hostname jvmuri="seche" rmiRegistryCreator="false"
+		<jvm2hostname jvmuri="seche" rmiRegistryCreator="false"
+			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
+		<jvm2hostname jvmuri="eolienne" rmiRegistryCreator="false"
 			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
 	</jvms2hostnames>
 </deployment>
