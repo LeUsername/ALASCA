@@ -19,5 +19,7 @@
 			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
 		<jvm2hostname jvmuri="lave" rmiRegistryCreator="false"
 			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
+		<jvm2hostname jvmuri="groupe" rmiRegistryCreator="false"
+			hostname="localhost" mainclass="src.wattwattReborn.main.DistributedCVM" />
 	</jvms2hostnames>
 </deployment>

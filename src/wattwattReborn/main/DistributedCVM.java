@@ -8,10 +8,12 @@ import wattwattReborn.composants.appareils.incontrolable.sechecheveux.SecheCheve
 import wattwattReborn.composants.appareils.planifiable.lavelinge.LaveLinge;
 import wattwattReborn.composants.appareils.suspensible.refrigerateur.Refrigerateur;
 import wattwattReborn.composants.sources.aleatoire.eolienne.Eolienne;
+import wattwattReborn.composants.sources.intermittent.groupeelectrogene.GroupeElectrogene;
 import wattwattReborn.connecteurs.CompteurConnector;
 import wattwattReborn.connecteurs.appareils.incontrolable.sechecheveux.SecheCheveuxConnector;
 import wattwattReborn.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
 import wattwattReborn.connecteurs.sources.aleatoire.eolienne.EolienneConnector;
+import wattwattReborn.connecteurs.sources.intermittent.groupeelectrogene.GroupeElectrogeneConnector;
 import wattwattReborn.tools.URIS;
 
 public class DistributedCVM extends AbstractDistributedCVM {
@@ -22,6 +24,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 	protected String secheUri;
 	protected String eolUri;
 	protected String laveUri;
+	protected String groupeUri;
 
 	public DistributedCVM(String[] args) throws Exception {
 		super(args);
@@ -88,6 +91,15 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.toggleTracing(this.laveUri);
 			this.toggleLogging(this.laveUri);
 
+		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
+
+			this.groupeUri = AbstractComponent.createComponent(GroupeElectrogene.class.getCanonicalName(),
+					new Object[] { URIS.GROUPEELECTRO_URI, URIS.GROUPEELECTRO_IN_URI });
+			assert this.isDeployedComponent(this.groupeUri);
+			assert this.isDeployedComponent(this.groupeUri);
+			this.toggleTracing(this.groupeUri);
+			this.toggleLogging(this.groupeUri);
+
 		} else {
 
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
@@ -109,14 +121,18 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 			this.doPortConnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
 					SecheCheveuxConnector.class.getCanonicalName());
-			
+
 			this.doPortConnection(this.controleurUri, URIS.EOLIENNE_OUT_URI, URIS.EOLIENNE_IN_URI,
 					EolienneConnector.class.getCanonicalName());
+
+			this.doPortConnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
+					GroupeElectrogeneConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
 		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
 		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -137,6 +153,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
 		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
 		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -151,6 +168,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
 		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
 		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
