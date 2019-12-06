@@ -1,37 +1,16 @@
 #!/bin/bash
-java -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     fr.sorbonne_u.components.registry.GlobalRegistry config.xml &
-
 java -ea -Xms2m -cp 'jars/*' -Djava.security.manager \
      -Djava.security.policy=dcvm.policy \
      fr.sorbonne_u.components.cvm.utils.DCVMCyclicBarrier config.xml &
 
-java -ea -cp 'jars/*' -Djava.security.manager \
+java -cp 'jars/*' -Djava.security.manager \
      -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM controleur config.xml &
-
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM compteur config.xml &
-
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM refri config.xml &
-
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM seche config.xml &
-     
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM eolienne config.xml &
-     
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM lave config.xml &
-
-java -ea -cp 'jars/*' -Djava.security.manager \
-     -Djava.security.policy=dcvm.policy \
-     distributedcvm.DistributedCVM groupe config.xml &
-
+     fr.sorbonne_u.components.registry.GlobalRegistry config.xml &
+sleep 3
+java -jar jars/WattWatt.jar "controleur" "config.xml" &
+java -jar jars/WattWatt.jar "compteur" "config.xml" &
+java -jar jars/WattWatt.jar "refri" "config.xml" &
+java -jar jars/WattWatt.jar "seche" "config.xml" &
+java -jar jars/WattWatt.jar "eolienne" "config.xml" &
+java -jar jars/WattWatt.jar "lave" "config.xml" &
+java -jar jars/WattWatt.jar "groupe" "config.xml"
