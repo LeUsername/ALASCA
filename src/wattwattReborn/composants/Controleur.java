@@ -8,46 +8,51 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import wattwatt.interfaces.appareils.planifiable.ILaveLinge;
 import wattwattReborn.interfaces.appareils.incontrolable.sechecheveux.ISecheCheveux;
+import wattwattReborn.interfaces.appareils.planifiable.lavelinge.ILaveLinge;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.interfaces.sources.aleatoire.eolienne.IEolienne;
+import wattwattReborn.interfaces.sources.intermittent.IGroupeElectrogene;
 import wattwattReborn.ports.appareils.incontrolable.sechecheveux.SecheCheveuxOutPort;
 import wattwattReborn.ports.appareils.planifiable.lavelinge.LaveLingeOutPort;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOutPort;
 import wattwattReborn.ports.compteur.CompteurOutPort;
 import wattwattReborn.ports.sources.aleatoire.eolienne.EolienneOutPort;
+import wattwattReborn.ports.sources.intermittent.groupeelectrogene.GroupeElectrogeneOutPort;
 import wattwattReborn.tools.controleur.ControleurReglage;
 
 @OfferedInterfaces(offered = IControleur.class)
 @RequiredInterfaces(required = { ICompteur.class, IRefrigerateur.class, ISecheCheveux.class, IEolienne.class,
-		ILaveLinge.class })
+		ILaveLinge.class, IGroupeElectrogene.class })
 public class Controleur extends AbstractComponent {
 	protected String cptin;
 	protected String refrin;
 	protected String sechin;
 	protected String eoin;
 	protected String lavein;
+	protected String groupein;
 
 	protected CompteurOutPort cptout;
 	protected RefrigerateurOutPort refriout;
 	protected SecheCheveuxOutPort sechout;
 	protected EolienneOutPort eoout;
 	protected LaveLingeOutPort laveout;
+	protected GroupeElectrogeneOutPort groupeout;
 
 	protected int allCons;
 
 	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin,
-			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut) throws Exception {
-		super(uri, 1, 5);
+			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut, String groupeIn, String groupeOut) throws Exception {
+		super(uri, 1, 6);
 
 		this.cptin = compteurIn;
 		this.refrin = refriIn;
 		this.sechin = sechin;
 		this.eoin = eoIn;
 		this.lavein = laveIn;
+		this.groupein = groupeIn;
 
 		this.cptout = new CompteurOutPort(compteurOut, this);
 		this.cptout.publishPort();
@@ -63,6 +68,9 @@ public class Controleur extends AbstractComponent {
 
 		this.laveout = new LaveLingeOutPort(laveOut, this);
 		this.laveout.publishPort();
+		
+		this.groupeout = new GroupeElectrogeneOutPort(groupeOut, this);
+		this.groupeout.publishPort();
 
 		this.tracer.setRelativePosition(0, 0);
 	}
@@ -187,6 +195,22 @@ public class Controleur extends AbstractComponent {
 				}
 			}
 		}, 100, TimeUnit.MILLISECONDS);
+		
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						((Controleur) this.getTaskOwner())
+								.logMessage("Groupe Electro>> " + ((Controleur) this.getTaskOwner()).groupeout.fuelQuantity());
+
+						Thread.sleep(ControleurReglage.MAJ_RATE);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -198,6 +222,7 @@ public class Controleur extends AbstractComponent {
 			this.sechout.unpublishPort();
 			this.eoout.unpublishPort();
 			this.laveout.unpublishPort();
+			this.groupeout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

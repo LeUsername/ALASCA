@@ -9,6 +9,7 @@ public class URIS {
 	public static final String SECHECHEVEUX_URI = "seche";
 	public static final String EOLIENNE_URI = "eolienne";
 	public static final String LAVELINGE_URI = "lave";
+	public static final String GROUPEELECTRO_URI = "groupe";
 
 	public static final String COMPTEUR_IN_URI = "compteurIn";
 	public static final String COMPTEUR_OUT_URI = "compteurOut";
@@ -24,4 +25,7 @@ public class URIS {
 	
 	public static final String LAVELINGE_IN_URI = "laveIn";
 	public static final String LAVELINGE_OUT_URI = "laveOut";
+	
+	public static final String GROUPEELECTRO_IN_URI = "groupeIn";
+	public static final String GROUPEELECTRO_OUT_URI = "groupeOut";
 }

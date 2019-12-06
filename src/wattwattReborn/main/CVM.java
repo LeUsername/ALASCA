@@ -8,11 +8,13 @@ import wattwattReborn.composants.appareils.incontrolable.sechecheveux.SecheCheve
 import wattwattReborn.composants.appareils.planifiable.lavelinge.LaveLinge;
 import wattwattReborn.composants.appareils.suspensible.refrigerateur.Refrigerateur;
 import wattwattReborn.composants.sources.aleatoire.eolienne.Eolienne;
+import wattwattReborn.composants.sources.intermittent.groupeelectrogene.GroupeElectrogene;
 import wattwattReborn.connecteurs.CompteurConnector;
 import wattwattReborn.connecteurs.appareils.incontrolable.sechecheveux.SecheCheveuxConnector;
 import wattwattReborn.connecteurs.appareils.planifiable.lavelinge.LaveLingeConnector;
 import wattwattReborn.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
 import wattwattReborn.connecteurs.sources.aleatoire.eolienne.EolienneConnector;
+import wattwattReborn.connecteurs.sources.intermittent.groupeelectrogene.GroupeElectrogeneConnector;
 import wattwattReborn.tools.URIS;
 
 public class CVM extends AbstractCVM {
@@ -23,6 +25,7 @@ public class CVM extends AbstractCVM {
 	protected String secheUri;
 	protected String eolUri;
 	protected String laveUri;
+	protected String groupeUri;
 
 	public CVM() throws Exception {
 		super();
@@ -37,7 +40,7 @@ public class CVM extends AbstractCVM {
 				new Object[] { URIS.CONTROLLEUR_URI, URIS.COMPTEUR_IN_URI, URIS.COMPTEUR_OUT_URI,
 						URIS.REFRIGERATEUR_IN_URI, URIS.REFRIGERATEUR_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
 						URIS.SECHECHEVEUX_OUT_URI, URIS.EOLIENNE_IN_URI, URIS.EOLIENNE_OUT_URI, URIS.LAVELINGE_IN_URI,
-						URIS.LAVELINGE_OUT_URI });
+						URIS.LAVELINGE_OUT_URI , URIS.GROUPEELECTRO_IN_URI, URIS.GROUPEELECTRO_OUT_URI});
 		assert this.isDeployedComponent(this.controleurUri);
 
 		this.compteurUri = AbstractComponent.createComponent(Compteur.class.getCanonicalName(),
@@ -58,7 +61,11 @@ public class CVM extends AbstractCVM {
 		
 		this.laveUri = AbstractComponent.createComponent(LaveLinge.class.getCanonicalName(),
 				new Object[] { URIS.LAVELINGE_URI, URIS.LAVELINGE_IN_URI });
-		assert this.isDeployedComponent(this.eolUri);
+		assert this.isDeployedComponent(this.laveUri);
+		
+		this.groupeUri = AbstractComponent.createComponent(GroupeElectrogene.class.getCanonicalName(),
+				new Object[] { URIS.GROUPEELECTRO_URI, URIS.GROUPEELECTRO_IN_URI });
+		assert this.isDeployedComponent(this.groupeUri);
 
 		this.toggleLogging(this.controleurUri);
 		this.toggleTracing(this.controleurUri);
@@ -77,6 +84,9 @@ public class CVM extends AbstractCVM {
 		
 		this.toggleLogging(this.laveUri);
 		this.toggleTracing(this.laveUri);
+		
+		this.toggleLogging(this.groupeUri);
+		this.toggleTracing(this.groupeUri);
 
 		this.doPortConnection(this.controleurUri, URIS.COMPTEUR_OUT_URI, URIS.COMPTEUR_IN_URI,
 				CompteurConnector.class.getCanonicalName());
@@ -92,6 +102,9 @@ public class CVM extends AbstractCVM {
 		
 		this.doPortConnection(this.controleurUri, URIS.LAVELINGE_OUT_URI, URIS.LAVELINGE_IN_URI,
 				LaveLingeConnector.class.getCanonicalName());
+		
+		this.doPortConnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
+				GroupeElectrogeneConnector.class.getCanonicalName());
 
 		super.deploy();
 		assert this.deploymentDone();
@@ -104,6 +117,7 @@ public class CVM extends AbstractCVM {
 		this.doPortDisconnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.EOLIENNE_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.LAVELINGE_OUT_URI);
+		this.doPortDisconnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI);
 		super.finalise();
 	}
 

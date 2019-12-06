@@ -8,7 +8,7 @@ public interface IGroupeElectrogene extends ISources {
 	public boolean fuelIsFull() throws Exception;
 	public int fuelQuantity() throws Exception;
 	
-	public void start() throws Exception; // use fuel to prod electricity
-	public void stop() throws Exception;
+	public void on() throws Exception; // use fuel to prod electricity
+	public void off() throws Exception;
 
 }
