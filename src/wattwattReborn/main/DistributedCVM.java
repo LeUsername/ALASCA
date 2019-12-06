@@ -5,6 +5,7 @@ import fr.sorbonne_u.components.cvm.AbstractDistributedCVM;
 import wattwattReborn.composants.Compteur;
 import wattwattReborn.composants.Controleur;
 import wattwattReborn.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
+import wattwattReborn.composants.appareils.planifiable.lavelinge.LaveLinge;
 import wattwattReborn.composants.appareils.suspensible.refrigerateur.Refrigerateur;
 import wattwattReborn.composants.sources.aleatoire.eolienne.Eolienne;
 import wattwattReborn.connecteurs.CompteurConnector;
@@ -20,6 +21,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 	protected String refriUri;
 	protected String secheUri;
 	protected String eolUri;
+	protected String laveUri;
 
 	public DistributedCVM(String[] args) throws Exception {
 		super(args);
@@ -77,6 +79,15 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.toggleTracing(this.eolUri);
 			this.toggleLogging(this.eolUri);
 
+		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
+
+			this.laveUri = AbstractComponent.createComponent(LaveLinge.class.getCanonicalName(),
+					new Object[] { URIS.LAVELINGE_URI, URIS.LAVELINGE_IN_URI });
+			assert this.isDeployedComponent(this.laveUri);
+			assert this.isDeployedComponent(this.laveUri);
+			this.toggleTracing(this.laveUri);
+			this.toggleLogging(this.laveUri);
+
 		} else {
 
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
@@ -103,10 +114,9 @@ public class DistributedCVM extends AbstractDistributedCVM {
 					EolienneConnector.class.getCanonicalName());
 
 		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
+		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -120,12 +130,13 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.doPortDisconnection(this.controleurUri, URIS.COMPTEUR_OUT_URI);
 			this.doPortDisconnection(this.controleurUri, URIS.REFRIGERATEUR_OUT_URI);
 			this.doPortDisconnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.EOLIENNE_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.LAVELINGE_OUT_URI);
 
 		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
+		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -136,11 +147,10 @@ public class DistributedCVM extends AbstractDistributedCVM {
 	@Override
 	public void shutdown() throws Exception {
 		if (thisJVMURI.equals(URIS.CONTROLLEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-
 		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-
+		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
+		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}

@@ -1,4 +1,11 @@
 #!/bin/bash
+java -cp 'jars/*' -Djava.security.manager \
+     -Djava.security.policy=dcvm.policy \
+     fr.sorbonne_u.components.registry.GlobalRegistry config.xml &
+
+java -ea -Xms2m -cp 'jars/*' -Djava.security.manager \
+     -Djava.security.policy=dcvm.policy \
+     fr.sorbonne_u.components.cvm.utils.DCVMCyclicBarrier config.xml &
 
 java -ea -cp 'jars/*' -Djava.security.manager \
      -Djava.security.policy=dcvm.policy \
@@ -19,5 +26,9 @@ java -ea -cp 'jars/*' -Djava.security.manager \
 java -ea -cp 'jars/*' -Djava.security.manager \
      -Djava.security.policy=dcvm.policy \
      distributedcvm.DistributedCVM eolienne config.xml &
+     
+java -ea -cp 'jars/*' -Djava.security.manager \
+     -Djava.security.policy=dcvm.policy \
+     distributedcvm.DistributedCVM lave config.xml &
 
 

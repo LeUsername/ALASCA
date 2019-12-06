@@ -162,7 +162,7 @@ public class Refrigerateur extends AbstractComponent {
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Compteur shutdown");
+		this.logMessage("Refrigerateur shutdown");
 		try {
 			this.refrin.unpublishPort();
 		} catch (Exception e) {

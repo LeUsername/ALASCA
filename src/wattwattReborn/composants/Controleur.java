@@ -8,40 +8,46 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import wattwatt.interfaces.appareils.planifiable.ILaveLinge;
 import wattwattReborn.interfaces.appareils.incontrolable.sechecheveux.ISecheCheveux;
 import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwattReborn.interfaces.compteur.ICompteur;
 import wattwattReborn.interfaces.controleur.IControleur;
 import wattwattReborn.interfaces.sources.aleatoire.eolienne.IEolienne;
 import wattwattReborn.ports.appareils.incontrolable.sechecheveux.SecheCheveuxOutPort;
+import wattwattReborn.ports.appareils.planifiable.lavelinge.LaveLingeOutPort;
 import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOutPort;
 import wattwattReborn.ports.compteur.CompteurOutPort;
 import wattwattReborn.ports.sources.aleatoire.eolienne.EolienneOutPort;
 import wattwattReborn.tools.controleur.ControleurReglage;
 
 @OfferedInterfaces(offered = IControleur.class)
-@RequiredInterfaces(required = { ICompteur.class, IRefrigerateur.class, ISecheCheveux.class, IEolienne.class})
+@RequiredInterfaces(required = { ICompteur.class, IRefrigerateur.class, ISecheCheveux.class, IEolienne.class,
+		ILaveLinge.class })
 public class Controleur extends AbstractComponent {
 	protected String cptin;
 	protected String refrin;
 	protected String sechin;
 	protected String eoin;
+	protected String lavein;
 
 	protected CompteurOutPort cptout;
 	protected RefrigerateurOutPort refriout;
 	protected SecheCheveuxOutPort sechout;
 	protected EolienneOutPort eoout;
+	protected LaveLingeOutPort laveout;
 
 	protected int allCons;
 
 	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin,
-			String sechOut, String eoIn, String eoOut) throws Exception {
-		super(uri, 1, 4);
+			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut) throws Exception {
+		super(uri, 1, 5);
 
 		this.cptin = compteurIn;
 		this.refrin = refriIn;
 		this.sechin = sechin;
 		this.eoin = eoIn;
+		this.lavein = laveIn;
 
 		this.cptout = new CompteurOutPort(compteurOut, this);
 		this.cptout.publishPort();
@@ -54,6 +60,9 @@ public class Controleur extends AbstractComponent {
 
 		this.eoout = new EolienneOutPort(eoOut, this);
 		this.eoout.publishPort();
+
+		this.laveout = new LaveLingeOutPort(laveOut, this);
+		this.laveout.publishPort();
 
 		this.tracer.setRelativePosition(0, 0);
 	}
@@ -101,12 +110,13 @@ public class Controleur extends AbstractComponent {
 								((Controleur) this.getTaskOwner()).refriout.resume();
 							}
 						}
-						if (((Controleur) this.getTaskOwner()).refriout.isOn() && ((Controleur) this.getTaskOwner()).refriout.isWorking() ) {
+						if (((Controleur) this.getTaskOwner()).refriout.isOn()
+								&& ((Controleur) this.getTaskOwner()).refriout.isWorking()) {
 							((Controleur) this.getTaskOwner()).logMessage("Refri>> ON and Working Conso : [ "
 									+ ((Controleur) this.getTaskOwner()).refriout.getConso() + " ] : ");
 						}
 						Thread.sleep(ControleurReglage.MAJ_RATE);
-						
+
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
@@ -130,7 +140,7 @@ public class Controleur extends AbstractComponent {
 				}
 			}
 		}, 1000, TimeUnit.MILLISECONDS);
-		
+
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
@@ -141,21 +151,35 @@ public class Controleur extends AbstractComponent {
 						if (((Controleur) this.getTaskOwner()).eoout.isOn()) {
 							((Controleur) this.getTaskOwner()).logMessage("Eolienne>> ON Prod : [ "
 									+ ((Controleur) this.getTaskOwner()).eoout.getEnergie() + " ] : ");
-						}
-						else {
+						} else {
 							((Controleur) this.getTaskOwner()).logMessage("Eolienne>> OFF Prod : [ "
 									+ ((Controleur) this.getTaskOwner()).eoout.getEnergie() + " ] : ");
 						}
-						if( rand.nextInt(100)>60) {
-							
-							if(((Controleur) this.getTaskOwner()).eoout.isOn()) {
+						if (rand.nextInt(100) > 60) {
+
+							if (((Controleur) this.getTaskOwner()).eoout.isOn()) {
 								((Controleur) this.getTaskOwner()).eoout.Off();
-							}	
-							else {
+							} else {
 								((Controleur) this.getTaskOwner()).eoout.On();
 							}
 						}
-						
+
+						Thread.sleep(ControleurReglage.MAJ_RATE);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}, 100, TimeUnit.MILLISECONDS);
+
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						((Controleur) this.getTaskOwner())
+								.logMessage("LaveLinge>> " + ((Controleur) this.getTaskOwner()).laveout.durationWork());
+
 						Thread.sleep(ControleurReglage.MAJ_RATE);
 					}
 				} catch (Exception e) {
@@ -173,6 +197,7 @@ public class Controleur extends AbstractComponent {
 			this.refriout.unpublishPort();
 			this.sechout.unpublishPort();
 			this.eoout.unpublishPort();
+			this.laveout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
