@@ -40,7 +40,7 @@ public class CVM extends AbstractCVM {
 				new Object[] { URIS.CONTROLLEUR_URI, URIS.COMPTEUR_IN_URI, URIS.COMPTEUR_OUT_URI,
 						URIS.REFRIGERATEUR_IN_URI, URIS.REFRIGERATEUR_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
 						URIS.SECHECHEVEUX_OUT_URI, URIS.EOLIENNE_IN_URI, URIS.EOLIENNE_OUT_URI, URIS.LAVELINGE_IN_URI,
-						URIS.LAVELINGE_OUT_URI , URIS.GROUPEELECTRO_IN_URI, URIS.GROUPEELECTRO_OUT_URI});
+						URIS.LAVELINGE_OUT_URI, URIS.GROUPEELECTRO_IN_URI, URIS.GROUPEELECTRO_OUT_URI });
 		assert this.isDeployedComponent(this.controleurUri);
 
 		this.compteurUri = AbstractComponent.createComponent(Compteur.class.getCanonicalName(),
@@ -58,11 +58,11 @@ public class CVM extends AbstractCVM {
 		this.eolUri = AbstractComponent.createComponent(Eolienne.class.getCanonicalName(),
 				new Object[] { URIS.EOLIENNE_URI, URIS.EOLIENNE_IN_URI });
 		assert this.isDeployedComponent(this.eolUri);
-		
+
 		this.laveUri = AbstractComponent.createComponent(LaveLinge.class.getCanonicalName(),
 				new Object[] { URIS.LAVELINGE_URI, URIS.LAVELINGE_IN_URI });
 		assert this.isDeployedComponent(this.laveUri);
-		
+
 		this.groupeUri = AbstractComponent.createComponent(GroupeElectrogene.class.getCanonicalName(),
 				new Object[] { URIS.GROUPEELECTRO_URI, URIS.GROUPEELECTRO_IN_URI });
 		assert this.isDeployedComponent(this.groupeUri);
@@ -81,10 +81,10 @@ public class CVM extends AbstractCVM {
 
 		this.toggleLogging(this.eolUri);
 		this.toggleTracing(this.eolUri);
-		
+
 		this.toggleLogging(this.laveUri);
 		this.toggleTracing(this.laveUri);
-		
+
 		this.toggleLogging(this.groupeUri);
 		this.toggleTracing(this.groupeUri);
 
@@ -99,10 +99,10 @@ public class CVM extends AbstractCVM {
 
 		this.doPortConnection(this.controleurUri, URIS.EOLIENNE_OUT_URI, URIS.EOLIENNE_IN_URI,
 				EolienneConnector.class.getCanonicalName());
-		
+
 		this.doPortConnection(this.controleurUri, URIS.LAVELINGE_OUT_URI, URIS.LAVELINGE_IN_URI,
 				LaveLingeConnector.class.getCanonicalName());
-		
+
 		this.doPortConnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
 				GroupeElectrogeneConnector.class.getCanonicalName());
 

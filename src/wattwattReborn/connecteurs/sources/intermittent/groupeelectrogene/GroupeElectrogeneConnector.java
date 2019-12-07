@@ -30,4 +30,16 @@ public class GroupeElectrogeneConnector extends SourceConnector implements IGrou
 		((IGroupeElectrogene) this.offering).off();
 	}
 
+	@Override
+	public void addFuel(int quantity) throws Exception {
+		((IGroupeElectrogene) this.offering).addFuel(quantity);
+
+	}
+
+	@Override
+	public boolean isOn() throws Exception {
+
+		return ((IGroupeElectrogene) this.offering).isOn();
+	}
+
 }

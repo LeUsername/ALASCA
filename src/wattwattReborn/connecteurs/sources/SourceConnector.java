@@ -7,7 +7,7 @@ public abstract class SourceConnector extends AbstractConnector implements ISour
 
 	@Override
 	public int getEnergie() throws Exception {
-		return ((ISources)this.offering).getEnergie();
+		return ((ISources) this.offering).getEnergie();
 	}
 
 }

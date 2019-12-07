@@ -43,8 +43,9 @@ public class DistributedCVM extends AbstractDistributedCVM {
 			this.controleurUri = AbstractComponent.createComponent(Controleur.class.getCanonicalName(),
 					new Object[] { URIS.CONTROLLEUR_URI, URIS.COMPTEUR_IN_URI, URIS.COMPTEUR_OUT_URI,
 							URIS.REFRIGERATEUR_IN_URI, URIS.REFRIGERATEUR_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
-							URIS.SECHECHEVEUX_OUT_URI, URIS.EOLIENNE_IN_URI, URIS.EOLIENNE_OUT_URI, URIS.LAVELINGE_IN_URI,
-							URIS.LAVELINGE_OUT_URI , URIS.GROUPEELECTRO_IN_URI, URIS.GROUPEELECTRO_OUT_URI});
+							URIS.SECHECHEVEUX_OUT_URI, URIS.EOLIENNE_IN_URI, URIS.EOLIENNE_OUT_URI,
+							URIS.LAVELINGE_IN_URI, URIS.LAVELINGE_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
+							URIS.GROUPEELECTRO_OUT_URI });
 			assert this.isDeployedComponent(this.controleurUri);
 
 			this.toggleTracing(this.controleurUri);
@@ -127,7 +128,7 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 			this.doPortConnection(this.controleurUri, URIS.EOLIENNE_OUT_URI, URIS.EOLIENNE_IN_URI,
 					EolienneConnector.class.getCanonicalName());
-			
+
 			this.doPortConnection(this.controleurUri, URIS.LAVELINGE_OUT_URI, URIS.LAVELINGE_IN_URI,
 					LaveLingeConnector.class.getCanonicalName());
 

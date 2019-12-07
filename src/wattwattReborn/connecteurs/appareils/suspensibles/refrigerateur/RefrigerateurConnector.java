@@ -6,12 +6,12 @@ import wattwattReborn.interfaces.appareils.suspensible.refrigerateur.IRefrigerat
 public class RefrigerateurConnector extends SuspensibleConnector implements IRefrigerateur {
 
 	@Override
-	public double getTempHaut() throws Exception {
-		return ((IRefrigerateur) this.offering).getTempHaut();
+	public double getTempH() throws Exception {
+		return ((IRefrigerateur) this.offering).getTempH();
 	}
 
 	@Override
-	public double getTempBas() throws Exception {
-		return ((IRefrigerateur) this.offering).getTempBas();
+	public double getTempB() throws Exception {
+		return ((IRefrigerateur) this.offering).getTempB();
 	}
 }

@@ -45,13 +45,13 @@ public class RefrigerateurOutPort extends AbstractOutboundPort implements IRefri
 	}
 
 	@Override
-	public double getTempHaut() throws Exception {
-		return ((IRefrigerateur)this.connector).getTempHaut();
+	public double getTempH() throws Exception {
+		return ((IRefrigerateur)this.connector).getTempH();
 	}
 
 	@Override
-	public double getTempBas() throws Exception {
-		return ((IRefrigerateur)this.connector).getTempBas();
+	public double getTempB() throws Exception {
+		return ((IRefrigerateur)this.connector).getTempB();
 	}
 
 	@Override

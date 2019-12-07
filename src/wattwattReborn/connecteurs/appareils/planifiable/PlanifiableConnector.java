@@ -3,7 +3,7 @@ package wattwattReborn.connecteurs.appareils.planifiable;
 import wattwattReborn.connecteurs.appareils.AppareilConnector;
 import wattwattReborn.interfaces.appareils.planifiable.IPlanifiable;
 
-public abstract class PlanifiableConnector  extends AppareilConnector implements IPlanifiable {
+public abstract class PlanifiableConnector extends AppareilConnector implements IPlanifiable {
 
 	@Override
 	public boolean isWorking() throws Exception {
@@ -33,13 +33,13 @@ public abstract class PlanifiableConnector  extends AppareilConnector implements
 	@Override
 	public void endBefore(int end) throws Exception {
 		((IPlanifiable) this.offering).endBefore(end);
-		
+
 	}
 
 	@Override
 	public void startAt(int debut) throws Exception {
 		((IPlanifiable) this.offering).startAt(debut);
-		
+
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public abstract class PlanifiableConnector  extends AppareilConnector implements
 	@Override
 	public void advance(int advance) throws Exception {
 		((IPlanifiable) this.offering).advance(advance);
-		
+
 	}
 
 }

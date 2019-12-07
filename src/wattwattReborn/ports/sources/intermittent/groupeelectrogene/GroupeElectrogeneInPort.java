@@ -13,7 +13,7 @@ public class GroupeElectrogeneInPort extends AbstractInboundPort implements IGro
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GroupeElectrogeneInPort(String uri,  ComponentI owner) throws Exception {
+	public GroupeElectrogeneInPort(String uri, ComponentI owner) throws Exception {
 		super(uri, IGroupeElectrogene.class, owner);
 	}
 
@@ -57,7 +57,23 @@ public class GroupeElectrogeneInPort extends AbstractInboundPort implements IGro
 				return null;
 			}
 		});
-		
+
+	}
+
+	@Override
+	public void addFuel(int quantity) throws Exception {
+		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
+			@Override
+			public Void call() throws Exception {
+				((GroupeElectrogene) this.getServiceOwner()).addFuel(quantity);
+				return null;
+			}
+		});
+	}
+
+	@Override
+	public boolean isOn() throws Exception {
+		return this.getOwner().handleRequestSync(owner -> ((GroupeElectrogene) owner).isOn());
 	}
 
 }

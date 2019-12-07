@@ -4,7 +4,7 @@ import wattwattReborn.interfaces.appareils.suspensible.ISuspensible;
 
 public interface IRefrigerateur extends ISuspensible {
 	
-	public double getTempHaut() throws Exception;
-	public double getTempBas() throws Exception;
+	public double getTempH() throws Exception;
+	public double getTempB() throws Exception;
 
 }

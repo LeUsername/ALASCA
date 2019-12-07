@@ -35,12 +35,12 @@ public class Eolienne extends AbstractComponent {
 		if (this.isOn) {
 			this.production += EolienneReglage.PROD_THR;
 		} else {
-			
+
 			if (this.production - EolienneReglage.PROD_THR <= 0) {
 				this.production = 0;
 			} else {
-				
-				this.production -= EolienneReglage.PROD_THR ;
+
+				this.production -= EolienneReglage.PROD_THR;
 			}
 
 		}
@@ -59,7 +59,7 @@ public class Eolienne extends AbstractComponent {
 	}
 
 	public boolean isOn() {
-		
+
 		return this.isOn;
 	}
 

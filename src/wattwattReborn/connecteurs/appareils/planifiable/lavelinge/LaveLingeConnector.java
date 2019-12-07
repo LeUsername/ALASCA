@@ -8,13 +8,13 @@ public class LaveLingeConnector extends PlanifiableConnector implements ILaveLin
 	@Override
 	public void ecoLavage() throws Exception {
 		((ILaveLinge) this.offering).ecoLavage();
-		
+
 	}
 
 	@Override
 	public void premiumLavage() throws Exception {
 		((ILaveLinge) this.offering).premiumLavage();
-		
+
 	}
 
 }

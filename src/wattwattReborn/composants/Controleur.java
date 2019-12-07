@@ -21,6 +21,7 @@ import wattwattReborn.ports.appareils.suspensible.refrigerateur.RefrigerateurOut
 import wattwattReborn.ports.compteur.CompteurOutPort;
 import wattwattReborn.ports.sources.aleatoire.eolienne.EolienneOutPort;
 import wattwattReborn.ports.sources.intermittent.groupeelectrogene.GroupeElectrogeneOutPort;
+import wattwattReborn.tools.GroupeElectrogene.GroupreElectrogeneReglage;
 import wattwattReborn.tools.controleur.ControleurReglage;
 
 @OfferedInterfaces(offered = IControleur.class)
@@ -44,7 +45,8 @@ public class Controleur extends AbstractComponent {
 	protected int allCons;
 
 	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin,
-			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut, String groupeIn, String groupeOut) throws Exception {
+			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut, String groupeIn, String groupeOut)
+			throws Exception {
 		super(uri, 1, 6);
 
 		this.cptin = compteurIn;
@@ -68,7 +70,7 @@ public class Controleur extends AbstractComponent {
 
 		this.laveout = new LaveLingeOutPort(laveOut, this);
 		this.laveout.publishPort();
-		
+
 		this.groupeout = new GroupeElectrogeneOutPort(groupeOut, this);
 		this.groupeout.publishPort();
 
@@ -195,22 +197,31 @@ public class Controleur extends AbstractComponent {
 				}
 			}
 		}, 100, TimeUnit.MILLISECONDS);
-		
+
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
 					while (true) {
-						((Controleur) this.getTaskOwner())
-								.logMessage("Groupe Electro>> " + ((Controleur) this.getTaskOwner()).groupeout.fuelQuantity());
+						((Controleur) this.getTaskOwner()).groupeout.on();
+						while (((Controleur) this.getTaskOwner()).groupeout.isOn()) {
+							if (((Controleur) this.getTaskOwner()).groupeout.isOn()) {
+								((Controleur) this.getTaskOwner()).logMessage("Groupe Electro>> ON prod : ["
+										+ ((Controleur) this.getTaskOwner()).groupeout.getEnergie() + "]"
+										+ " fuel at : " + ((Controleur) this.getTaskOwner()).groupeout.fuelQuantity()
+										+ " / " + GroupreElectrogeneReglage.FUEL_CAPACITY);
+							}
+							Thread.sleep(ControleurReglage.MAJ_RATE);
+						}
+						Thread.sleep(2 * ControleurReglage.MAJ_RATE);
+						((Controleur) this.getTaskOwner()).groupeout.addFuel(GroupreElectrogeneReglage.FUEL_CAPACITY);
 
-						Thread.sleep(ControleurReglage.MAJ_RATE);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 100, TimeUnit.MILLISECONDS);
+		}, 3000, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

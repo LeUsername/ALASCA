@@ -71,12 +71,12 @@ public class RefrigerateurInPort extends AbstractInboundPort implements IRefrige
 	}
 
 	@Override
-	public double getTempHaut() throws Exception {
+	public double getTempH() throws Exception {
 		return this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).getTempHaut());
 	}
 
 	@Override
-	public double getTempBas() throws Exception {
+	public double getTempB() throws Exception {
 		return this.getOwner().handleRequestSync(owner ->((Refrigerateur)owner).getTempBas());
 	}
 
