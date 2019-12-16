@@ -1,4 +1,4 @@
-package simulTest.controleur;
+package simulTest.controleur.components;
 
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;

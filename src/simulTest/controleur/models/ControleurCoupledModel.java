@@ -1,4 +1,4 @@
-package simulTest.models;
+package simulTest.controleur.models;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

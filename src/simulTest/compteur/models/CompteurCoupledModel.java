@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.HairDryerUserModel;
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.SwitchOn;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSink;
@@ -26,13 +25,21 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
+import simulTest.compteur.components.CompteurSensorModel;
 import simulTest.compteur.models.events.Consommation;
 
 public class CompteurCoupledModel extends CoupledModel {
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
 	public static final String URI = "CompteurCoupledModel";
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 
 	public CompteurCoupledModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine,
 			ModelDescriptionI[] submodels, Map<Class<? extends EventI>, EventSink[]> imported,
@@ -44,6 +51,13 @@ public class CompteurCoupledModel extends CoupledModel {
 				reexportedVars, bindings);
 	}
 
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.CoupledModel#getFinalReport()
+	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
 		StandardCoupledModelReport ret = new StandardCoupledModelReport(this.getURI());
@@ -53,28 +67,37 @@ public class CompteurCoupledModel extends CoupledModel {
 		return ret;
 	}
 
+	/**
+	 * build the simulation architecture corresponding to this coupled model.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	true			// no precondition.
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @return the simulation architecture corresponding to this coupled model.
+	 * @throws Exception <i>TO DO.</i>
+	 */
 	public static Architecture build() throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
-		atomicModelDescriptors.put(CompteurModel.URI, AtomicModelDescriptor.create(CompteurModel.class,
+		atomicModelDescriptors.put(CompteurModel.URI, AtomicHIOA_Descriptor.create(CompteurModel.class,
 				CompteurModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-		// atomicModelDescriptors.put(
-		// HairDryerUserModel.URI,
-		// AtomicModelDescriptor.create(
-		// HairDryerUserModel.class,
-		// HairDryerUserModel.URI,
-		// TimeUnit.SECONDS,
-		// null,
-		// SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
+		atomicModelDescriptors.put(CompteurSensorModel.URI, AtomicModelDescriptor.create(CompteurSensorModel.class,
+				CompteurSensorModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(CompteurModel.URI);
-		// submodels.add(HairDryerUserModel.URI) ;
+		submodels.add(CompteurSensorModel.URI);
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(HairDryerUserModel.URI, SwitchOn.class);
+		EventSource from1 = new EventSource(CompteurSensorModel.URI, Consommation.class);
 		EventSink[] to1 = new EventSink[] { new EventSink(CompteurModel.URI, Consommation.class) };
 		connections.put(from1, to1);
 

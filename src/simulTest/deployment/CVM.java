@@ -23,7 +23,7 @@ public class CVM extends		AbstractCVM
 		String componentURI =
 				AbstractComponent.createComponent(
 						Compteur.class.getCanonicalName(),
-						new Object[]{1,0}) ;
+						new Object[]{}) ;
 
 		super.deploy();
 	}
