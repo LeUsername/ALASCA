@@ -1,14 +1,10 @@
-package simulTest.controleur.models.events;
+package simulTest.equipements.controleur.models.events;
 
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.HairDryerModel;
 import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.AbstractHairDryerEvent;
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.SetLow;
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.events.SwitchOn;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
-import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import simulTest.controleur.models.ControleurModel;
+import simulTest.equipements.controleur.models.ControleurModel;
 
 public class GetConsoEvent extends AbstractHairDryerEvent {
 

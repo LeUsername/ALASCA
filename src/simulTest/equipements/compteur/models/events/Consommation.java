@@ -1,11 +1,10 @@
-package simulTest.compteur.models.events;
+package simulTest.equipements.compteur.models.events;
 
-import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.HairDryerModel;
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import simulTest.compteur.models.CompteurModel;
+import simulTest.equipements.compteur.models.CompteurModel;
 
 public class Consommation extends ES_Event {
 
@@ -53,6 +52,6 @@ public class Consommation extends ES_Event {
 		assert	model instanceof CompteurModel ;
 
 		CompteurModel m = (CompteurModel)model ;
-		m.setConsommation(50);
+		m.setConsommation(((Reading)this.getEventInformation()).value);
 	}
 }

@@ -1,11 +1,10 @@
-package simulTest.compteur.models;
+package simulTest.equipements.compteur.models;
 
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
-import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -19,7 +18,7 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulTest.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.Consommation;
 
 @ModelExternalEvents(imported = { Consommation.class })
 public class CompteurModel extends		AtomicHIOAwithEquations
@@ -28,22 +27,6 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	/**
-	 * The class <code>HairDryerReport</code> implements the simulation
-	 * report of the hair dryer model.
-	 *
-	 * <p><strong>Description</strong></p>
-	 * 
-	 * <p><strong>Invariant</strong></p>
-	 * 
-	 * <pre>
-	 * invariant		true
-	 * </pre>
-	 * 
-	 * <p>Created on : 2019-10-10</p>
-	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
-	 */
 	public static class		CompteurModelReport
 	extends		AbstractSimulationReport
 	{
@@ -75,12 +58,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 
 	private static final String		SERIES = "consommation" ;
 
-	/** current intensity in Amperes; intensity is power/tension.			*/
-	@ExportedVariable(type = Double.class)
-	protected final Value<Double>	currentIntensity =
-											new Value<Double>(this, 0.0, 0) ;
-	
-	protected double consommation;
+	protected Value<Double>	consommationTotale = new Value<Double>(this, 0.0);
 
 	/** plotter for the intensity level over time.							*/
 	protected XYPlotter				consommationPlotter ;
@@ -125,7 +103,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 						"Time (sec)",
 						"Consommation",
 						100,
-						0,
+						400,
 						600,
 						400) ;
 		this.consommationPlotter = new XYPlotter(pd) ;
@@ -179,11 +157,6 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
-		// as the hair dryer starts in mode OFF, its power consumption is 0
-		this.currentIntensity.v = 0.0 ;
-		
-		this.consommation = 1.0;
-
 		// first data in the plotter to start the plot.
 		this.consommationPlotter.addData(
 				SERIES,
@@ -251,21 +224,25 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 
 		Vector<EventI> currentEvents = this.getStoredEventAndReset() ;
 
-//		assert	currentEvents != null && currentEvents.size() == 1 ;
+		assert	currentEvents != null && currentEvents.size() == 1 ;
 
 		Event ce = (Event) currentEvents.get(0) ;
-//		assert	ce instanceof AbstractHairDryerEvent ;
 
+		assert ce instanceof Consommation;
+		
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
 				this.getConsommation());
 
 		ce.executeOn(this) ;
-
-
-
-
+		// add a new data on the plotter; this data will open a new piece
+				
+		this.consommationPlotter.addData(
+				SERIES,
+				this.getCurrentStateTime().getSimulatedTime(),
+				this.getConsommation());
+				
 		super.userDefinedExternalTransition(elapsedTime) ;
 	}
 
@@ -300,11 +277,11 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	
 	public double		getConsommation()
 	{
-		return this.consommation;
+		return this.consommationTotale.v;
 	}
 	
 	public void		setConsommation(double c)
 	{
-		this.consommation = c;
+		this.consommationTotale.v += c;
 	}
 }

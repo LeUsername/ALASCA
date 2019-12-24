@@ -1,8 +1,8 @@
-package simulTest.compteur.components;
+package simulTest.equipements.compteur.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulTest.compteur.models.CompteurModel;
+import simulTest.equipements.compteur.models.CompteurModel;
 
 public class CompteurSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;

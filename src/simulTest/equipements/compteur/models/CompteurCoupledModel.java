@@ -1,4 +1,4 @@
-package simulTest.compteur.models;
+package simulTest.equipements.compteur.models;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,8 +25,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
-import simulTest.compteur.components.CompteurSensorModel;
-import simulTest.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.Consommation;
 
 public class CompteurCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------

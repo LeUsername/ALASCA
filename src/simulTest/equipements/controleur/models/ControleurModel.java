@@ -1,4 +1,4 @@
-package simulTest.controleur.models;
+package simulTest.equipements.controleur.models;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;

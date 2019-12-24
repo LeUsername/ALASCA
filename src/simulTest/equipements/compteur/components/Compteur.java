@@ -1,4 +1,4 @@
-package simulTest.compteur.components;
+package simulTest.equipements.compteur.components;
 
 import java.util.HashMap;
 
@@ -8,7 +8,8 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.cyphy.examples.sg.equipments.hairdryer.models.HairDryerModel;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulTest.compteur.models.CompteurCoupledModel;
+import simulTest.equipements.compteur.models.CompteurCoupledModel;
+import simulTest.equipements.compteur.models.CompteurModel;
 
 public class Compteur extends		AbstractCyPhyComponent
 implements	EmbeddingComponentStateAccessI
@@ -99,8 +100,8 @@ implements	EmbeddingComponentStateAccessI
 		// During the simulation, the following lines provide an example how
 		// to use the simulation model access facility by the component.
 		for (int i = 0 ; i < 100 ; i++) {
-			this.logMessage("HairDryer " +
-				this.asp.getModelStateValue(HairDryerModel.URI, "consommation")) ;
+			this.logMessage("Compteur " +
+				this.asp.getModelStateValue(CompteurModel.URI, "consommation")) ;
 			Thread.sleep(5L) ;
 		}
 	}
@@ -113,7 +114,7 @@ implements	EmbeddingComponentStateAccessI
 	throws Exception
 	{
 		// As there is only one value, don't care about the name.
-		return 5; // just an example...
+		return HairDryerModel.State.LOW; // just an example...
 		// With this facility, the state of the hair dryer can be set by the
 		// component part (e.g., the controller) rather than by the user model
 		// included in the hair dryer model in a development process going from

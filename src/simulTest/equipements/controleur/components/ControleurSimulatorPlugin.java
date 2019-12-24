@@ -1,8 +1,8 @@
-package simulTest.controleur.components;
+package simulTest.equipements.controleur.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulTest.controleur.models.ControleurModel;
+import simulTest.equipements.controleur.models.ControleurModel;
 
 public class ControleurSimulatorPlugin extends AtomicSimulatorPlugin {
 

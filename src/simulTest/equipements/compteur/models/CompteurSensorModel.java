@@ -1,4 +1,4 @@
-package simulTest.compteur.components;
+package simulTest.equipements.compteur.models;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import simulTest.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.Consommation;
 
 @ModelExternalEvents(exported = { Consommation.class })
 public class CompteurSensorModel extends AtomicES_Model {

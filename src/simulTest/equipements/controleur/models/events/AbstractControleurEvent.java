@@ -1,4 +1,4 @@
-package simulTest.controleur.models.events;
+package simulTest.equipements.controleur.models.events;
 
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;

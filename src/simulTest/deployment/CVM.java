@@ -3,7 +3,7 @@ package simulTest.deployment;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulTest.compteur.components.Compteur;
+import simulTest.equipements.sechecheveux.components.SecheCheveux;
 
 public class CVM extends		AbstractCVM
 {
@@ -22,7 +22,7 @@ public class CVM extends		AbstractCVM
 		@SuppressWarnings("unused")
 		String componentURI =
 				AbstractComponent.createComponent(
-						Compteur.class.getCanonicalName(),
+						SecheCheveux.class.getCanonicalName(),
 						new Object[]{}) ;
 
 		super.deploy();
