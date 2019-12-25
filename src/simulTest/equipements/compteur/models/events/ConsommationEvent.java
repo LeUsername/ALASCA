@@ -6,7 +6,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulTest.equipements.compteur.models.CompteurModel;
 
-public class Consommation extends ES_Event {
+public class ConsommationEvent extends ES_Event {
 
 	public static class		Reading
 	implements EventInformationI
@@ -26,11 +26,11 @@ public class Consommation extends ES_Event {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public Consommation(Time timeOfOccurrence, EventInformationI content) {
+	public ConsommationEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
-	public Consommation(Time timeOfOccurrence, double content) {
+	public ConsommationEvent(Time timeOfOccurrence, double content) {
 		super(timeOfOccurrence, new Reading(content));
 	}
 

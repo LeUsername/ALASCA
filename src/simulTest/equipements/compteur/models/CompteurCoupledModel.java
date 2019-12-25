@@ -25,7 +25,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
-import simulTest.equipements.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.ConsommationEvent;
 
 public class CompteurCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -96,8 +96,8 @@ public class CompteurCoupledModel extends CoupledModel {
 		submodels.add(CompteurSensorModel.URI);
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(CompteurSensorModel.URI, Consommation.class);
-		EventSink[] to1 = new EventSink[] { new EventSink(CompteurModel.URI, Consommation.class) };
+		EventSource from1 = new EventSource(CompteurSensorModel.URI, ConsommationEvent.class);
+		EventSink[] to1 = new EventSink[] { new EventSink(CompteurModel.URI, ConsommationEvent.class) };
 		connections.put(from1, to1);
 
 		coupledModelDescriptors.put(CompteurCoupledModel.URI,

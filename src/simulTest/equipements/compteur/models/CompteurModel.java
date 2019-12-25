@@ -18,9 +18,9 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulTest.equipements.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.ConsommationEvent;
 
-@ModelExternalEvents(imported = { Consommation.class })
+@ModelExternalEvents(imported = { ConsommationEvent.class })
 public class CompteurModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------
@@ -101,7 +101,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 				new PlotterDescription(
 						"Total consommation",
 						"Time (sec)",
-						"Consommation",
+						"Consommation (kW)",
 						100,
 						400,
 						600,
@@ -219,16 +219,13 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	@Override
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
-
-
-
 		Vector<EventI> currentEvents = this.getStoredEventAndReset() ;
 
 		assert	currentEvents != null && currentEvents.size() == 1 ;
 
 		Event ce = (Event) currentEvents.get(0) ;
 
-		assert ce instanceof Consommation;
+		assert ce instanceof ConsommationEvent;
 		
 		this.consommationPlotter.addData(
 				SERIES,
@@ -256,8 +253,6 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 				SERIES,
 				endTime.getSimulatedTime(),
 				this.getConsommation()) ;
-		Thread.sleep(10000L) ;
-		this.consommationPlotter.dispose() ;
 
 		super.endSimulation(endTime) ;
 	}

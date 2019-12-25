@@ -6,11 +6,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
+import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
+import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel.Mode;
 import simulTest.equipements.sechecheveux.models.events.SwitchMode;
@@ -19,6 +21,23 @@ import simulTest.equipements.sechecheveux.models.events.SwitchOn;
 
 @ModelExternalEvents(exported = { SwitchOn.class, SwitchOff.class, SwitchMode.class })
 public class SecheCheveuxUserModel extends AtomicES_Model {
+	
+	public static class SecheCheveuxUserModelReport extends AbstractSimulationReport {
+		private static final long serialVersionUID = 1L;
+
+		public SecheCheveuxUserModelReport(String modelURI) {
+			super(modelURI);
+		}
+
+		/**
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "SecheCheveuxUserModelReport(" + this.getModelURI() + ")";
+		}
+	}
+	
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -195,5 +214,14 @@ public class SecheCheveuxUserModel extends AtomicES_Model {
 			d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			this.scheduleEvent(new SwitchOff(this.getCurrentStateTime().add(d)));
 		}
+	}
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
+	 */
+	@Override
+	public SimulationReportI	getFinalReport() throws Exception
+	{
+		return new SecheCheveuxUserModelReport(this.getURI());
 	}
 }

@@ -20,14 +20,13 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulTest.equipements.compteur.models.events.Consommation;
-import simulTest.equipements.sechecheveux.models.events.AbstractSecheCheveuxEvent;
+import simulTest.equipements.compteur.models.events.ConsommationEvent;
 import simulTest.equipements.sechecheveux.models.events.SwitchMode;
 import simulTest.equipements.sechecheveux.models.events.SwitchOff;
 import simulTest.equipements.sechecheveux.models.events.SwitchOn;
 
 @ModelExternalEvents(imported = { TicEvent.class, SwitchOn.class, SwitchOff.class, SwitchMode.class }, exported = {
-		Consommation.class })
+		ConsommationEvent.class })
 public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
@@ -67,9 +66,9 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	private static final String SERIES = "intensity";
 
 	/** energy consumption (in Watts) of the hair dryer in HOT_AIR mode. */
-	protected static final double CONSO_HOT_MODE = 5.0; // Watts
+	protected static final double CONSO_HOT_MODE = 500.0; // Watts
 	/** energy consumption (in Watts) of the hair dryer in COLD_HAIR mode. */
-	protected static final double CONSO_COLD_MODE = 3.0;; // Watts
+	protected static final double CONSO_COLD_MODE = 800.0;; // Watts
 	/** nominal tension (in Volts) of the hair dryer. */
 	protected static final double TENSION = 220.0; // Volts
 
@@ -169,13 +168,12 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Vector<EventI> output() {
-		System.out.println("FSFSGFDH");
 		if (this.triggerReading) {
-			double reading = this.currentIntensity.v;
+			double reading = this.currentIntensity.v * TENSION / 1000; // kW
 
 			Vector<EventI> ret = new Vector<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
-			Consommation consommation = new Consommation(currentTime, reading);
+			ConsommationEvent consommation = new ConsommationEvent(currentTime, reading);
 			ret.add(consommation);
 
 			this.triggerReading = false;
@@ -203,7 +201,7 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		super.userDefinedInternalTransition(elapsedTime);
-		this.logMessage(this.getCurrentStateTime() + "Intensiteé " + this.currentIntensity.v);
+//		this.logMessage(this.getCurrentStateTime() + " Intensite " + this.currentIntensity.v);
 	}
 
 	/**
@@ -217,13 +215,12 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 
 		// get the vector of current external events
 		Vector<EventI> currentEvents = this.getStoredEventAndReset();
-		// when this method is called, there is at least one external event,
-		// and for the hair dryer model, there will be exactly one by
-		// construction.
-		assert currentEvents != null && currentEvents.size() == 1;
+		boolean ticReceived = false;
+		// when this method is called, there is at least one external event
+		assert currentEvents != null;
 
 		Event ce = (Event) currentEvents.get(0);
-		assert ce instanceof AbstractSecheCheveuxEvent;
+
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("HairDryerModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
 		}
@@ -238,8 +235,15 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 
 		// execute the current external event on this model, changing its state
 		// and intensity level
-		ce.executeOn(this);
-
+		if (ce instanceof TicEvent) {
+			ticReceived = true;
+		} else {
+			ce.executeOn(this);
+		}
+		if (ticReceived) {
+			this.triggerReading = true;
+			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+		}
 //		if (this.hasDebugLevel(1)) {
 //			this.logMessage("HairDryerModel::userDefinedExternalTransition 4 " + this.getMode());
 //		}
@@ -259,8 +263,6 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
 		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.getIntensity());
-		Thread.sleep(10000L);
-		this.intensityPlotter.dispose();
 
 		super.endSimulation(endTime);
 	}

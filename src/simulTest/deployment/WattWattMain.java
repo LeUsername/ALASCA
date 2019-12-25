@@ -13,6 +13,8 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
@@ -22,11 +24,12 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
+import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulTest.equipements.WattWattModel;
 import simulTest.equipements.compteur.models.CompteurModel;
-import simulTest.equipements.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.ConsommationEvent;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxUserModel;
@@ -79,12 +82,21 @@ public class WattWattMain {
 			atomicModelDescriptors.put(SecheCheveuxUserModel.URI,
 					AtomicModelDescriptor.create(SecheCheveuxUserModel.class, SecheCheveuxUserModel.URI,
 							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(
+					TicModel.URI + "-1",
+					AtomicModelDescriptor.create(
+							TicModel.class,
+							TicModel.URI + "-1",
+							TimeUnit.SECONDS,
+							null,
+							SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
 
 			Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 			Set<String> submodels = new HashSet<String>();
 			submodels.add(SecheCheveuxModel.URI);
 			submodels.add(SecheCheveuxUserModel.URI);
+			submodels.add(TicModel.URI + "-1") ;
 
 			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 			EventSource from1 = new EventSource(SecheCheveuxUserModel.URI, SwitchOn.class);
@@ -96,13 +108,21 @@ public class WattWattMain {
 			EventSource from3 = new EventSource(SecheCheveuxUserModel.URI, SwitchMode.class);
 			EventSink[] to3 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchMode.class) };
 			connections.put(from3, to3);
+			EventSource from4 =
+					new EventSource(TicModel.URI + "-1",
+									TicEvent.class) ;
+			EventSink[] to4 =
+					new EventSink[] {
+						new EventSink(SecheCheveuxModel.URI,
+									  TicEvent.class)} ;
+			connections.put(from4, to4);
 			
 			Map<Class<? extends EventI>,ReexportedEvent> reexported =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
 			reexported.put(
-					Consommation.class,
+					ConsommationEvent.class,
 					new ReexportedEvent(SecheCheveuxModel.URI,
-							Consommation.class)) ;
+							ConsommationEvent.class)) ;
 
 			coupledModelDescriptors.put(SecheCheveuxCoupledModel.URI,
 					new CoupledHIOA_Descriptor(SecheCheveuxCoupledModel.class, SecheCheveuxCoupledModel.URI, submodels,
@@ -127,9 +147,9 @@ public class WattWattMain {
 
 			Map<EventSource, EventSink[]> connections2 = new HashMap<EventSource, EventSink[]>();
 
-			EventSource from21 = new EventSource(SecheCheveuxCoupledModel.URI, Consommation.class);
+			EventSource from21 = new EventSource(SecheCheveuxCoupledModel.URI, ConsommationEvent.class);
 			EventSink[] to21 = new EventSink[] {
-					new EventSink(CompteurModel.URI, Consommation.class) };
+					new EventSink(CompteurModel.URI, ConsommationEvent.class) };
 			connections2.put(from21, to21);
 			
 			coupledModelDescriptors.put(
@@ -157,7 +177,11 @@ public class WattWattMain {
 			SimulationEngine se = architecture.constructSimulator() ;
 			se.setDebugLevel(0);
 			
-			String modelURI = SecheCheveuxCoupledModel.URI ;
+			String modelURI = TicModel.URI  + "-1" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			
+			modelURI = SecheCheveuxCoupledModel.URI ;
 			simParams.put(
 					modelURI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
@@ -184,14 +208,13 @@ public class WattWattMain {
 							SimulationMain.getPlotterHeight())) ;
 			
 			
-			
-			
 			se.setSimulationRunParameters(simParams) ;
 			
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			long start = System.currentTimeMillis() ;
 			se.doStandAloneSimulation(0.0, 5000.0) ;
 			long end = System.currentTimeMillis() ;
+			System.out.println(se.getFinalReport()) ;
 			System.out.println("Simulation ends. " + (end - start)) ;
 			Thread.sleep(1000000L);
 			System.exit(0) ;

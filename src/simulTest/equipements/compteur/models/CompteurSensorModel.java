@@ -12,9 +12,9 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import simulTest.equipements.compteur.models.events.Consommation;
+import simulTest.equipements.compteur.models.events.ConsommationEvent;
 
-@ModelExternalEvents(exported = { Consommation.class })
+@ModelExternalEvents(exported = { ConsommationEvent.class })
 public class CompteurSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -63,7 +63,7 @@ public class CompteurSensorModel extends AtomicES_Model {
 		super.initialiseState(initialTime);
 
 		Time t = this.getCurrentStateTime();
-		this.scheduleEvent(new Consommation(t, 1));
+		this.scheduleEvent(new ConsommationEvent(t, 1));
 
 		// Redo the initialisation to take into account the initial event
 		// just scheduled.
@@ -132,10 +132,10 @@ public class CompteurSensorModel extends AtomicES_Model {
 		
 		Time t = this.getCurrentStateTime().add(d);
 
-		this.scheduleEvent(new Consommation(t, 1));
+		this.scheduleEvent(new ConsommationEvent(t, 1));
 
 		d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
-		this.scheduleEvent(new Consommation(this.getCurrentStateTime().add(d), 10));
+		this.scheduleEvent(new ConsommationEvent(this.getCurrentStateTime().add(d), 10));
 
 	}
 }
