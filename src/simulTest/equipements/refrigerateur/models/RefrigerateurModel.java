@@ -1,4 +1,4 @@
-package simulTest.equipements.sechecheveux.models;
+package simulTest.equipements.refrigerateur.models;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,7 +33,7 @@ import wattwatt.tools.sechecheveux.SecheCheveuxReglage;
 
 @ModelExternalEvents(imported = { TicEvent.class, SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
 		IncreasePowerEvent.class, DecreasePowerEvent.class }, exported = { ConsommationEvent.class })
-public class SecheCheveuxModel extends AtomicHIOAwithEquations {
+public class RefrigerateurModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -110,7 +110,7 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public SecheCheveuxModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public RefrigerateurModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
 		// creation of a plotter to show the evolution of the intensity over

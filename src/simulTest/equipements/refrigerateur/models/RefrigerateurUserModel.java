@@ -1,4 +1,4 @@
-package simulTest.equipements.sechecheveux.models;
+package simulTest.equipements.refrigerateur.models;
 
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 
 @ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
 		IncreasePowerEvent.class, DecreasePowerEvent.class })
-public class SecheCheveuxUserModel extends AtomicES_Model {
+public class RefrigerateurUserModel extends AtomicES_Model {
 
 	public static class SecheCheveuxUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
@@ -93,7 +93,7 @@ public class SecheCheveuxUserModel extends AtomicES_Model {
 	 * @param simulationEngine  simulation engine enacting the model.
 	 * @throws Exception <i>TODO</i>.
 	 */
-	public SecheCheveuxUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public RefrigerateurUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
 		this.rg = new RandomDataGenerator();

@@ -1,10 +1,10 @@
-package simulTest.equipements.sechecheveux.components;
+package simulTest.equipements.refrigerateur.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
-public class SecheCheveuxSimulatorPlugin extends AtomicSimulatorPlugin {
+public class RefrigerateurSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;
 
 	/**

@@ -1,4 +1,4 @@
-package simulTest.equipements.sechecheveux.models;
+package simulTest.equipements.refrigerateur.models;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ import simulTest.equipements.sechecheveux.models.events.SwitchModeEvent;
 import simulTest.equipements.sechecheveux.models.events.SwitchOffEvent;
 import simulTest.equipements.sechecheveux.models.events.SwitchOnEvent;
 
-public class SecheCheveuxCoupledModel extends CoupledModel {
+public class RefrigerateurCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public class SecheCheveuxCoupledModel extends CoupledModel {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public SecheCheveuxCoupledModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine,
+	public RefrigerateurCoupledModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine,
 			ModelDescriptionI[] submodels, Map<Class<? extends EventI>, EventSink[]> imported,
 			Map<Class<? extends EventI>, ReexportedEvent> reexported, Map<EventSource, EventSink[]> connections,
 			Map<StaticVariableDescriptor, VariableSink[]> importedVars,
@@ -88,40 +88,40 @@ public class SecheCheveuxCoupledModel extends CoupledModel {
 	public static Architecture build() throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
-		atomicModelDescriptors.put(SecheCheveuxModel.URI, AtomicHIOA_Descriptor.create(SecheCheveuxModel.class,
-				SecheCheveuxModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-		atomicModelDescriptors.put(SecheCheveuxUserModel.URI, AtomicModelDescriptor.create(SecheCheveuxUserModel.class,
-				SecheCheveuxUserModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(RefrigerateurModel.URI, AtomicHIOA_Descriptor.create(RefrigerateurModel.class,
+				RefrigerateurModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(RefrigerateurSensorModel.URI, AtomicModelDescriptor.create(RefrigerateurSensorModel.class,
+				RefrigerateurSensorModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		Set<String> submodels = new HashSet<String>();
-		submodels.add(SecheCheveuxModel.URI);
-		submodels.add(SecheCheveuxUserModel.URI);
+		submodels.add(RefrigerateurModel.URI);
+		submodels.add(RefrigerateurSensorModel.URI);
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(SecheCheveuxUserModel.URI, SwitchOnEvent.class);
-		EventSink[] to1 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOnEvent.class) };
+		EventSource from1 = new EventSource(RefrigerateurSensorModel.URI, SwitchOnEvent.class);
+		EventSink[] to1 = new EventSink[] { new EventSink(RefrigerateurModel.URI, SwitchOnEvent.class) };
 		connections.put(from1, to1);
-		EventSource from2 = new EventSource(SecheCheveuxUserModel.URI, SwitchOffEvent.class);
-		EventSink[] to2 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOffEvent.class) };
+		EventSource from2 = new EventSource(RefrigerateurSensorModel.URI, SwitchOffEvent.class);
+		EventSink[] to2 = new EventSink[] { new EventSink(RefrigerateurModel.URI, SwitchOffEvent.class) };
 		connections.put(from2, to2);
-		EventSource from3 = new EventSource(SecheCheveuxUserModel.URI, SwitchModeEvent.class);
-		EventSink[] to3 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchModeEvent.class) };
+		EventSource from3 = new EventSource(RefrigerateurSensorModel.URI, SwitchModeEvent.class);
+		EventSink[] to3 = new EventSink[] { new EventSink(RefrigerateurModel.URI, SwitchModeEvent.class) };
 		connections.put(from3, to3);
-		EventSource from4 = new EventSource(SecheCheveuxUserModel.URI, IncreasePowerEvent.class);
-		EventSink[] to4 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, IncreasePowerEvent.class) };
+		EventSource from4 = new EventSource(RefrigerateurSensorModel.URI, IncreasePowerEvent.class);
+		EventSink[] to4 = new EventSink[] { new EventSink(RefrigerateurModel.URI, IncreasePowerEvent.class) };
 		connections.put(from4, to4);
-		EventSource from5 = new EventSource(SecheCheveuxUserModel.URI, DecreasePowerEvent.class);
-		EventSink[] to5 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, DecreasePowerEvent.class) };
+		EventSource from5 = new EventSource(RefrigerateurSensorModel.URI, DecreasePowerEvent.class);
+		EventSink[] to5 = new EventSink[] { new EventSink(RefrigerateurModel.URI, DecreasePowerEvent.class) };
 		connections.put(from5, to5);
 
-		coupledModelDescriptors.put(SecheCheveuxCoupledModel.URI,
-				new CoupledHIOA_Descriptor(SecheCheveuxCoupledModel.class, SecheCheveuxCoupledModel.URI, submodels,
+		coupledModelDescriptors.put(RefrigerateurCoupledModel.URI,
+				new CoupledHIOA_Descriptor(RefrigerateurCoupledModel.class, RefrigerateurCoupledModel.URI, submodels,
 						null, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 						null));
 
-		return new Architecture(SecheCheveuxCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,
+		return new Architecture(RefrigerateurCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,
 				TimeUnit.SECONDS);
 	}
 }

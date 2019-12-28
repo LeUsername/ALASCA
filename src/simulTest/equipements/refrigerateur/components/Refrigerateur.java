@@ -1,31 +1,28 @@
-package simulTest.equipements.compteur.components;
+package simulTest.equipements.refrigerateur.components;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
-import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
-import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
-import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulTest.equipements.compteur.models.CompteurModel;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
-public class Compteur extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
-	protected CompteurSimulatorPlugin asp;
+	protected RefrigerateurSimulatorPlugin asp;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	protected Compteur() throws Exception {
+	protected Refrigerateur() throws Exception {
 		// 2 threads to be able to execute tasks and requests while executing
 		// the DEVS simulation.
 		super(2, 0);
@@ -33,17 +30,12 @@ public class Compteur extends AbstractCyPhyComponent implements EmbeddingCompone
 
 	}
 
-	protected Compteur(String reflectionInboundPortURI) throws Exception {
-		super(reflectionInboundPortURI, 1, 0);
-		this.initialise();
-	}
-
 	protected void initialise() throws Exception {
 		// The coupled model has been made able to create the simulation
 		// architecture description.
 		Architecture localArchitecture = this.createLocalArchitecture(null);
 		// Create the appropriate DEVS simulation plug-in.
-		this.asp = new CompteurSimulatorPlugin();
+		this.asp = new RefrigerateurSimulatorPlugin();
 		// Set the URI of the plug-in, using the URI of its associated
 		// simulation model.
 		this.asp.setPluginURI(localArchitecture.getRootModelURI());
@@ -64,18 +56,11 @@ public class Compteur extends AbstractCyPhyComponent implements EmbeddingCompone
 	 */
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
-		// Utiliser la ligne en dessous uniquement pour le MIL
-		//return CompteurCoupledModel.build();
-		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
-		atomicModelDescriptors.put(CompteurModel.URI, AtomicHIOA_Descriptor.create(CompteurModel.class,
-				CompteurModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-
-		return new Architecture(CompteurModel.URI, atomicModelDescriptors, new HashMap<>(),
-				TimeUnit.SECONDS);
+		return SecheCheveuxCoupledModel.build();
 	}
 
 	/**
-	 * @see fr.sorbonne_ u.components.AbstractComponent#execute()
+	 * @see fr.sorbonne_u.components.AbstractComponent#execute()
 	 */
 	@Override
 	public void execute() throws Exception {
@@ -101,9 +86,12 @@ public class Compteur extends AbstractCyPhyComponent implements EmbeddingCompone
 		// During the simulation, the following lines provide an example how
 		// to use the simulation model access facility by the component.
 		for (int i = 0; i < 100; i++) {
-			this.logMessage("Compteur " + this.asp.getModelStateValue(CompteurModel.URI, "consommation"));
+			this.logMessage("SecheCheveux " + this.asp.getModelStateValue(SecheCheveuxModel.URI, "mode") + " "
+					+ this.asp.getModelStateValue(SecheCheveuxModel.URI, "isOn") + " "
+					+ this.asp.getModelStateValue(SecheCheveuxModel.URI, "intensity"));
 			Thread.sleep(5L);
 		}
+//		super.execute();
 	}
 
 	/**
@@ -111,6 +99,13 @@ public class Compteur extends AbstractCyPhyComponent implements EmbeddingCompone
 	 */
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		return this.asp.getModelStateValue(CompteurModel.URI, "consommation");
+//		return HairDryerModel.State.LOW;
+		if (name.equals("mode")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "mode");
+		} else if (name.equals("isOn")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "isOn");
+		} else {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "intensity");
+		}
 	}
 }

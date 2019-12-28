@@ -1,13 +1,21 @@
 package wattwatt.composants.appareils.incontrolable.sechecheveux;
 
+import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import simulTest.equipements.sechecheveux.components.SecheCheveuxSimulatorPlugin;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxModel.PowerLevel;
 import wattwatt.interfaces.appareils.incontrolable.sechecheveux.ISecheCheveux;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.incontrolable.sechecheveux.SecheCheveuxInPort;
@@ -16,25 +24,53 @@ import wattwatt.tools.sechecheveux.SecheCheveuxReglage;
 
 @OfferedInterfaces(offered = ISecheCheveux.class)
 @RequiredInterfaces(required = IControleur.class)
-public class SecheCheveux extends AbstractComponent {
-
-	protected SecheCheveuxInPort sechin;
-	
+public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
 	protected SecheCheveuxMode mode;
-	
+
 	protected int powerLvl;
 	protected boolean isOn;
 	protected int conso;
 
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+
+	protected SecheCheveuxInPort sechin;
+	protected SecheCheveuxSimulatorPlugin asp;
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
 	protected SecheCheveux(String uri, String sechin) throws Exception {
-		super(uri, 1, 1);
+		super(uri, 2, 0);
+		this.initialise();
 		this.sechin = new SecheCheveuxInPort(sechin, this);
 		this.sechin.publishPort();
 
 		this.mode = SecheCheveuxMode.HOT_AIR;
 		this.powerLvl = SecheCheveuxReglage.POWER_LVL_MIN;
+		this.isOn = false;
 
 		this.tracer.setRelativePosition(1, 1);
+	}
+
+	protected void initialise() throws Exception {
+		// The coupled model has been made able to create the simulation
+		// architecture description.
+		Architecture localArchitecture = this.createLocalArchitecture(null);
+		// Create the appropriate DEVS simulation plug-in.
+		this.asp = new SecheCheveuxSimulatorPlugin();
+		// Set the URI of the plug-in, using the URI of its associated
+		// simulation model.
+		this.asp.setPluginURI(localArchitecture.getRootModelURI());
+		// Set the simulation architecture.
+		this.asp.setSimulationArchitecture(localArchitecture);
+		// Install the plug-in on the component, starting its own life-cycle.
+		this.installPlugin(this.asp);
+
+		// Toggle logging on to get a log on the screen.
+		this.toggleLogging();
 	}
 
 	public void on() {
@@ -43,6 +79,10 @@ public class SecheCheveux extends AbstractComponent {
 
 	public void off() {
 		this.isOn = false;
+	}
+
+	protected void setOn(boolean isOn) {
+		this.isOn = isOn;
 	}
 
 	public int giveConso() {
@@ -61,6 +101,10 @@ public class SecheCheveux extends AbstractComponent {
 		}
 	}
 
+	protected void setMode(SecheCheveuxMode mode) {
+		this.mode = mode;
+	}
+
 	public void increasePower() {
 		if (this.powerLvl + 1 >= SecheCheveuxReglage.POWER_LVL_MAX) {
 			this.powerLvl = SecheCheveuxReglage.POWER_LVL_MAX;
@@ -75,6 +119,20 @@ public class SecheCheveux extends AbstractComponent {
 			this.powerLvl = SecheCheveuxReglage.POWER_LVL_MIN;
 		} else {
 			this.powerLvl--;
+		}
+	}
+
+	protected void setPowerLevel(PowerLevel powerLeveLValue) {
+		switch (powerLeveLValue) {
+		case LOW:
+			this.powerLvl = 1;
+			break;
+		case MEDIUM:
+			this.powerLvl = 2;
+			break;
+		case HIGH:
+			this.powerLvl = 3;
+			break;
 		}
 	}
 
@@ -124,37 +182,75 @@ public class SecheCheveux extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
+		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+		// To give an example of the embedding component access facility, the
+		// following lines show how to set the reference to the embedding
+		// component or a proxy responding to the access calls.
+		HashMap<String, Object> simParams = new HashMap<String, Object>();
+		simParams.put("componentRef", this);
+		this.asp.setSimulationRunParameters(simParams);
+		// Start the simulation.
+		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
-				Random rand = new Random();
-				int useTime = 0;
+				try {
+					asp.doStandAloneSimulation(0.0, 5000.0);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		this.runTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
 				try {
 					while (true) {
-						if (rand.nextInt(100) > 98 && useTime == 0) {
-							((SecheCheveux) this.getTaskOwner()).on();
-							useTime = SecheCheveuxReglage.MIN_USE_TIME + rand.nextInt(SecheCheveuxReglage.MAX_USE_TIME);
-							((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux ON for : " + useTime);
-						} else {
-							((SecheCheveux) this.getTaskOwner()).behave(rand);
-							if (useTime - 1 <= 0) {
-								useTime = 0;
-							} else {
-								useTime--;
-							}
-							Thread.sleep(SecheCheveuxReglage.REGUL_RATE);
-							if (useTime <= 0) {
-								((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux OFF");
-								((SecheCheveux) this.getTaskOwner()).off();
-							}
+						((SecheCheveux) this.getTaskOwner())
+								.setOn((boolean) asp.getModelStateValue(SecheCheveuxModel.URI, "isOn"));
+						if (isOn) {
+							((SecheCheveux) this.getTaskOwner())
+									.setMode((SecheCheveuxMode) asp.getModelStateValue(SecheCheveuxModel.URI, "mode"));
+							((SecheCheveux) this.getTaskOwner()).setPowerLevel(
+									(PowerLevel) asp.getModelStateValue(SecheCheveuxModel.URI, "powerLevel"));
 						}
-
+						Thread.sleep(1000);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 100, TimeUnit.MILLISECONDS);
+		});
+//		this.scheduleTask(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				Random rand = new Random();
+//				int useTime = 0;
+//				try {
+//					while (true) {
+//						if (rand.nextInt(100) > 98 && useTime == 0) {
+//							((SecheCheveux) this.getTaskOwner()).on();
+//							useTime = SecheCheveuxReglage.MIN_USE_TIME + rand.nextInt(SecheCheveuxReglage.MAX_USE_TIME);
+//							((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux ON for : " + useTime);
+//						} else {
+//							((SecheCheveux) this.getTaskOwner()).behave(rand);
+//							if (useTime - 1 <= 0) {
+//								useTime = 0;
+//							} else {
+//								useTime--;
+//							}
+//							Thread.sleep(SecheCheveuxReglage.REGUL_RATE);
+//							if (useTime <= 0) {
+//								((SecheCheveux) this.getTaskOwner()).logMessage("seche cheveux OFF");
+//								((SecheCheveux) this.getTaskOwner()).off();
+//							}
+//						}
+//
+//					}
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -173,4 +269,29 @@ public class SecheCheveux extends AbstractComponent {
 		super.finalise();
 	}
 
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent#createLocalArchitecture(java.lang.String)
+	 */
+	@Override
+	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
+		return SecheCheveuxCoupledModel.build();
+	}
+
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI#getEmbeddingComponentStateValue(java.lang.String)
+	 */
+	@Override
+	public Object getEmbeddingComponentStateValue(String name) throws Exception {
+		if (name.equals("mode")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "mode");
+		} else if (name.equals("isOn")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "isOn");
+		} else {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "intensity");
+		}
+	}
 }

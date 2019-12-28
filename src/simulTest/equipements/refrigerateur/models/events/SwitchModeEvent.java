@@ -1,12 +1,12 @@
-package simulTest.equipements.sechecheveux.models.events;
+package simulTest.equipements.refrigerateur.models.events;
 
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
+import simulTest.equipements.refrigerateur.models.RefrigerateurModel;
 import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 
-public class SwitchModeEvent extends AbstractSecheCheveuxEvent {
+public class SwitchModeEvent extends AbstractRefrigerateurEvent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -50,9 +50,9 @@ public class SwitchModeEvent extends AbstractSecheCheveuxEvent {
 	 */
 	@Override
 	public void executeOn(AtomicModel model) {
-		assert model instanceof SecheCheveuxModel;
+		assert model instanceof RefrigerateurModel;
 		
-		SecheCheveuxModel m = (SecheCheveuxModel) model;
+		RefrigerateurModel m = (RefrigerateurModel) model;
 		if (m.getMode() == SecheCheveuxMode.COLD_AIR) {
 			m.setMode(SecheCheveuxMode.HOT_AIR);
 		} else {
