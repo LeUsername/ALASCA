@@ -135,7 +135,7 @@ public class CompteurSensorModel extends AtomicES_Model {
 		this.scheduleEvent(new ConsommationEvent(t, 1));
 
 		d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
-		this.scheduleEvent(new ConsommationEvent(this.getCurrentStateTime().add(d), 10));
+		this.scheduleEvent(new ConsommationEvent(this.getCurrentStateTime().add(d), 1));
 
 	}
 }

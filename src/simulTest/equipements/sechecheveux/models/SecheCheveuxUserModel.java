@@ -15,11 +15,11 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel.Mode;
-import simulTest.equipements.sechecheveux.models.events.SwitchMode;
-import simulTest.equipements.sechecheveux.models.events.SwitchOff;
-import simulTest.equipements.sechecheveux.models.events.SwitchOn;
+import simulTest.equipements.sechecheveux.models.events.SwitchModeEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOffEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOnEvent;
 
-@ModelExternalEvents(exported = { SwitchOn.class, SwitchOff.class, SwitchMode.class })
+@ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class })
 public class SecheCheveuxUserModel extends AtomicES_Model {
 	
 	public static class SecheCheveuxUserModelReport extends AbstractSimulationReport {
@@ -125,7 +125,7 @@ public class SecheCheveuxUserModel extends AtomicES_Model {
 		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 				this.getSimulatedTimeUnit());
 		Time t = this.getCurrentStateTime().add(d1).add(d2);
-		this.scheduleEvent(new SwitchOn(t));
+		this.scheduleEvent(new SwitchOnEvent(t));
 
 		// Redo the initialisation to take into account the initial event
 		// just scheduled.
@@ -195,24 +195,24 @@ public class SecheCheveuxUserModel extends AtomicES_Model {
 
 		Duration d;
 		// See what is the type of event to be executed
-		if (this.nextEvent.equals(SwitchOn.class)) {
+		if (this.nextEvent.equals(SwitchOnEvent.class)) {
 
 			d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			// compute the time of occurrence (in the future)
 			Time t = this.getCurrentStateTime().add(d);
 
-			this.scheduleEvent(new SwitchMode(t));
+			this.scheduleEvent(new SwitchModeEvent(t));
 
 			d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
-			this.scheduleEvent(new SwitchOn(this.getCurrentStateTime().add(d)));
-		} else if (this.nextEvent.equals(SwitchMode.class) && mode == Mode.HOT_AIR) {
+			this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
+		} else if (this.nextEvent.equals(SwitchModeEvent.class) && mode == Mode.HOT_AIR) {
 
 			d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new SwitchMode(this.getCurrentStateTime().add(d)));
-		} else if (this.nextEvent.equals(SwitchMode.class) && mode == Mode.COLD_AIR) {
+			this.scheduleEvent(new SwitchModeEvent(this.getCurrentStateTime().add(d)));
+		} else if (this.nextEvent.equals(SwitchModeEvent.class) && mode == Mode.COLD_AIR) {
 
 			d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new SwitchOff(this.getCurrentStateTime().add(d)));
+			this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
 		}
 	}
 

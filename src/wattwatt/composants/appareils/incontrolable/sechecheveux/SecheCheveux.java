@@ -19,8 +19,9 @@ import wattwatt.tools.sechecheveux.SecheCheveuxReglage;
 public class SecheCheveux extends AbstractComponent {
 
 	protected SecheCheveuxInPort sechin;
-
+	
 	protected SecheCheveuxMode mode;
+	
 	protected int powerLvl;
 	protected boolean isOn;
 	protected int conso;

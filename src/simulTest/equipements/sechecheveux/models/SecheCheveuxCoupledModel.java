@@ -25,9 +25,9 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
-import simulTest.equipements.sechecheveux.models.events.SwitchMode;
-import simulTest.equipements.sechecheveux.models.events.SwitchOff;
-import simulTest.equipements.sechecheveux.models.events.SwitchOn;
+import simulTest.equipements.sechecheveux.models.events.SwitchModeEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOffEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOnEvent;
 
 public class SecheCheveuxCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -98,14 +98,14 @@ public class SecheCheveuxCoupledModel extends CoupledModel {
 		submodels.add(SecheCheveuxUserModel.URI);
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(SecheCheveuxUserModel.URI, SwitchOn.class);
-		EventSink[] to1 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOn.class) };
+		EventSource from1 = new EventSource(SecheCheveuxUserModel.URI, SwitchOnEvent.class);
+		EventSink[] to1 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOnEvent.class) };
 		connections.put(from1, to1);
-		EventSource from2 = new EventSource(SecheCheveuxUserModel.URI, SwitchOff.class);
-		EventSink[] to2 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOff.class) };
+		EventSource from2 = new EventSource(SecheCheveuxUserModel.URI, SwitchOffEvent.class);
+		EventSink[] to2 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchOffEvent.class) };
 		connections.put(from2, to2);
-		EventSource from3 = new EventSource(SecheCheveuxUserModel.URI, SwitchMode.class);
-		EventSink[] to3 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchMode.class) };
+		EventSource from3 = new EventSource(SecheCheveuxUserModel.URI, SwitchModeEvent.class);
+		EventSink[] to3 = new EventSink[] { new EventSink(SecheCheveuxModel.URI, SwitchModeEvent.class) };
 		connections.put(from3, to3);
 
 		coupledModelDescriptors.put(SecheCheveuxCoupledModel.URI,

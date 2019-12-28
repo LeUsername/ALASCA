@@ -1,9 +1,15 @@
 package simulTest.deployment;
 
+import java.util.HashMap;
+
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import simulTest.equipements.WattWattSupervisorComponent;
+import simulTest.equipements.compteur.components.Compteur;
+import simulTest.equipements.compteur.models.CompteurModel;
 import simulTest.equipements.sechecheveux.components.SecheCheveux;
+import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
 public class CVM extends		AbstractCVM
 {
@@ -19,11 +25,25 @@ public class CVM extends		AbstractCVM
 	@Override
 	public void			deploy() throws Exception
 	{
-		@SuppressWarnings("unused")
-		String componentURI =
+		HashMap<String,String> hm = new HashMap<>() ;
+		
+		String secheCheveuxURI =
 				AbstractComponent.createComponent(
 						SecheCheveux.class.getCanonicalName(),
 						new Object[]{}) ;
+		hm.put(SecheCheveuxModel.URI, secheCheveuxURI);
+		
+		String compteurURI =
+				AbstractComponent.createComponent(
+						Compteur.class.getCanonicalName(),
+						new Object[]{}) ;
+		hm.put(CompteurModel.URI, compteurURI);
+		
+		@SuppressWarnings("unused")
+		String supervisorURI =
+			AbstractComponent.createComponent(
+					WattWattSupervisorComponent.class.getCanonicalName(),
+					new Object[]{hm}) ;
 
 		super.deploy();
 	}

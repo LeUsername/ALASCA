@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
-public class SwitchOn extends AbstractSecheCheveuxEvent {
+public class SwitchOnEvent extends AbstractSecheCheveuxEvent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -16,7 +16,7 @@ public class SwitchOn extends AbstractSecheCheveuxEvent {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public SwitchOn(Time timeOfOccurrence) {
+	public SwitchOnEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 

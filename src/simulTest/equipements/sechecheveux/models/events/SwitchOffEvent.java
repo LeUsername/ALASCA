@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
-public class SwitchMode extends AbstractSecheCheveuxEvent {
+public class SwitchOffEvent extends AbstractSecheCheveuxEvent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -16,20 +16,20 @@ public class SwitchMode extends AbstractSecheCheveuxEvent {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public SwitchMode(Time timeOfOccurrence) {
+	public SwitchOffEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 	// Methods
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#eventAsString()
 	 */
 	@Override
 	public String eventAsString() {
-		return "SecheCheveux::SwitchMode";
+		return "SecheCheveux::SwitchOff";
 	}
 
 	/**
@@ -37,11 +37,7 @@ public class SwitchMode extends AbstractSecheCheveuxEvent {
 	 */
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		if (e instanceof SwitchOn) {
-			return false;
-		} else {
-			return true;
-		}
+		return false;
 	}
 
 	/**
@@ -50,12 +46,7 @@ public class SwitchMode extends AbstractSecheCheveuxEvent {
 	@Override
 	public void executeOn(AtomicModel model) {
 		assert model instanceof SecheCheveuxModel;
-		
-		SecheCheveuxModel m = (SecheCheveuxModel) model;
-		if (m.getMode() == SecheCheveuxModel.Mode.COLD_AIR) {
-			m.setMode(SecheCheveuxModel.Mode.HOT_AIR);
-		} else {
-			m.setMode(SecheCheveuxModel.Mode.COLD_AIR);
-		}
+
+		((SecheCheveuxModel) model).switchOff();
 	}
 }

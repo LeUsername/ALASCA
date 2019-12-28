@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
 
-public class SwitchOff extends AbstractSecheCheveuxEvent {
+public class SwitchModeEvent extends AbstractSecheCheveuxEvent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -16,20 +16,20 @@ public class SwitchOff extends AbstractSecheCheveuxEvent {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public SwitchOff(Time timeOfOccurrence) {
+	public SwitchModeEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
-	// ------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	// Methods
-	// ------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#eventAsString()
 	 */
 	@Override
 	public String eventAsString() {
-		return "SecheCheveux::SwitchOff";
+		return "SecheCheveux::SwitchMode";
 	}
 
 	/**
@@ -37,7 +37,11 @@ public class SwitchOff extends AbstractSecheCheveuxEvent {
 	 */
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		return false;
+		if (e instanceof SwitchOnEvent) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -46,7 +50,12 @@ public class SwitchOff extends AbstractSecheCheveuxEvent {
 	@Override
 	public void executeOn(AtomicModel model) {
 		assert model instanceof SecheCheveuxModel;
-
-		((SecheCheveuxModel) model).switchOff();
+		
+		SecheCheveuxModel m = (SecheCheveuxModel) model;
+		if (m.getMode() == SecheCheveuxModel.Mode.COLD_AIR) {
+			m.setMode(SecheCheveuxModel.Mode.HOT_AIR);
+		} else {
+			m.setMode(SecheCheveuxModel.Mode.COLD_AIR);
+		}
 	}
 }

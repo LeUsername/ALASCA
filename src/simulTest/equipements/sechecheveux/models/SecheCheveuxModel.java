@@ -21,11 +21,11 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulTest.equipements.compteur.models.events.ConsommationEvent;
-import simulTest.equipements.sechecheveux.models.events.SwitchMode;
-import simulTest.equipements.sechecheveux.models.events.SwitchOff;
-import simulTest.equipements.sechecheveux.models.events.SwitchOn;
+import simulTest.equipements.sechecheveux.models.events.SwitchModeEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOffEvent;
+import simulTest.equipements.sechecheveux.models.events.SwitchOnEvent;
 
-@ModelExternalEvents(imported = { TicEvent.class, SwitchOn.class, SwitchOff.class, SwitchMode.class }, exported = {
+@ModelExternalEvents(imported = { TicEvent.class, SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class }, exported = {
 		ConsommationEvent.class })
 public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 
