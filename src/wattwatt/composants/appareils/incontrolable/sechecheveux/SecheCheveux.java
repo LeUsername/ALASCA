@@ -12,10 +12,10 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulTest.equipements.sechecheveux.components.SecheCheveuxSimulatorPlugin;
-import simulTest.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
-import simulTest.equipements.sechecheveux.models.SecheCheveuxModel;
-import simulTest.equipements.sechecheveux.models.SecheCheveuxModel.PowerLevel;
+import simulation.equipements.sechecheveux.HairDryerPowerLevel;
+import simulation.equipements.sechecheveux.components.SecheCheveuxSimulatorPlugin;
+import simulation.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
+import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
 import wattwatt.interfaces.appareils.incontrolable.sechecheveux.ISecheCheveux;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.incontrolable.sechecheveux.SecheCheveuxInPort;
@@ -26,8 +26,8 @@ import wattwatt.tools.sechecheveux.SecheCheveuxReglage;
 @RequiredInterfaces(required = IControleur.class)
 public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
 	protected SecheCheveuxMode mode;
+	protected HairDryerPowerLevel powerLvl;
 
-	protected int powerLvl;
 	protected boolean isOn;
 	protected int conso;
 
@@ -49,7 +49,7 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 		this.sechin.publishPort();
 
 		this.mode = SecheCheveuxMode.HOT_AIR;
-		this.powerLvl = SecheCheveuxReglage.POWER_LVL_MIN;
+		this.powerLvl = HairDryerPowerLevel.LOW;
 		this.isOn = false;
 
 		this.tracer.setRelativePosition(1, 1);
@@ -106,34 +106,25 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 	}
 
 	public void increasePower() {
-		if (this.powerLvl + 1 >= SecheCheveuxReglage.POWER_LVL_MAX) {
-			this.powerLvl = SecheCheveuxReglage.POWER_LVL_MAX;
-		} else {
-			this.powerLvl++;
+		if (this.powerLvl == HairDryerPowerLevel.LOW) {
+			this.powerLvl = HairDryerPowerLevel.MEDIUM;
+		} else if(this.powerLvl == HairDryerPowerLevel.MEDIUM){
+			this.powerLvl = HairDryerPowerLevel.HIGH;
 		}
 
 	}
 
 	public void decreasePower() {
-		if (this.powerLvl - 1 <= SecheCheveuxReglage.POWER_LVL_MIN) {
-			this.powerLvl = SecheCheveuxReglage.POWER_LVL_MIN;
-		} else {
-			this.powerLvl--;
+		if (this.powerLvl == HairDryerPowerLevel.HIGH) {
+			this.powerLvl = HairDryerPowerLevel.MEDIUM;
+		} else if(this.powerLvl == HairDryerPowerLevel.MEDIUM){
+			this.powerLvl = HairDryerPowerLevel.LOW;
 		}
 	}
 
-	protected void setPowerLevel(PowerLevel powerLeveLValue) {
-		switch (powerLeveLValue) {
-		case LOW:
-			this.powerLvl = 1;
-			break;
-		case MEDIUM:
-			this.powerLvl = 2;
-			break;
-		case HIGH:
-			this.powerLvl = 3;
-			break;
-		}
+	protected void setPowerLevel(HairDryerPowerLevel powerLeveLValue) {
+		this.powerLvl = powerLeveLValue;
+		
 	}
 
 	@Override
@@ -158,9 +149,9 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 				}
 			}
 			if (this.mode == SecheCheveuxMode.COLD_AIR) {
-				this.conso += SecheCheveuxReglage.CONSO_COLD_MODE * this.powerLvl;
+				this.conso += SecheCheveuxReglage.CONSO_COLD_MODE * this.powerLvl.getValue();
 			} else {
-				this.conso += SecheCheveuxReglage.CONSO_HOT_MODE * this.powerLvl;
+				this.conso += SecheCheveuxReglage.CONSO_HOT_MODE * this.powerLvl.getValue();
 			}
 		} else {
 			if (this.mode == SecheCheveuxMode.COLD_AIR) {
@@ -211,7 +202,7 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 							((SecheCheveux) this.getTaskOwner())
 									.setMode((SecheCheveuxMode) asp.getModelStateValue(SecheCheveuxModel.URI, "mode"));
 							((SecheCheveux) this.getTaskOwner()).setPowerLevel(
-									(PowerLevel) asp.getModelStateValue(SecheCheveuxModel.URI, "powerLevel"));
+									(HairDryerPowerLevel) asp.getModelStateValue(SecheCheveuxModel.URI, "powerLevel"));
 						}
 						Thread.sleep(1000);
 					}
