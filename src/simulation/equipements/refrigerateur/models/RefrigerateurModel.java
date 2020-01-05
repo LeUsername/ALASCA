@@ -417,10 +417,10 @@ extends AtomicHIOAwithDE
 		if(this.currentConsumption == RefrigerateurConsommation.RESUMED) {
 			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_ACTIVE;
 			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
-				this.temperature.v = this.temperature.v + 0.25 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+				this.temperature.v = this.temperature.v + 0.1 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
 			} else {
 				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
-				this.temperature.v = this.temperature.v - 1.5 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+				this.temperature.v = this.temperature.v - RefrigerateurModel.CHANGEMENT_TEMPERATURE;
 				if(this.temperature.v <= this.minTemperature) {
 					this.temperature.v = this.minTemperature;
 				}
@@ -429,7 +429,7 @@ extends AtomicHIOAwithDE
 			assert	this.currentConsumption == RefrigerateurConsommation.SUSPENDED ;
 			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_PASSIVE;
 			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
-				this.temperature.v = this.temperature.v + 1.5*RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+				this.temperature.v = this.temperature.v + 0.5 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
 			} else {
 				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
 				this.temperature.v = this.temperature.v + 0.25*RefrigerateurModel.CHANGEMENT_TEMPERATURE;

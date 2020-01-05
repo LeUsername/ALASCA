@@ -457,7 +457,7 @@ extends		AtomicES_Model
 	protected String	modelContentAsString(String indent)
 	{
 		return super.modelContentAsString(indent) +
-							indent + "interrupted = " + this.currentState ;
+							indent + "door = " + this.currentState ;
 	}
 
 	/**
@@ -470,7 +470,7 @@ extends		AtomicES_Model
 		)
 	{
 		super.showCurrentStateContent(indent, elapsedTime) ;
-		System.out.println(indent + "interrupted = " + this.currentState) ;
+		System.out.println(indent + "door = " + this.currentState) ;
 	}
 }
 // -----------------------------------------------------------------------------

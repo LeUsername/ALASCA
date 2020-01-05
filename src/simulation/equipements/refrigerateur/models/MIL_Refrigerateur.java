@@ -82,7 +82,7 @@ public class MIL_Refrigerateur {
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			se.doStandAloneSimulation(0.0, 500.0) ;
+			se.doStandAloneSimulation(0.0, 1000.0) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

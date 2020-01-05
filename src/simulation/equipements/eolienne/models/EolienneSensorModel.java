@@ -43,7 +43,8 @@ public class EolienneSensorModel extends AtomicES_Model {
 	/** a random number generator from common math library. */
 	protected final RandomDataGenerator rg;
 	
-
+	protected int maxWindHour;
+	
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -74,6 +75,8 @@ public class EolienneSensorModel extends AtomicES_Model {
 		this.currentWind = MAX_WIND/2;
 
 		this.rg.reSeedSecure();
+		
+		maxWindHour = this.rg.nextInt(0, 23);
 
 		// Initialise to get the correct current time.
 		super.initialiseState(initialTime);

@@ -242,6 +242,16 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 			}
 			return ret ;
 		} else {
+			if (this.plotter != null) {
+				this.plotter.addData(
+					SERIES,
+					this.lastReadingTime,
+					this.temperature.v) ;
+				this.plotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.temperature.v) ;
+			}
 			return null ;
 		}
 	}

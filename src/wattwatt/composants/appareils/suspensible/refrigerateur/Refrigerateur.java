@@ -271,7 +271,7 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, 5000.0);
+					asp.doStandAloneSimulation(0.0, 1000.0);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
