@@ -18,11 +18,11 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.equipements.eolienne.EolienneState;
 import simulation.equipements.eolienne.models.events.AbstractEolienneEvent;
 import simulation.equipements.eolienne.models.events.SwitchOffEvent;
 import simulation.equipements.eolienne.models.events.SwitchOnEvent;
 import simulation.equipements.eolienne.models.events.WindReadingEvent;
+import simulation.equipements.eolienne.tools.EolienneState;
 
 @ModelExternalEvents(imported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class EolienneModel extends AtomicHIOAwithEquations {

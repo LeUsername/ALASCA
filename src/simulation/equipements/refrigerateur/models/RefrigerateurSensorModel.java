@@ -17,9 +17,11 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.equipements.refrigerateur.models.events.ResumeEvent;
+import simulation.equipements.refrigerateur.models.events.SuspendEvent;
 import simulation.equipements.refrigerateur.models.events.TemperatureReadingEvent;
 
-@ModelExternalEvents(imported = { TicEvent.class }, exported = {TemperatureReadingEvent.class})
+@ModelExternalEvents(imported = { TicEvent.class }, exported = {ResumeEvent.class, SuspendEvent.class})
 public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------
@@ -85,6 +87,17 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 	private static final String		SERIES = "Temperature" ;
 	public static final String		URI = "RefrigerateurSensorModel" ;
 
+	// Run parameter names to be used when initialising them before each run
+	/** name of the run parameter defining the maximum temperature.			*/
+	public static final String	MAX_TEMPERATURE = "max-temperature" ;
+	/** name of the run parameter defining the minimum temperature.			*/
+	public static final String	MIN_TEMPERATURE = "min-temperature" ;
+	
+	// Model implementation variables
+	/** the maximum temperature that should be reached						*/
+	protected double					maxTemperature ;
+	/** the minimum temperature	that should be reached						*/
+	protected double					minTemperature ;
 	/** true when a external event triggered a reading.						*/
 	protected boolean								triggerReading ;
 	/** the last value emitted as a reading of the bandwidth.			 	*/
@@ -137,7 +150,13 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 		// Get the values of the run parameters in the map using their names
 		// and set the model implementation variables accordingly
 		String vname =
-			this.getURI() + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+				this.getURI() + ":" + RefrigerateurSensorModel.MAX_TEMPERATURE ;
+		this.maxTemperature = (double) simParams.get(vname) ;
+		vname =
+				this.getURI() + ":" + RefrigerateurSensorModel.MIN_TEMPERATURE ;
+		this.minTemperature = (double) simParams.get(vname) ;
+		vname =
+				this.getURI() + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
 
 		// Initialise the look of the plotter
 		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
@@ -202,15 +221,25 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 					this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
 			TemperatureReadingEvent temp =
 					new TemperatureReadingEvent(currentTime, this.temperature.v) ;
-			ret.add(temp) ;
-
+//			ret.add(temp) ;
 			this.readings.addElement(temp) ;
-			this.logMessage(this.getCurrentStateTime() +
-					"|output|temperature reading " +
-					this.readings.size() + " with value = " +
-					this.temperature.v) ;
+//			this.logMessage(this.getCurrentStateTime() +
+//					"|output|temperature reading " +
+//					this.readings.size() + " with value = " +
+//					this.temperature.v) ;
 
 			this.triggerReading = false ;
+			if(this.temperature.v <= this.minTemperature) {
+				SuspendEvent suspend =
+						new SuspendEvent(currentTime) ;
+				ret.add(suspend) ;
+			} else if (this.temperature.v >= this.maxTemperature) {
+				ResumeEvent resume =
+						new ResumeEvent(currentTime) ;
+				ret.add(resume) ;
+			} else {
+				return null;
+			}
 			return ret ;
 		} else {
 			return null ;

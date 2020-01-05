@@ -22,11 +22,18 @@ import fr.sorbonne_u.utils.XYPlotter;
 import simulation.equipements.compteur.models.events.ConsommationEvent;
 import simulation.equipements.refrigerateur.models.events.CloseEvent;
 import simulation.equipements.refrigerateur.models.events.OpenEvent;
+import simulation.equipements.refrigerateur.models.events.ResumeEvent;
+import simulation.equipements.refrigerateur.models.events.SuspendEvent;
+import simulation.equipements.refrigerateur.tools.RefrigerateurConsommation;
+import simulation.equipements.refrigerateur.tools.RefrigerateurPorte;
+import wattwatt.tools.refrigerateur.RefrigerateurReglage;
 
 
 @ModelExternalEvents(imported = { CloseEvent.class, 
-								  OpenEvent.class},
-					exported = { ConsommationEvent.class })
+								  OpenEvent.class, 
+								  ResumeEvent.class, 
+								  SuspendEvent.class },
+					exported = { ConsommationEvent.class})
 public class RefrigerateurModel
 extends AtomicHIOAwithDE
 {
@@ -39,14 +46,17 @@ extends AtomicHIOAwithDE
 	{
 		private static final long serialVersionUID = 1L ;
 		public final Vector<DoublePiece>		temperatureFunction ;
+		public final Vector<DoublePiece>		intensityFunction ;
 
 		public			RefrigerateurModelReport(
 			String modelURI,
-			Vector<DoublePiece> temperatureFunction
+			Vector<DoublePiece> temperatureFunction,
+			Vector<DoublePiece> intensityFunction
 			)
 		{
 			super(modelURI) ;
 			this.temperatureFunction = temperatureFunction;
+			this.intensityFunction = intensityFunction;
 		}
 
 		/**
@@ -67,24 +77,27 @@ extends AtomicHIOAwithDE
 		}
 	}
 
-	protected enum Door {
-		OPENED,	
-		CLOSED		
-	}
-
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L ;
-	private static final String	SERIES = "refrigerateur temperature" ;
+	private static final String	TEMPERATURE_SERIES = "refrigerateur temperature" ;
+	private static final String	INTENSITY_SERIES = "refrigerateur intensity" ;
 	public static final String	URI = "RefrigerateurModel" ;
+	/** nominal tension (in Volts) of the fridge. */
+	protected static final double TENSION = 220.0; // Volts
+	protected static final double CHANGEMENT_TEMPERATURE = 0.05; // °C
 
 	// Run parameter names to be used when initialising them before each run
 	/** name of the run parameter defining the maximum temperature.			*/
 	public static final String	MAX_TEMPERATURE = "max-temperature" ;
 	/** name of the run parameter defining the minimum temperature.			*/
 	public static final String	MIN_TEMPERATURE = "min-temperature" ;
+	/** name of the plotter that displays the temperature.					*/
+	public static final String	TEMPERATURE = "temperature" ;
+	/** name of the plotter that displays the intensity.					*/
+	public static final String	INTENSITY = "intensity" ;
 	/** name of the run parameter defining the alpha parameter of the gamma
 	 *  probability distribution giving the bandwidth at resumption.		*/
 	public static final String	BAAR = "bandwidth-alpha-at-resumption" ;
@@ -131,10 +144,14 @@ extends AtomicHIOAwithDE
 	protected double					nextTemperature ;
 	/** delay until the next update of the bandwidth value.					*/
 	protected double					nextDelay ;
-	/** time at which the last disconnection ended.							*/
+	/** time at which the door was last openened.							*/
 	protected Time						timeOfLastOpening ;
-	/** current state of the model.											*/
-	protected Door						currentState ;
+	/** time at which the systel was last suspended.						*/
+	protected Time						timeOfLastSuspending ;
+	/** current state of the door.											*/
+	protected RefrigerateurPorte		currentDoorState ;
+	/** current state of the consumption.									*/
+	protected RefrigerateurConsommation	currentConsumption ;
 
 	// Bandwidth function and statistics for the report
 	/** average temperature during the simulation run.						*/
@@ -142,9 +159,14 @@ extends AtomicHIOAwithDE
 	/** function giving the temperature at all time during the
 	 *  simulation run.														*/
 	protected final Vector<DoublePiece>	temperatureFunction ;
+	/** function giving the intensity at all time during the
+	 *  simulation run.														*/
+	protected final Vector<DoublePiece>	intensityFunction ;
 
-	/** Frame used to plot the bandwidth during the simulation.				*/
-	protected XYPlotter					plotter ;
+	/** Frame used to plot the temperature during the simulation.				*/
+	protected XYPlotter					temperaturePlotter ;
+	/** Frame used to plot the intensity during the simulation.				*/
+	protected XYPlotter					intensityPlotter ;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -154,6 +176,9 @@ extends AtomicHIOAwithDE
 	@ExportedVariable(type = Double.class)
 	protected Value<Double>				temperature =
 											new Value<Double>(this, 10.0, 0) ;
+	/** Intensity in Watt.								*/
+	protected Double				intensity/* =
+											new Double(this, 10.0, 0)*/ ;
 
 	// ------------------------------------------------------------------------
 	// Constructors
@@ -174,8 +199,10 @@ extends AtomicHIOAwithDE
 		this.genTemperature = new RandomDataGenerator() ;
 		this.rgBrownianMotion1 = new RandomDataGenerator() ;
 		this.rgBrownianMotion2 = new RandomDataGenerator() ;
-		// Create the representation of the bandwidth function for the report
+		// Create the representation of the temperature function for the report
 		this.temperatureFunction = new Vector<DoublePiece>() ;
+		// Create the representation of the intensity function for the report
+		this.intensityFunction = new Vector<DoublePiece>() ;
 
 		assert	this.temperature != null ;
 	}
@@ -234,10 +261,14 @@ extends AtomicHIOAwithDE
 		this.bandwidthIntegrationStep = (double) simParams.get(vname) ;
 
 		// Initialise the look of the plotter
-		vname = this.getURI() + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
-		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
-		this.plotter = new XYPlotter(pd) ;
-		this.plotter.createSeries(SERIES) ;
+		vname = this.getURI() + ":" + RefrigerateurModel.TEMPERATURE + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
+		this.temperaturePlotter = new XYPlotter(pdTemperature) ;
+		this.temperaturePlotter.createSeries(TEMPERATURE_SERIES) ;
+		vname = this.getURI() + ":" + RefrigerateurModel.INTENSITY + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pdIntensity = (PlotterDescription) simParams.get(vname) ;
+		this.intensityPlotter = new XYPlotter(pdIntensity) ;
+		this.intensityPlotter.createSeries(INTENSITY_SERIES) ;
 	}
 
 	/**
@@ -251,16 +282,27 @@ extends AtomicHIOAwithDE
 		this.rgBrownianMotion1.reSeedSecure() ;
 		this.rgBrownianMotion2.reSeedSecure() ;
 
-		// the model starts in the interrupted state wating for resumption 
+		// the model starts with a closed door 
 		this.timeOfLastOpening = initialTime ;
-		this.currentState = Door.CLOSED ;
+		this.currentDoorState = RefrigerateurPorte.CLOSED ;
+		
+		// the model starts in the suspended
+		this.timeOfLastSuspending = initialTime ;
+		this.currentConsumption = RefrigerateurConsommation.SUSPENDED ;
 
-		// initialisation of the bandwidth function for the report
+		// initialisation of the temperature function for the report
 		this.temperatureFunction.clear() ;
-		// initialisation of the bandwidth function plotter on the screen
-		if (this.plotter != null) {
-			this.plotter.initialise() ;
-			this.plotter.showPlotter() ;
+		// initialisation of the temperature function plotter on the screen
+		if (this.temperaturePlotter != null) {
+			this.temperaturePlotter.initialise() ;
+			this.temperaturePlotter.showPlotter() ;
+		}
+		// initialisation of the intensity function for the report
+		this.intensityFunction.clear() ;
+		// initialisation of the intensity function plotter on the screen
+		if (this.intensityPlotter != null) {
+			this.intensityPlotter.initialise() ;
+			this.intensityPlotter.showPlotter() ;
 		}
 
 		// standard initialisation
@@ -279,6 +321,9 @@ extends AtomicHIOAwithDE
 		// of HIOA
 		double newTemperature = this.generateBandwidthAtResumption() ;
 		this.temperature.v = newTemperature ;
+		// The consumption is initialized at 0 because the door is closed and the fridge is
+		// in Suspended mode
+		this.intensity = 0.0;
 	}
 
 	/**
@@ -298,10 +343,10 @@ extends AtomicHIOAwithDE
 	@Override
 	public Duration		timeAdvance()
 	{
-		if (this.currentState == Door.CLOSED) {
+		if (this.currentDoorState == RefrigerateurPorte.CLOSED) {
 			return new Duration(this.nextDelay, this.getSimulatedTimeUnit()) ;
 		} else {
-			assert	this.currentState == Door.OPENED ;
+			assert	this.currentDoorState == RefrigerateurPorte.OPENED ;
 			// the model will resume its internal transitions when it will
 			// receive the corresponding triggering external event.
 			return Duration.INFINITY ;
@@ -320,7 +365,7 @@ extends AtomicHIOAwithDE
 		// the quantum may be limited, hence changing the delay until the limit
 		// is reached. This delay becomes the next time advance of the model.
 
-		if (this.currentState == Door.CLOSED) {
+		if (this.currentDoorState == RefrigerateurPorte.CLOSED) {
 			double delta_t = this.bandwidthIntegrationStep ;
 			double uniform1 = this.rgBrownianMotion1.nextUniform(0.0, 1.0) ;
 			// To generate a random number following an exponential distribution,
@@ -362,8 +407,34 @@ extends AtomicHIOAwithDE
 				}
 			}
 		} else {
-			assert	this.currentState == Door.OPENED ;
+			assert	this.currentDoorState == RefrigerateurPorte.OPENED ;
 			
+		}
+	}
+	
+	protected void		computeNextState()
+	{
+		if(this.currentConsumption == RefrigerateurConsommation.RESUMED) {
+			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_ACTIVE;
+			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
+				this.temperature.v = this.temperature.v + 0.25 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+			} else {
+				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
+				this.temperature.v = this.temperature.v - 1.5 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+				if(this.temperature.v <= this.minTemperature) {
+					this.temperature.v = this.minTemperature;
+				}
+			}
+		} else {
+			assert	this.currentConsumption == RefrigerateurConsommation.SUSPENDED ;
+			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_PASSIVE;
+			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
+				this.temperature.v = this.temperature.v + 1.5*RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+			} else {
+				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
+				this.temperature.v = this.temperature.v + 0.25*RefrigerateurModel.CHANGEMENT_TEMPERATURE;
+				
+			}
 		}
 	}
 
@@ -380,29 +451,53 @@ extends AtomicHIOAwithDE
 		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
 			super.userDefinedInternalTransition(elapsedTime) ;
 
-			double oldBandwith = this.temperature.v ;
-			if (this.currentState == Door.CLOSED) {
-				// the value of the bandwidth at the next internal transition
-				// is computed in the timeAdvance function when computing
-				// the delay until the next internal transition.
-				this.temperature.v = this.nextTemperature ;
-			}
+			double oldTemperature = this.temperature.v ;
+//			if (this.currentDoorState == Door.CLOSED) {
+//				// the value of the bandwidth at the next internal transition
+//				// is computed in the timeAdvance function when computing
+//				// the delay until the next internal transition.
+//				this.temperature.v = this.nextTemperature ;
+//			}
+			this.computeNextState();
 			this.temperature.time = this.getCurrentStateTime() ;
 
 			// visualisation and simulation report.
 			this.temperatureFunction.add(
 				new DoublePiece(this.temperature.time.getSimulatedTime(),
-								oldBandwith,
+								oldTemperature,
 								this.getCurrentStateTime().getSimulatedTime(),
 								this.temperature.v)) ;
-			if (this.plotter != null) {
-				this.plotter.addData(
-						SERIES,
+			if (this.temperaturePlotter != null) {
+				this.temperaturePlotter.addData(
+						TEMPERATURE_SERIES,
 						this.getCurrentStateTime().getSimulatedTime(),
 						this.temperature.v) ;
 			}
+			this.intensityFunction.add(
+					new DoublePiece(this.temperature.time.getSimulatedTime(),
+									oldTemperature,
+									this.getCurrentStateTime().getSimulatedTime(),
+									this.temperature.v)) ;
+				if (this.temperaturePlotter != null) {
+					this.temperaturePlotter.addData(
+							TEMPERATURE_SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.temperature.v) ;
+				}
+			this.intensityFunction.add(
+					new DoublePiece(
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.intensity,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.intensity)) ;
+				if (this.intensityPlotter != null) {
+					this.intensityPlotter.addData(
+						INTENSITY_SERIES,
+						this.getCurrentStateTime().getSimulatedTime(), 
+						this.intensity) ;
+				}
 			this.logMessage(this.getCurrentStateTime() +
-					"|internal|bandwidth = " + this.temperature.v + " Mbps") ;
+					"|internal|temperature = " + this.temperature.v + " °C") ;
 		}
 	}
 
@@ -419,90 +514,93 @@ extends AtomicHIOAwithDE
 		Vector<EventI> currentEvents = this.getStoredEventAndReset() ;
 		assert	currentEvents != null && currentEvents.size() == 1 ;
 
-		if (currentEvents.get(0) instanceof CloseEvent) {
-			// visualisation and simulation report.
-			try {
-				Time start = this.getSimulationEngine().getTimeOfStart();
-				if (this.getCurrentStateTime().greaterThan(start) &&
-						elapsedTime.greaterThan(
-									Duration.zero(getSimulatedTimeUnit()))) {
-					this.temperatureFunction.add(
-						new DoublePiece(
-								this.temperature.time.getSimulatedTime(),
-								this.temperature.v,
-								this.getCurrentStateTime().getSimulatedTime(),
-								this.temperature.v)) ;
-					if (this.plotter != null) {
-						this.plotter.addData(
-							SERIES,
-							this.getCurrentStateTime().getSimulatedTime(), 
-							this.temperature.v) ;
-					}
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e) ;
-			}
-
-			// compute new state after resumption
-			this.temperature.v = this.generateBandwidthAtResumption() ;
-			this.temperature.time = this.getCurrentStateTime() ;
-			this.currentState = Door.CLOSED ;
-			this.computeDerivatives() ;
-			this.timeOfLastOpening = this.getCurrentStateTime() ;
-
-			// visualisation and simulation report.
-			if (this.plotter != null) {
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.temperature.v) ;
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.temperature.v) ;
-			}
-			this.logMessage(this.getCurrentStateTime() +
-									"|external|closing with internal temperature of " +
-									this.temperature.v + " °C.") ;
-		} else {
-			assert	currentEvents.get(0) instanceof OpenEvent ;
-			// visualisation and simulation report.
-			if (elapsedTime.greaterThan(
-									Duration.zero(getSimulatedTimeUnit()))) {
+		// visualisation and simulation report.
+		try {
+			Time start = this.getSimulationEngine().getTimeOfStart();
+			if (this.getCurrentStateTime().greaterThan(start) &&
+					elapsedTime.greaterThan(
+								Duration.zero(getSimulatedTimeUnit()))) {
 				this.temperatureFunction.add(
-						new DoublePiece(
-								this.temperature.time.getSimulatedTime(),
-								this.temperature.v,
-								this.getCurrentStateTime().getSimulatedTime(),
-								this.temperature.v)) ;
-				if (this.plotter != null) {
-					this.plotter.addData(
-							SERIES,
+					new DoublePiece(
+							this.temperature.time.getSimulatedTime(),
+							this.temperature.v,
 							this.getCurrentStateTime().getSimulatedTime(),
-							this.temperature.v) ;
-				}
-			}
-//			this.temperature.v = this.maxTemperature ;
-			this.temperature.time = this.getCurrentStateTime() ;
-			this.timeOfLastOpening = this.getCurrentStateTime() ;
-			this.currentState = Door.OPENED ;
-			this.computeDerivatives() ;
-
-			// visualisation and simulation report.
-			if (this.plotter != null) {
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
+							this.temperature.v)) ;
+				if (this.temperaturePlotter != null) {
+					this.temperaturePlotter.addData(
+						TEMPERATURE_SERIES,
+						this.getCurrentStateTime().getSimulatedTime(), 
 						this.temperature.v) ;
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.nextTemperature) ;
+				}
+				this.intensityFunction.add(
+						new DoublePiece(
+								this.getCurrentStateTime().getSimulatedTime(),
+								this.intensity,
+								this.getCurrentStateTime().getSimulatedTime(),
+								this.intensity)) ;
+					if (this.intensityPlotter != null) {
+						this.intensityPlotter.addData(
+							INTENSITY_SERIES,
+							this.getCurrentStateTime().getSimulatedTime(), 
+							this.intensity) ;
+					}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
+		}
+		this.temperature.time = this.getCurrentStateTime() ;
+		this.timeOfLastOpening = this.getCurrentStateTime() ;
+		this.timeOfLastSuspending = this.getCurrentStateTime();
+//		this.temperature.v = this.generateBandwidthAtResumption() ;
+		
+		if (currentEvents.get(0) instanceof CloseEvent) {
+			this.currentDoorState = RefrigerateurPorte.CLOSED ;
 			this.logMessage(this.getCurrentStateTime() +
-												"|external|interrupt.") ;
+					"|external|Closed.") ;
+			System.out.println("Closed");
+		} else if(currentEvents.get(0) instanceof OpenEvent) {
+			this.currentDoorState = RefrigerateurPorte.OPENED ;
+			this.logMessage(this.getCurrentStateTime() +
+					"|external|Opened.") ;
+			System.out.println("Opened");
+		} else if (currentEvents.get(0) instanceof ResumeEvent) {
+			this.currentConsumption = RefrigerateurConsommation.RESUMED ;
+			this.logMessage(this.getCurrentStateTime() +
+					"|external|Resumed.") ;
+			System.out.println("Resumed");
+		} else {
+			assert	currentEvents.get(0) instanceof SuspendEvent ;
+			this.currentConsumption = RefrigerateurConsommation.SUSPENDED ;
+			this.logMessage(this.getCurrentStateTime() +
+					"|external|Suspended.") ;
+			System.out.println("Suspended");
+		}
+//		this.computeDerivatives() ;
+		this.computeNextState();
+
+		// visualisation and simulation report.
+		if (this.temperaturePlotter != null) {
+			this.temperaturePlotter.addData(
+					TEMPERATURE_SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.temperature.v) ;
+			this.temperaturePlotter.addData(
+					TEMPERATURE_SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.nextTemperature) ;
+		}
+		if (this.intensityPlotter != null) {
+			this.intensityPlotter.addData(
+				INTENSITY_SERIES,
+				this.getCurrentStateTime().getSimulatedTime(), 
+				this.intensity) ;
+			this.intensityPlotter.addData(
+					INTENSITY_SERIES,
+					this.getCurrentStateTime().getSimulatedTime(), 
+					this.intensity) ;
 		}
 	}
+	
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
@@ -526,8 +624,15 @@ extends AtomicHIOAwithDE
 						this.temperature.v,
 						end.getSimulatedTime(),
 						this.temperature.v)) ;
+		this.intensityFunction.add(
+				new DoublePiece(
+						this.timeOfLastSuspending.getSimulatedTime(),
+						this.intensity,
+						end.getSimulatedTime(),
+						this.intensity)) ;
 		return new RefrigerateurModelReport(this.getURI(),
-									  this.temperatureFunction) ;
+									  this.temperatureFunction,
+									  this.intensityFunction) ;
 	}
 }
 //------------------------------------------------------------------------------

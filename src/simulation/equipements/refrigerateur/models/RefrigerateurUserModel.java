@@ -18,6 +18,7 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.equipements.refrigerateur.models.events.CloseEvent;
 import simulation.equipements.refrigerateur.models.events.OpenEvent;
+import simulation.equipements.refrigerateur.tools.RefrigerateurPorte;
 
 //-----------------------------------------------------------------------------
 @ModelExternalEvents(exported = { CloseEvent.class, 
@@ -73,11 +74,6 @@ extends		AtomicES_Model
 		}
 	}
 
-	protected enum Door {
-		OPENED,	
-		CLOSED		
-	}
-
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -106,7 +102,7 @@ extends		AtomicES_Model
 	/**	a random number generator from common math library.					*/
 	protected final RandomDataGenerator	rgInterruptionDurations ;
 	/** 	the current state of the refrigerateur's door.					*/
-	protected Door						currentState ;
+	protected RefrigerateurPorte currentState ;
 
 	// Report generation
 	/** piecewise boolean function giving the opened time and the closed time
@@ -230,7 +226,7 @@ extends		AtomicES_Model
 
 		// The model is set to start in the state interrupted and with a
 		// resumption event that occurs at time 0.
-		this.currentState = Door.OPENED ;
+		this.currentState = RefrigerateurPorte.OPENED ;
 		this.scheduleEvent(new CloseEvent(initialTime)) ;
 		// re-initialisation of the time of occurrence of the next event
 		// required here after adding a new event in the schedule.
@@ -245,7 +241,7 @@ extends		AtomicES_Model
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
-		if (this.currentState == Door.OPENED) {
+		if (this.currentState == RefrigerateurPorte.OPENED) {
 			// The event that forced the execution of an internal transition
 			// is a resumption event.
 
@@ -253,7 +249,7 @@ extends		AtomicES_Model
 			this.logMessage(this.getCurrentStateTime() +
 												"|open event.") ;
 			// Switch to connected state.
-			this.currentState = Door.CLOSED ;
+			this.currentState = RefrigerateurPorte.CLOSED ;
 
 			// Include a new point in the event occurrences function (report)
 			if (this.timeOfLastOpening >= 0.0) {
@@ -287,7 +283,7 @@ extends		AtomicES_Model
 						1.0) ;
 			}
 		} else {
-			assert	this.currentState == Door.CLOSED ;
+			assert	this.currentState == RefrigerateurPorte.CLOSED ;
 			// The event that forced the execution of an internal transition
 			// is an interruption event.
 
@@ -296,7 +292,7 @@ extends		AtomicES_Model
 												"|interrupt transmission.") ;
 
 			// Switch to interrupted state.
-			this.currentState = Door.OPENED ;
+			this.currentState = RefrigerateurPorte.OPENED ;
 
 			// Include a new point in the event occurrences function (report)
 			this.closeFunction.add(
@@ -340,12 +336,12 @@ extends		AtomicES_Model
 		// advance the time at the current (ending) time and finish the
 		// event occurrences function for the report.
 		double end = endTime.getSimulatedTime() ;
-		if (this.currentState == Door.OPENED) {
+		if (this.currentState == RefrigerateurPorte.OPENED) {
 			if (this.plotter != null) {
 				this.plotter.addData(SERIES, end, 0.0) ;
 			}
 		} else {
-			assert	this.currentState == Door.CLOSED ;
+			assert	this.currentState == RefrigerateurPorte.CLOSED ;
 			if (this.plotter != null) {
 				this.plotter.addData(SERIES, end, 1.0) ;
 			}

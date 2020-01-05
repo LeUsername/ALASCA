@@ -40,7 +40,7 @@ public class MIL_Refrigerateur {
 			simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BMASSF, 1.0/11.0) ;
 			simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BIS, 0.5) ;
 			simParams.put(
-					RefrigerateurModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					RefrigerateurModel.URI + ":" + RefrigerateurModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurModel",
 							"Time (sec)",
@@ -50,13 +50,28 @@ public class MIL_Refrigerateur {
 							WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
+			simParams.put(
+					RefrigerateurModel.URI + ":"  + RefrigerateurModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"RefrigerateurModel",
+							"Time (sec)",
+							"Intensity (Watt)",
+							WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y +
+							WattWattMain.getPlotterHeight(),
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
 
+			simParams.put(
+					RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+			simParams.put(
+					RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
 			simParams.put(
 					RefrigerateurSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurSensorModel",
 							"Time (sec)",
-							"Bandwidth (Mbps)",
+							"Temperature (°C)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
 							2*WattWattMain.getPlotterHeight(),

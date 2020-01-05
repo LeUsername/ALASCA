@@ -8,6 +8,7 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import simulation.equipements.refrigerateur.components.RefrigerateurSimulatorPlugin;
 import wattwatt.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.suspensible.refrigerateur.RefrigerateurInPort;
@@ -17,14 +18,23 @@ import wattwatt.tools.refrigerateur.RefrigerateurReglage;
 @RequiredInterfaces(required = IControleur.class)
 public class Refrigerateur extends AbstractComponent {
 
-	protected RefrigerateurInPort refrin;
-
 	protected double tempH;
 	protected double tempB;
 
 	protected boolean isOn;
 	protected boolean isWorking;
 	protected int conso;
+	
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+
+	protected RefrigerateurInPort refrin;
+	protected RefrigerateurSimulatorPlugin asp;
+
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 
 	protected Refrigerateur(String uri, String refriIn) throws Exception {
 		super(uri, 1, 1);

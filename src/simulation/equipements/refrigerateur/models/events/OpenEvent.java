@@ -44,7 +44,11 @@ public class OpenEvent extends AbstractRefrigerateurEvent
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		return true ;
+		if(e instanceof CloseEvent) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**

@@ -1,4 +1,4 @@
-package simulation.equipements.sechecheveux;
+package simulation.equipements.sechecheveux.tools;
 
 public class HairDryerUserBehaviour {
 

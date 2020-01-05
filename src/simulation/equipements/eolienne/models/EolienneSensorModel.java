@@ -13,10 +13,10 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import simulation.equipements.eolienne.EolienneState;
 import simulation.equipements.eolienne.models.events.SwitchOffEvent;
 import simulation.equipements.eolienne.models.events.SwitchOnEvent;
 import simulation.equipements.eolienne.models.events.WindReadingEvent;
+import simulation.equipements.eolienne.tools.EolienneState;
 
 @ModelExternalEvents(exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class EolienneSensorModel extends AtomicES_Model {

@@ -14,12 +14,12 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import simulation.equipements.sechecheveux.HairDryerUserBehaviour;
 import simulation.equipements.sechecheveux.models.events.DecreasePowerEvent;
 import simulation.equipements.sechecheveux.models.events.IncreasePowerEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchModeEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchOffEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchOnEvent;
+import simulation.equipements.sechecheveux.tools.HairDryerUserBehaviour;
 import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 
 @ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,

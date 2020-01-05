@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
@@ -27,7 +29,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.equipements.refrigerateur.models.events.CloseEvent;
 import simulation.equipements.refrigerateur.models.events.OpenEvent;
-import simulation.equipements.refrigerateur.models.events.TemperatureReadingEvent;
+import simulation.equipements.refrigerateur.models.events.ResumeEvent;
+import simulation.equipements.refrigerateur.models.events.SuspendEvent;
 
 public class RefrigerateurCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -94,21 +97,24 @@ public class RefrigerateurCoupledModel extends CoupledModel {
 		atomicModelDescriptors.put(RefrigerateurSensorModel.URI,
 				AtomicHIOA_Descriptor.create(RefrigerateurSensorModel.class, RefrigerateurSensorModel.URI,
 						TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(TicModel.URI + "-2", AtomicModelDescriptor.create(TicModel.class,
+				TicModel.URI + "-2", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<>();
 
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(RefrigerateurUserModel.URI);
 		submodels.add(RefrigerateurModel.URI);
+		submodels.add(TicModel.URI + "-2");
 		submodels.add(RefrigerateurSensorModel.URI);
 
 		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
 
 		Map<Class<? extends EventI>, ReexportedEvent> reexported = new HashMap<Class<? extends EventI>, ReexportedEvent>();
-		reexported.put(TemperatureReadingEvent.class,
-				new ReexportedEvent(RefrigerateurSensorModel.URI, TemperatureReadingEvent.class));
 		reexported.put(OpenEvent.class, new ReexportedEvent(RefrigerateurUserModel.URI, OpenEvent.class));
 		reexported.put(CloseEvent.class, new ReexportedEvent(RefrigerateurUserModel.URI, CloseEvent.class));
+		reexported.put(ResumeEvent.class, new ReexportedEvent(RefrigerateurSensorModel.URI, ResumeEvent.class));
+		reexported.put(SuspendEvent.class, new ReexportedEvent(RefrigerateurSensorModel.URI, SuspendEvent.class));
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 		EventSource from1 = new EventSource(RefrigerateurUserModel.URI, OpenEvent.class);
@@ -117,6 +123,15 @@ public class RefrigerateurCoupledModel extends CoupledModel {
 		EventSource from2 = new EventSource(RefrigerateurUserModel.URI, CloseEvent.class);
 		EventSink[] to2 = new EventSink[] { new EventSink(RefrigerateurModel.URI, CloseEvent.class) };
 		connections.put(from2, to2);
+		EventSource from3 = new EventSource(RefrigerateurSensorModel.URI, ResumeEvent.class);
+		EventSink[] to3 = new EventSink[] { new EventSink(RefrigerateurModel.URI, ResumeEvent.class) };
+		connections.put(from3, to3);
+		EventSource from4 = new EventSource(RefrigerateurSensorModel.URI, SuspendEvent.class);
+		EventSink[] to4 = new EventSink[] { new EventSink(RefrigerateurModel.URI, SuspendEvent.class) };
+		connections.put(from4, to4);
+		EventSource from5 = new EventSource(TicModel.URI + "-2", TicEvent.class);
+		EventSink[] to5 = new EventSink[] { new EventSink(RefrigerateurSensorModel.URI, TicEvent.class) };
+		connections.put(from5, to5);
 
 		Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
 		VariableSource source = new VariableSource("temperature", Double.class, RefrigerateurModel.URI);

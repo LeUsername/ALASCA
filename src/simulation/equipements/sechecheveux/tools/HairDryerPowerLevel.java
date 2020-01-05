@@ -1,4 +1,4 @@
-package simulation.equipements.sechecheveux;
+package simulation.equipements.sechecheveux.tools;
 
 import java.util.Arrays;
 import java.util.Optional;

@@ -45,7 +45,11 @@ extends AbstractRefrigerateurEvent
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		return false ;
+		if(e instanceof SuspendEvent) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

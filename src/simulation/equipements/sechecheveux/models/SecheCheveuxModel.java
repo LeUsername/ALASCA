@@ -20,13 +20,13 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.equipements.compteur.models.events.ConsommationEvent;
-import simulation.equipements.sechecheveux.HairDryerState;
-import simulation.equipements.sechecheveux.HairDryerPowerLevel;
 import simulation.equipements.sechecheveux.models.events.DecreasePowerEvent;
 import simulation.equipements.sechecheveux.models.events.IncreasePowerEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchModeEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchOffEvent;
 import simulation.equipements.sechecheveux.models.events.SwitchOnEvent;
+import simulation.equipements.sechecheveux.tools.HairDryerPowerLevel;
+import simulation.equipements.sechecheveux.tools.HairDryerState;
 import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 import wattwatt.tools.sechecheveux.SecheCheveuxReglage;
 
