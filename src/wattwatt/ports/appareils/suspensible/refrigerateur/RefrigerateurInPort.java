@@ -14,7 +14,7 @@ public class RefrigerateurInPort extends AbstractInboundPort implements IRefrige
 	private static final long serialVersionUID = 1L;
 
 	public RefrigerateurInPort(String uri, ComponentI owner) throws Exception {
-		super(uri, Refrigerateur.class, owner);
+		super(uri, IRefrigerateur.class, owner);
 	}
 
 	@Override

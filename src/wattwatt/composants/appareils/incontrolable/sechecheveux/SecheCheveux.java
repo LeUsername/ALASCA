@@ -246,7 +246,7 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Eolienne shutdown");
+		this.logMessage("Seche cheveux shutdown");
 		try {
 			this.sechin.unpublishPort();
 		} catch (Exception e) {
@@ -282,6 +282,7 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 		} else if (name.equals("isOn")) {
 			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "isOn");
 		} else {
+			assert name.equals("intensity");
 			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "intensity");
 		}
 	}

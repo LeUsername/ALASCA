@@ -557,23 +557,19 @@ extends AtomicHIOAwithDE
 			this.currentDoorState = RefrigerateurPorte.CLOSED ;
 			this.logMessage(this.getCurrentStateTime() +
 					"|external|Closed.") ;
-			System.out.println("Closed");
 		} else if(currentEvents.get(0) instanceof OpenEvent) {
 			this.currentDoorState = RefrigerateurPorte.OPENED ;
 			this.logMessage(this.getCurrentStateTime() +
 					"|external|Opened.") ;
-			System.out.println("Opened");
 		} else if (currentEvents.get(0) instanceof ResumeEvent) {
 			this.currentConsumption = RefrigerateurConsommation.RESUMED ;
 			this.logMessage(this.getCurrentStateTime() +
 					"|external|Resumed.") ;
-			System.out.println("Resumed");
 		} else {
 			assert	currentEvents.get(0) instanceof SuspendEvent ;
 			this.currentConsumption = RefrigerateurConsommation.SUSPENDED ;
 			this.logMessage(this.getCurrentStateTime() +
 					"|external|Suspended.") ;
-			System.out.println("Suspended");
 		}
 //		this.computeDerivatives() ;
 		this.computeNextState();
@@ -633,6 +629,26 @@ extends AtomicHIOAwithDE
 		return new RefrigerateurModelReport(this.getURI(),
 									  this.temperatureFunction,
 									  this.intensityFunction) ;
+	}
+	
+	// ------------------------------------------------------------------------
+	// Model-specific methods
+	// ------------------------------------------------------------------------
+
+	public RefrigerateurPorte getDoorState() {
+		return this.currentDoorState;
+	}
+	
+	public RefrigerateurConsommation getConsumptionState() {
+		return this.currentConsumption;
+	}
+	
+	public double getTemperature() {
+		return this.temperature.v;
+	}
+	
+	public double getIntensity() {
+		return this.intensity;
 	}
 }
 //------------------------------------------------------------------------------

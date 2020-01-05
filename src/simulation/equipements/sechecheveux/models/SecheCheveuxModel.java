@@ -19,6 +19,7 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.deployment.WattWattMain;
 import simulation.equipements.compteur.models.events.ConsommationEvent;
 import simulation.equipements.sechecheveux.models.events.DecreasePowerEvent;
 import simulation.equipements.sechecheveux.models.events.IncreasePowerEvent;
@@ -101,8 +102,11 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	public SecheCheveuxModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
-		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (sec)", "Intensity (Amp)", 100,
-				0, 600, 400);
+		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (sec)", "Intensity (Amp)", 
+				WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+				WattWattMain.ORIGIN_Y,
+				WattWattMain.getPlotterWidth(),
+				WattWattMain.getPlotterHeight());
 		this.intensityPlotter = new XYPlotter(pd);
 		this.intensityPlotter.createSeries(SERIES);
 

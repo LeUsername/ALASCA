@@ -1,14 +1,26 @@
 package wattwatt.composants.appareils.suspensible.refrigerateur;
 
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
 import simulation.equipements.refrigerateur.components.RefrigerateurSimulatorPlugin;
+import simulation.equipements.refrigerateur.models.RefrigerateurCoupledModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurSensorModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurUserModel;
+import simulation.equipements.refrigerateur.tools.RefrigerateurConsommation;
+import simulation.equipements.refrigerateur.tools.RefrigerateurPorte;
+import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
 import wattwatt.interfaces.appareils.suspensible.refrigerateur.IRefrigerateur;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.suspensible.refrigerateur.RefrigerateurInPort;
@@ -16,7 +28,12 @@ import wattwatt.tools.refrigerateur.RefrigerateurReglage;
 
 @OfferedInterfaces(offered = IRefrigerateur.class)
 @RequiredInterfaces(required = IControleur.class)
-public class Refrigerateur extends AbstractComponent {
+public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+
+	protected RefrigerateurConsommation consumptionState;
+	protected RefrigerateurPorte currentDoorState;
+	protected double intensity;
+	protected double temperature;
 
 	protected double tempH;
 	protected double tempB;
@@ -24,7 +41,7 @@ public class Refrigerateur extends AbstractComponent {
 	protected boolean isOn;
 	protected boolean isWorking;
 	protected int conso;
-	
+
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -37,15 +54,38 @@ public class Refrigerateur extends AbstractComponent {
 	// -------------------------------------------------------------------------
 
 	protected Refrigerateur(String uri, String refriIn) throws Exception {
-		super(uri, 1, 1);
-
+		super(uri, 2, 1);
+		this.initialise();
 		this.refrin = new RefrigerateurInPort(refriIn, this);
 		this.refrin.publishPort();
 
 		this.tempH = RefrigerateurReglage.TEMP_H_INIT;
 		this.tempB = RefrigerateurReglage.TEMP_B_INIT;
 
+		this.consumptionState = RefrigerateurConsommation.SUSPENDED;
+		this.currentDoorState = RefrigerateurPorte.CLOSED;
+		this.intensity = 0.0;
+		this.temperature = (double) this.asp.getModelStateValue(RefrigerateurModel.URI, "temperature");
+
 		this.tracer.setRelativePosition(1, 0);
+	}
+
+	protected void initialise() throws Exception {
+		// The coupled model has been made able to create the simulation
+		// architecture description.
+		Architecture localArchitecture = this.createLocalArchitecture(null);
+		// Create the appropriate DEVS simulation plug-in.
+		this.asp = new RefrigerateurSimulatorPlugin();
+		// Set the URI of the plug-in, using the URI of its associated
+		// simulation model.
+		this.asp.setPluginURI(localArchitecture.getRootModelURI());
+		// Set the simulation architecture.
+		this.asp.setSimulationArchitecture(localArchitecture);
+		// Install the plug-in on the component, starting its own life-cycle.
+		this.installPlugin(this.asp);
+
+		// Toggle logging on to get a log on the screen.
+		this.toggleLogging();
 	}
 
 	public double getTempHaut() {
@@ -89,6 +129,22 @@ public class Refrigerateur extends AbstractComponent {
 
 	public int giveConso() {
 		return conso;
+	}
+
+	public void setDoorState(RefrigerateurPorte door) {
+		this.currentDoorState = door;
+	}
+
+	public void setConsumptionState(RefrigerateurConsommation consumption) {
+		this.consumptionState = consumption;
+	}
+
+	public void setIntensity(double intensity) {
+		this.intensity = intensity;
+	}
+
+	public void setTemperature(double temperature) {
+		this.temperature = temperature;
 	}
 
 	public void regule() {
@@ -144,30 +200,103 @@ public class Refrigerateur extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
+		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+		// To give an example of the embedding component access facility, the
+		// following lines show how to set the reference to the embedding
+		// component or a proxy responding to the access calls.
+		HashMap<String, Object> simParams = new HashMap<String, Object>();
+		simParams.put("componentRef", this);
+		simParams.put(RefrigerateurUserModel.URI + ":" + RefrigerateurUserModel.MTBI, 200.0) ;
+		simParams.put(RefrigerateurUserModel.URI + ":" + RefrigerateurUserModel.MID, 10.0) ;
+		simParams.put(
+				RefrigerateurUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurUserModel",
+						"Time (sec)",
+						"Opened/Closed",
+						WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y,
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		
+		simParams.put(
+				RefrigerateurModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+		simParams.put(
+				RefrigerateurModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
+		simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BAAR, 1.75) ;
+		simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BBAR, 1.75) ;
+		simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BMASSF, 1.0/11.0) ;
+		simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BIS, 0.5) ;
+		simParams.put(
+				RefrigerateurModel.URI + ":" + RefrigerateurModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurModel",
+						"Time (sec)",
+						"Temperature (°C)",
+						WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y +
+						WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		simParams.put(
+				RefrigerateurModel.URI + ":"  + RefrigerateurModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurModel",
+						"Time (sec)",
+						"Intensity (Watt)",
+						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y +
+						WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+
+		simParams.put(
+				RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+		simParams.put(
+				RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
+		simParams.put(
+				RefrigerateurSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurSensorModel",
+						"Time (sec)",
+						"Temperature (°C)",
+						WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y +
+						2*WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		this.asp.setSimulationRunParameters(simParams);
+		// Start the simulation.
+		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
-				Random rand = new Random();
+				try {
+					asp.doStandAloneSimulation(0.0, 5000.0);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		this.runTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
 				try {
 					while (true) {
-						((Refrigerateur) this.getTaskOwner()).regule();
-						((Refrigerateur) this.getTaskOwner()).printState();
-						Thread.sleep(RefrigerateurReglage.REGUL_RATE);
-						if (rand.nextInt(100) > 90) {
-							((Refrigerateur) this.getTaskOwner()).off();
-							for (int tick = 0; tick < 5; tick++) {
-								Thread.sleep(RefrigerateurReglage.REGUL_RATE);
-								((Refrigerateur) this.getTaskOwner()).regule();
-								((Refrigerateur) this.getTaskOwner()).printState();
-							}
-							((Refrigerateur) this.getTaskOwner()).on();
-						}
+						((Refrigerateur) this.getTaskOwner()).setDoorState(
+								(((RefrigerateurPorte) asp.getModelStateValue(SecheCheveuxModel.URI, "door"))));
+						((Refrigerateur) this.getTaskOwner()).setConsumptionState((((RefrigerateurConsommation) asp
+								.getModelStateValue(SecheCheveuxModel.URI, "consumption"))));
+						((Refrigerateur) this.getTaskOwner()).setTemperature(
+								((double) asp.getModelStateValue(SecheCheveuxModel.URI, "temperature")));
+						((Refrigerateur) this.getTaskOwner())
+								.setIntensity(((double) asp.getModelStateValue(SecheCheveuxModel.URI, "intensity")));
+						Thread.sleep(1000);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 100, TimeUnit.MILLISECONDS);
+		});
 	}
 
 	@Override
@@ -186,4 +315,32 @@ public class Refrigerateur extends AbstractComponent {
 		super.finalise();
 	}
 
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent#createLocalArchitecture(java.lang.String)
+	 */
+	@Override
+	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
+		return RefrigerateurCoupledModel.build();
+	}
+
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI#getEmbeddingComponentStateValue(java.lang.String)
+	 */
+	@Override
+	public Object getEmbeddingComponentStateValue(String name) throws Exception {
+		if (name.equals("door")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "door");
+		} else if (name.equals("consumption")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "consumption");
+		} else if (name.equals("temperature")) {
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "temperature");
+		} else {
+			assert name.equals("intensity");
+			return this.asp.getModelStateValue(SecheCheveuxModel.URI, "intensity");
+		}
+	}
 }

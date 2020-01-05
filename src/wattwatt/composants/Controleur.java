@@ -44,7 +44,7 @@ public class Controleur extends AbstractComponent {
 
 	protected int allCons;
 
-	public Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin,
+	protected Controleur(String uri, String compteurIn, String compteurOut, String refriIn, String refriOut, String sechin,
 			String sechOut, String eoIn, String eoOut, String laveIn, String laveOut, String groupeIn, String groupeOut)
 			throws Exception {
 		super(uri, 1, 6);

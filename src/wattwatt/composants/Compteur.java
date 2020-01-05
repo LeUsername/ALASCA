@@ -21,7 +21,7 @@ public class Compteur extends AbstractComponent {
 
 	protected int consomation;
 
-	public Compteur(String uri, String compteurIn) throws Exception {
+	protected Compteur(String uri, String compteurIn) throws Exception {
 		super(uri, 1, 1);
 
 		this.cptin = new CompteurInPort(compteurIn, this);

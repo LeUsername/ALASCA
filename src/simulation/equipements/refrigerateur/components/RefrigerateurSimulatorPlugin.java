@@ -2,7 +2,7 @@ package simulation.equipements.refrigerateur.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurModel;
 
 public class RefrigerateurSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;
@@ -17,20 +17,20 @@ public class RefrigerateurSimulatorPlugin extends AtomicSimulatorPlugin {
 		// simulation model.
 		ModelDescriptionI m = this.simulator.getDescendentModel(modelURI);
 
-		assert m instanceof SecheCheveuxModel;
+		assert m instanceof RefrigerateurModel;
 		// The following is the implementation of the protocol converting
 		// names used by the caller to the values provided by the model;
 		// alternatively, the simulation model could take care of the
 		// link between names and values.
-		if (name.equals("mode")) {
-			return ((SecheCheveuxModel) m).getMode();
-		} else if (name.equals("isOn")) {
-			return ((SecheCheveuxModel) m).isOn();
-		} else if (name.equals("powerLevel")) {
-			return ((SecheCheveuxModel) m).getPowerLevel();
+		if (name.equals("door")) {
+			return ((RefrigerateurModel) m).getDoorState();
+		} else if (name.equals("consumption")) {
+			return ((RefrigerateurModel) m).getConsumptionState();
+		} else if (name.equals("temperature")) {
+			return ((RefrigerateurModel) m).getTemperature();
 		}else {
 			assert name.equals("intensity");
-			return ((SecheCheveuxModel) m).getIntensity();
+			return ((RefrigerateurModel) m).getIntensity();
 		}
 	}
 }
