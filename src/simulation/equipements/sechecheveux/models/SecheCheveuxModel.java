@@ -199,7 +199,23 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		super.userDefinedInternalTransition(elapsedTime);
+		if (this.hasDebugLevel(1)) {
+			this.logMessage("SecheCheveuxModel#userDefinedInternalTransition "
+							+ elapsedTime) ;
+		}
+		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+			super.userDefinedInternalTransition(elapsedTime) ;
+
+
+		if (this.intensityPlotter != null) {
+			this.intensityPlotter.addData(
+				SERIES,
+				this.getCurrentStateTime().getSimulatedTime(), 
+				this.currentIntensity.v) ;
+		}
+		this.logMessage(this.getCurrentStateTime() +
+				"|internal|temperature = " + this.currentIntensity.v + " �C") ;
+		}
 	}
 
 	/**

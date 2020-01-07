@@ -1,6 +1,5 @@
 package simulation.equipements.eolienne.models;
 
-import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +71,7 @@ public class EolienneSensorModel extends AtomicES_Model {
 		
 		this.state = EolienneState.OFF;
 		
-		this.currentWind = MAX_WIND/2;
+		this.currentWind = EolienneSensorModel.MAX_WIND * this.rg.nextBeta(2., 2.);
 
 		this.rg.reSeedSecure();
 		
@@ -152,9 +151,7 @@ public class EolienneSensorModel extends AtomicES_Model {
 		
 		Time t = this.getCurrentStateTime().add(d);
 
-		Random r = new Random();
-		
-		this.currentWind = this.currentWind + (r.nextInt(4)-2);
+		this.currentWind = EolienneSensorModel.MAX_WIND * this.rg.nextBeta(2., 2.);
 		if(this.currentWind <= 0.0) {
 			this.currentWind = 0.0;
 		}

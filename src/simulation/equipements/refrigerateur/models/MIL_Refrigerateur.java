@@ -32,7 +32,7 @@ public class MIL_Refrigerateur {
 							WattWattMain.getPlotterHeight())) ;
 			
 			simParams.put(
-					RefrigerateurModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+					RefrigerateurModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 5.0) ;
 			simParams.put(
 					RefrigerateurModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
 			simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BAAR, 1.75) ;
@@ -44,7 +44,7 @@ public class MIL_Refrigerateur {
 					new PlotterDescription(
 							"RefrigerateurModel",
 							"Time (sec)",
-							"Temperature (°C)",
+							"Temperature (ï¿½C)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
 							WattWattMain.getPlotterHeight(),
@@ -56,14 +56,14 @@ public class MIL_Refrigerateur {
 							"RefrigerateurModel",
 							"Time (sec)",
 							"Intensity (Watt)",
-							WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
-							WattWattMain.getPlotterHeight(),
+							2*WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
 
 			simParams.put(
-					RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+					RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 2.5) ;
 			simParams.put(
 					RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
 			simParams.put(
@@ -71,10 +71,10 @@ public class MIL_Refrigerateur {
 					new PlotterDescription(
 							"RefrigerateurSensorModel",
 							"Time (sec)",
-							"Temperature (°C)",
+							"Temperature (ï¿½C)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
-							2*WattWattMain.getPlotterHeight(),
+							3*WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
 
@@ -82,7 +82,7 @@ public class MIL_Refrigerateur {
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			se.doStandAloneSimulation(0.0, 1000.0) ;
+			se.doStandAloneSimulation(0.0, 1000) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

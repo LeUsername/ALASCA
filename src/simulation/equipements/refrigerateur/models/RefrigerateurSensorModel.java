@@ -114,7 +114,7 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** Temp in °C.								*/
+	/** Temp in ï¿½C.								*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>							temperature ;
 
@@ -233,12 +233,14 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 				SuspendEvent suspend =
 						new SuspendEvent(currentTime) ;
 				ret.add(suspend) ;
-			} else if (this.temperature.v >= this.maxTemperature) {
+			} else if (this.temperature.v > this.maxTemperature ) {
 				ResumeEvent resume =
 						new ResumeEvent(currentTime) ;
 				ret.add(resume) ;
 			} else {
-				return null;
+				ResumeEvent resume =
+						new ResumeEvent(currentTime) ;
+				ret.add(resume) ;
 			}
 			return ret ;
 		} else {
@@ -265,7 +267,7 @@ public class RefrigerateurSensorModel extends		AtomicHIOAwithEquations
 		super.userDefinedInternalTransition(elapsedTime) ;
 		this.logMessage(this.getCurrentStateTime() +
 								"|internal|temperature = " +
-								this.temperature.v + " °C") ;
+								this.temperature.v + " ï¿½C") ;
 	}
 
 	/**

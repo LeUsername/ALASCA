@@ -220,7 +220,7 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 						WattWattMain.getPlotterHeight())) ;
 		
 		simParams.put(
-				RefrigerateurModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+				RefrigerateurModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 5.0) ;
 		simParams.put(
 				RefrigerateurModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
 		simParams.put(RefrigerateurModel.URI + ":" + RefrigerateurModel.BAAR, 1.75) ;
@@ -232,7 +232,7 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				new PlotterDescription(
 						"RefrigerateurModel",
 						"Time (sec)",
-						"Temperature (°C)",
+						"Temperature (ï¿½C)",
 						WattWattMain.ORIGIN_X,
 						WattWattMain.ORIGIN_Y +
 						WattWattMain.getPlotterHeight(),
@@ -244,14 +244,14 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 						"RefrigerateurModel",
 						"Time (sec)",
 						"Intensity (Watt)",
-						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_X,
 						WattWattMain.ORIGIN_Y +
-						WattWattMain.getPlotterHeight(),
+						2*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
 
 		simParams.put(
-				RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 10.0) ;
+				RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MAX_TEMPERATURE, 2.5) ;
 		simParams.put(
 				RefrigerateurSensorModel.URI + ":" + RefrigerateurModel.MIN_TEMPERATURE, 1.0) ;
 		simParams.put(
@@ -259,10 +259,10 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				new PlotterDescription(
 						"RefrigerateurSensorModel",
 						"Time (sec)",
-						"Temperature (°C)",
+						"Temperature (ï¿½C)",
 						WattWattMain.ORIGIN_X,
 						WattWattMain.ORIGIN_Y +
-						2*WattWattMain.getPlotterHeight(),
+						3*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
 		this.asp.setSimulationRunParameters(simParams);

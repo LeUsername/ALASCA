@@ -87,7 +87,7 @@ extends AtomicHIOAwithDE
 	public static final String	URI = "RefrigerateurModel" ;
 	/** nominal tension (in Volts) of the fridge. */
 	protected static final double TENSION = 220.0; // Volts
-	protected static final double CHANGEMENT_TEMPERATURE = 0.05; // °C
+	protected static final double CHANGEMENT_TEMPERATURE = 0.05; // ï¿½C
 
 	// Run parameter names to be used when initialising them before each run
 	/** name of the run parameter defining the maximum temperature.			*/
@@ -172,7 +172,7 @@ extends AtomicHIOAwithDE
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** Temp in °C.								*/
+	/** Temp in ï¿½C.								*/
 	@ExportedVariable(type = Double.class)
 	protected Value<Double>				temperature =
 											new Value<Double>(this, 10.0, 0) ;
@@ -417,6 +417,7 @@ extends AtomicHIOAwithDE
 		if(this.currentConsumption == RefrigerateurConsommation.RESUMED) {
 			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_ACTIVE;
 			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
+				this.intensity += RefrigerateurReglage.CONSOMMATION_OUVERTURE * RefrigerateurModel.TENSION;
 				this.temperature.v = this.temperature.v + 0.1 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
 			} else {
 				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
@@ -429,6 +430,7 @@ extends AtomicHIOAwithDE
 			assert	this.currentConsumption == RefrigerateurConsommation.SUSPENDED ;
 			this.intensity = RefrigerateurModel.TENSION * RefrigerateurReglage.CONSOMMATION_PASSIVE;
 			if (this.currentDoorState == RefrigerateurPorte.OPENED) {
+				this.intensity += RefrigerateurReglage.CONSOMMATION_OUVERTURE * RefrigerateurModel.TENSION;
 				this.temperature.v = this.temperature.v + 0.5 * RefrigerateurModel.CHANGEMENT_TEMPERATURE;
 			} else {
 				assert	this.currentDoorState == RefrigerateurPorte.CLOSED ;
@@ -445,13 +447,14 @@ extends AtomicHIOAwithDE
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
 		if (this.hasDebugLevel(1)) {
-			this.logMessage("WiFiBandwidthModel#userDefinedInternalTransition "
+			this.logMessage("RefrigerateurModel#userDefinedInternalTransition "
 							+ elapsedTime) ;
 		}
 		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
 			super.userDefinedInternalTransition(elapsedTime) ;
 
 			double oldTemperature = this.temperature.v ;
+			double oldIntensity = this.intensity;
 //			if (this.currentDoorState == Door.CLOSED) {
 //				// the value of the bandwidth at the next internal transition
 //				// is computed in the timeAdvance function when computing
@@ -474,20 +477,9 @@ extends AtomicHIOAwithDE
 						this.temperature.v) ;
 			}
 			this.intensityFunction.add(
-					new DoublePiece(this.temperature.time.getSimulatedTime(),
-									oldTemperature,
-									this.getCurrentStateTime().getSimulatedTime(),
-									this.temperature.v)) ;
-				if (this.temperaturePlotter != null) {
-					this.temperaturePlotter.addData(
-							TEMPERATURE_SERIES,
-							this.getCurrentStateTime().getSimulatedTime(),
-							this.temperature.v) ;
-				}
-			this.intensityFunction.add(
 					new DoublePiece(
 							this.getCurrentStateTime().getSimulatedTime(),
-							this.intensity,
+							oldIntensity,
 							this.getCurrentStateTime().getSimulatedTime(),
 							this.intensity)) ;
 				if (this.intensityPlotter != null) {
@@ -497,7 +489,7 @@ extends AtomicHIOAwithDE
 						this.intensity) ;
 				}
 			this.logMessage(this.getCurrentStateTime() +
-					"|internal|temperature = " + this.temperature.v + " °C") ;
+					"|internal|temperature = " + this.temperature.v + " ï¿½C") ;
 		}
 	}
 

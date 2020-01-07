@@ -14,6 +14,8 @@ public class RefrigerateurReglage {
 	public static final double CONSOMMATION_ACTIVE = 12.0;
 	public static final double CONSOMMATION_PASSIVE = 6.0;
 	
+	public static final double CONSOMMATION_OUVERTURE = 2.0;
+	
 	public static final int REGUL_RATE = 500; //ms
 	
 	
