@@ -1,13 +1,33 @@
 package wattwatt.composants.appareils.planifiable.lavelinge;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
+import simulation.equipements.lavelinge.components.LaveLingeSimulatorPlugin;
+import simulation.equipements.lavelinge.models.LaveLingeCoupledModel;
+import simulation.equipements.lavelinge.models.LaveLingeModel;
+import simulation.equipements.lavelinge.models.LaveLingeUserModel;
+import simulation.equipements.lavelinge.tools.LaveLingeLavage;
+import simulation.equipements.lavelinge.tools.LaveLingeUserBehaviour;
+import simulation.equipements.refrigerateur.models.RefrigerateurModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurSensorModel;
+import simulation.equipements.refrigerateur.models.RefrigerateurUserModel;
+import simulation.equipements.refrigerateur.tools.RefrigerateurConsommation;
+import simulation.equipements.refrigerateur.tools.RefrigerateurPorte;
+import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
+import wattwatt.composants.appareils.suspensible.refrigerateur.Refrigerateur;
 import wattwatt.interfaces.appareils.planifiable.lavelinge.ILaveLinge;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.planifiable.lavelinge.LaveLingeInPort;
@@ -16,7 +36,7 @@ import wattwatt.tools.lavelinge.LaveLingeReglage;
 
 @OfferedInterfaces(offered = ILaveLinge.class)
 @RequiredInterfaces(required = IControleur.class)
-public class LaveLinge extends AbstractComponent {
+public class LaveLinge extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
 
 	protected LaveLingeInPort lavein;
 
@@ -28,16 +48,46 @@ public class LaveLinge extends AbstractComponent {
 	protected boolean isWorking;
 	protected int conso;
 
+	protected boolean isOnSim;
+	protected LaveLingeLavage state;
+	protected boolean isWorkingSim;
+	protected double consoSim;	
+	
+	protected LaveLingeSimulatorPlugin asp;
+	
 	protected LaveLinge(String uri, String laveIn) throws Exception {
-		super(uri, 1, 1);
-
+		super(uri, 2, 1);
+		this.initialise();
 		this.lavein = new LaveLingeInPort(laveIn, this);
 		this.lavein.publishPort();
 
+		this.isOnSim = (boolean)this.asp.getModelStateValue(LaveLingeModel.URI, "isOn");
+		this.state = (LaveLingeLavage)this.asp.getModelStateValue(LaveLingeModel.URI, "lavageMode");
+		this.isWorkingSim = (boolean)this.asp.getModelStateValue(LaveLingeModel.URI, "isWorking");
+		this.consoSim = (double)this.asp.getModelStateValue(LaveLingeModel.URI, "consommation");
+		
 		ecoLavage();
 		this.startingTime = LaveLingeReglage.START;
 		this.tracer.setRelativePosition(1, 2);
 
+	}
+	
+	protected void initialise() throws Exception {
+		// The coupled model has been made able to create the simulation
+		// architecture description.
+		Architecture localArchitecture = this.createLocalArchitecture(null);
+		// Create the appropriate DEVS simulation plug-in.
+		this.asp = new LaveLingeSimulatorPlugin();
+		// Set the URI of the plug-in, using the URI of its associated
+		// simulation model.
+		this.asp.setPluginURI(localArchitecture.getRootModelURI());
+		// Set the simulation architecture.
+		this.asp.setSimulationArchitecture(localArchitecture);
+		// Install the plug-in on the component, starting its own life-cycle.
+		this.installPlugin(this.asp);
+
+		// Toggle logging on to get a log on the screen.
+		this.toggleLogging();
 	}
 
 	public boolean canDelay(int delay) {
@@ -161,21 +211,72 @@ public class LaveLinge extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
+		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+		// To give an example of the embedding component access facility, the
+		// following lines show how to set the reference to the embedding
+		// component or a proxy responding to the access calls.
+		HashMap<String, Object> simParams = new HashMap<String, Object>();
+
+		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.MTBU,
+				LaveLingeUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.MTWE,
+				LaveLingeUserBehaviour.MEAN_TIME_WORKING_ECO);
+		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.MTWP,
+				LaveLingeUserBehaviour.MEAN_TIME_WORKING_PREMIUM);
+		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.STD,
+				10.0);
+		
+		simParams.put(LaveLingeModel.URI + ":" + LaveLingeModel.CONSUMPTION_ECO,
+				LaveLingeReglage.CONSO_ECO_MODE_SIM);
+		simParams.put(LaveLingeModel.URI + ":" + LaveLingeModel.CONSUMPTION_PREMIUM,
+				LaveLingeReglage.CONSO_PREMIUM_MODE_SIM);
+		simParams.put(LaveLingeModel.URI + ":" + LaveLingeUserModel.STD,
+				10.0);
+		
+		simParams.put(
+				LaveLingeUserModel.URI + ":" + LaveLingeUserModel.ACTION + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
+						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+
+		simParams.put(
+				LaveLingeModel.URI + ":" + LaveLingeModel.INTENSITY_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("LaveLingeModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		// Start the simulation.
+		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
-				Random rand = new Random();
+				try {
+					asp.doStandAloneSimulation(0.0, 1000.0);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		this.runTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
 				try {
 					while (true) {
-						((LaveLinge) this.getTaskOwner()).behave(rand);
-						((LaveLinge) this.getTaskOwner()).printState();
-						Thread.sleep(LaveLingeReglage.REGUL_RATE);
+						((LaveLinge) this.getTaskOwner()).isOnSim = 
+								(((boolean) asp.getModelStateValue(LaveLingeModel.URI, "isOn")));
+						((LaveLinge) this.getTaskOwner()).isWorkingSim = 
+								(((boolean) asp.getModelStateValue(LaveLingeModel.URI, "isWorking")));
+						((LaveLinge) this.getTaskOwner()).consoSim = 
+								(((double) asp.getModelStateValue(LaveLingeModel.URI, "consomation")));
+						((LaveLinge) this.getTaskOwner()).state = 
+								(((LaveLingeLavage) asp.getModelStateValue(LaveLingeModel.URI, "lavageMode")));
+						Thread.sleep(1000);
 					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 100, TimeUnit.MILLISECONDS);
+		});
 	}
 
 	@Override
@@ -192,6 +293,17 @@ public class LaveLinge extends AbstractComponent {
 	@Override
 	public void finalise() throws Exception {
 		super.finalise();
+	}
+
+	@Override
+	public Object getEmbeddingComponentStateValue(String name) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
+		return LaveLingeCoupledModel.build();
 	}
 
 }

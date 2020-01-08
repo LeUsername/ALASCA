@@ -283,13 +283,13 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				try {
 					while (true) {
 						((Refrigerateur) this.getTaskOwner()).setDoorState(
-								(((RefrigerateurPorte) asp.getModelStateValue(SecheCheveuxModel.URI, "door"))));
+								(((RefrigerateurPorte) asp.getModelStateValue(RefrigerateurModel.URI, "door"))));
 						((Refrigerateur) this.getTaskOwner()).setConsumptionState((((RefrigerateurConsommation) asp
-								.getModelStateValue(SecheCheveuxModel.URI, "consumption"))));
+								.getModelStateValue(RefrigerateurModel.URI, "consumption"))));
 						((Refrigerateur) this.getTaskOwner()).setTemperature(
-								((double) asp.getModelStateValue(SecheCheveuxModel.URI, "temperature")));
+								((double) asp.getModelStateValue(RefrigerateurModel.URI, "temperature")));
 						((Refrigerateur) this.getTaskOwner())
-								.setIntensity(((double) asp.getModelStateValue(SecheCheveuxModel.URI, "intensity")));
+								.setIntensity(((double) asp.getModelStateValue(RefrigerateurModel.URI, "intensity")));
 						Thread.sleep(1000);
 					}
 				} catch (Exception e) {

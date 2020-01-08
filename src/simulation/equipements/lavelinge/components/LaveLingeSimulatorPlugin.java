@@ -2,7 +2,6 @@ package simulation.equipements.lavelinge.components;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulation.equipements.eolienne.models.EolienneModel;
 import simulation.equipements.lavelinge.models.LaveLingeModel;
 
 public class LaveLingeSimulatorPlugin extends AtomicSimulatorPlugin {
@@ -19,12 +18,16 @@ public class LaveLingeSimulatorPlugin extends AtomicSimulatorPlugin {
 	
 		assert m instanceof LaveLingeModel;
 
-		/*if (name.equals("isOn")) {
+		if (name.equals("isOn")) {
 			return ((LaveLingeModel) m).isOn();
-		}else {
-			return null;
-		}*/
-		return null;
+		}else if(name.equals("consommation")){
+			return ((LaveLingeModel) m).getIntensity();
+		} else if(name.equals("lavageMode")) {
+			return ((LaveLingeModel) m).getLavage();
+		} else {
+			assert name.equals("isWorking");
+			return ((LaveLingeModel) m).isWorking();
+		}
 	}
 
 }

@@ -25,6 +25,8 @@ public class MIL_GroupeElectrogene {
 					GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING);
 			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTR,
 					GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL);
+			
+			
 			simParams.put(
 					GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.ACTION + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,

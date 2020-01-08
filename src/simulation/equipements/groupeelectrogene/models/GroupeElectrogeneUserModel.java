@@ -103,9 +103,9 @@ public class GroupeElectrogeneUserModel extends AtomicES_Model {
 	public void initialiseState(Time initialTime) {
 		this.initialDelay = GroupeElectrogeneUserBehaviour.INITIAL_DELAY;
 		this.interdayDelay = GroupeElectrogeneUserBehaviour.INTER_DAY_DELAY;
-		this.meanTimeBetweenUsages = GroupeElectrogeneUserBehaviour.MEAN_TIME_BETWEEN_USAGES;
-		this.meanTimeWorking = GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING;
-		this.meanTimeAtRefill = GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL;
+//		this.meanTimeBetweenUsages = GroupeElectrogeneUserBehaviour.MEAN_TIME_BETWEEN_USAGES;
+//		this.meanTimeWorking = GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING;
+//		this.meanTimeAtRefill = GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL;
 
 		this.rg.reSeedSecure();
 
@@ -233,8 +233,6 @@ public class GroupeElectrogeneUserModel extends AtomicES_Model {
 						0.0) ;
 			}
 			
-		}else {
-			System.out.println("iii");
 		}
 
 	}

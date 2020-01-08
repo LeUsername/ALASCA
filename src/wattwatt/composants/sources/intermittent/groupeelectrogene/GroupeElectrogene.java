@@ -1,7 +1,6 @@
 package wattwatt.composants.sources.intermittent.groupeelectrogene;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -19,14 +18,10 @@ import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneCoupledM
 import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneModel;
 import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneUserModel;
 import simulation.equipements.groupeelectrogene.tools.GroupeElectrogeneUserBehaviour;
-import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
-import simulation.equipements.sechecheveux.tools.HairDryerPowerLevel;
-import wattwatt.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.interfaces.sources.intermittent.IGroupeElectrogene;
 import wattwatt.ports.sources.intermittent.groupeelectrogene.GroupeElectrogeneInPort;
 import wattwatt.tools.GroupeElectrogene.GroupreElectrogeneReglage;
-import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 
 @OfferedInterfaces(offered = IGroupeElectrogene.class)
 @RequiredInterfaces(required = IControleur.class)
@@ -48,7 +43,7 @@ public class GroupeElectrogene  extends AbstractCyPhyComponent implements Embedd
 	
 
 	protected GroupeElectrogene(String uri, String groupeIn) throws Exception {
-		super(uri, 1, 1);
+		super(uri, 2, 1);
 		this.initialise();
 		this.groupein = new GroupeElectrogeneInPort(groupeIn, this);
 		this.groupein.publishPort();
