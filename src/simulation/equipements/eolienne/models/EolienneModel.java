@@ -203,7 +203,6 @@ public class EolienneModel extends AtomicHIOAwithEquations {
 
 		assert ce instanceof AbstractEolienneEvent;
 
-		this.productionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
 
 		if (ce instanceof WindReadingEvent) {
 			this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();

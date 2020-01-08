@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
@@ -17,7 +18,7 @@ import simulation.equipements.eolienne.models.events.SwitchOnEvent;
 import simulation.equipements.eolienne.models.events.WindReadingEvent;
 import simulation.equipements.eolienne.tools.EolienneState;
 
-@ModelExternalEvents(exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
+@ModelExternalEvents(imported = { TicEvent.class }, exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class EolienneSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -41,8 +42,6 @@ public class EolienneSensorModel extends AtomicES_Model {
 
 	/** a random number generator from common math library. */
 	protected final RandomDataGenerator rg;
-	
-	protected int maxWindHour;
 	
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -75,8 +74,6 @@ public class EolienneSensorModel extends AtomicES_Model {
 
 		this.rg.reSeedSecure();
 		
-		maxWindHour = this.rg.nextInt(0, 23);
-
 		// Initialise to get the correct current time.
 		super.initialiseState(initialTime);
 
@@ -155,8 +152,6 @@ public class EolienneSensorModel extends AtomicES_Model {
 		if(this.currentWind <= 0.0) {
 			this.currentWind = 0.0;
 		}
-		
-		System.out.println(this.currentWind);
 		
 		if(this.currentWind > EolienneSensorModel.MAX_WIND) {
 			if(this.state.equals(EolienneState.ON)) {
