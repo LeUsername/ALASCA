@@ -454,8 +454,6 @@ extends AtomicHIOAwithDE
 		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
 			super.userDefinedInternalTransition(elapsedTime) ;
 
-			double oldTemperature = this.temperature.v ;
-			double oldIntensity = this.intensity;
 //			if (this.currentDoorState == Door.CLOSED) {
 //				// the value of the bandwidth at the next internal transition
 //				// is computed in the timeAdvance function when computing

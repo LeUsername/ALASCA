@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
+import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
@@ -235,6 +236,11 @@ public class GroupeElectrogeneUserModel extends AtomicES_Model {
 			
 		}
 
+	}
+	
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new GroupeElectrogeneUserModelReport(this.getURI());
 	}
 
 	

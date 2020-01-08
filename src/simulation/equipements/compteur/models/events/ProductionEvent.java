@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.equipements.compteur.models.CompteurModel;
 
-public class ConsommationEvent extends AbstractCompteurEvent {
+public class ProductionEvent extends AbstractCompteurEvent {
 
 	public static class		Reading
 	implements EventInformationI
@@ -25,11 +25,11 @@ public class ConsommationEvent extends AbstractCompteurEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ConsommationEvent(Time timeOfOccurrence, EventInformationI content) {
+	public ProductionEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
-	public ConsommationEvent(Time timeOfOccurrence, double content) {
+	public ProductionEvent(Time timeOfOccurrence, double content) {
 		super(timeOfOccurrence, new Reading(content));
 	}
 
@@ -41,8 +41,8 @@ public class ConsommationEvent extends AbstractCompteurEvent {
 	@Override
 	public String eventContentAsString() {
 		return	"time = " + this.getTimeOfOccurrence() + ", " +
-				"level = " + ((Reading)this.getEventInformation()).value
-												+ " mAh";
+				"production = " + ((Reading)this.getEventInformation()).value
+												+ " W";
 	}
 	
 	@Override
@@ -51,6 +51,6 @@ public class ConsommationEvent extends AbstractCompteurEvent {
 		assert	model instanceof CompteurModel ;
 
 		CompteurModel m = (CompteurModel)model ;
-		m.setConsommation(((Reading)this.getEventInformation()).value);
+		m.setProduction(((Reading)this.getEventInformation()).value);
 	}
 }

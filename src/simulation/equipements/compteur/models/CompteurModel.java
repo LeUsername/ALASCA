@@ -18,9 +18,11 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.equipements.compteur.models.events.AbstractCompteurEvent;
 import simulation.equipements.compteur.models.events.ConsommationEvent;
+import simulation.equipements.compteur.models.events.ProductionEvent;
 
-@ModelExternalEvents(imported = { ConsommationEvent.class })
+@ModelExternalEvents(imported = { ConsommationEvent.class, ProductionEvent.class })
 public class CompteurModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------
@@ -60,8 +62,14 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 
 	protected Value<Double>	consommationTotale = new Value<Double>(this, 0.0);
 
+	protected double production;
+	
 	/** plotter for the intensity level over time.							*/
 	protected XYPlotter				consommationPlotter ;
+	
+	protected XYPlotter				productionPlotter;
+	
+	protected XYPlotter				totalePlotter;
 
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
@@ -100,7 +108,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		PlotterDescription pd =
 				new PlotterDescription(
 						"Total consommation",
-						"Time (sec)",
+						"Time (min)",
 						"Consommation (kW)",
 						100,
 						400,
@@ -108,7 +116,21 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 						400) ;
 		this.consommationPlotter = new XYPlotter(pd) ;
 		this.consommationPlotter.createSeries(SERIES) ;
+		
+		PlotterDescription pd2 =
+				new PlotterDescription(
+						"Total production",
+						"Time (sec)",
+						"Production (kW)",
+						100,
+						400,
+						600,
+						400) ;
+		this.productionPlotter= new XYPlotter(pd2) ;
+		this.productionPlotter.createSeries(SERIES) ;
 
+
+		
 		// create a standard logger (logging on the terminal)
 		this.setLogger(new StandardLogger()) ;
 	}
@@ -141,6 +163,12 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		// show the plotter on the screen
 		this.consommationPlotter.showPlotter() ;
 
+//		// initialisation of the intensity plotter 
+//		this.productionPlotter.initialise() ;
+//		// show the plotter on the screen
+//		this.productionPlotter.showPlotter() ;
+
+		
 		try {
 			// set the debug level triggering the production of log messages.
 			this.setDebugLevel(1) ;
@@ -157,11 +185,18 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
+		this.production = 0.0;
+		
 		// first data in the plotter to start the plot.
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsommation()+this.production);
+		
+//		this.productionPlotter.addData(
+//				SERIES,
+//				this.getCurrentStateTime().getSimulatedTime(),
+//				this.getConsommation() + this.production);
 
 		super.initialiseVariables(startTime);
 	}
@@ -225,12 +260,19 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 
 		Event ce = (Event) currentEvents.get(0) ;
 
-		assert ce instanceof ConsommationEvent;
+		assert ce instanceof AbstractCompteurEvent;
+		
+		System.out.println(ce.getClass());
 		
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsommation()+this.production);
+		
+//		this.productionPlotter.addData(
+//				SERIES,
+//				this.getCurrentStateTime().getSimulatedTime(),
+//				this.production);
 
 		ce.executeOn(this) ;
 		// add a new data on the plotter; this data will open a new piece
@@ -238,7 +280,12 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsommation()+this.production);
+		
+//		this.productionPlotter.addData(
+//				SERIES,
+//				this.getCurrentStateTime().getSimulatedTime(),
+//				this.production);
 				
 		super.userDefinedExternalTransition(elapsedTime) ;
 	}
@@ -252,7 +299,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		this.consommationPlotter.addData(
 				SERIES,
 				endTime.getSimulatedTime(),
-				this.getConsommation()) ;
+				this.getConsommation()+this.production) ;
 
 		super.endSimulation(endTime) ;
 	}
@@ -277,6 +324,12 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	
 	public void		setConsommation(double c)
 	{
-		this.consommationTotale.v += c;
+		this.consommationTotale.v = 1000 * c;
+	}
+	
+	
+	public void		setProduction(double p)
+	{
+		this.production = p;
 	}
 }

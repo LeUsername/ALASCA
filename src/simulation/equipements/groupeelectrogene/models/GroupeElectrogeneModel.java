@@ -9,6 +9,7 @@ import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
+import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -18,13 +19,14 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.equipements.compteur.models.events.ProductionEvent;
 import simulation.equipements.groupeelectrogene.models.events.ReplenishEvent;
 import simulation.equipements.groupeelectrogene.models.events.StartEvent;
 import simulation.equipements.groupeelectrogene.models.events.StopEvent;
 import simulation.equipements.groupeelectrogene.tools.GroupeElectrogeneState;
 import wattwatt.tools.GroupeElectrogene.GroupreElectrogeneReglage;
 
-@ModelExternalEvents(imported = { ReplenishEvent.class, StartEvent.class, StopEvent.class , TicEvent.class})
+@ModelExternalEvents(imported = { ReplenishEvent.class, StartEvent.class, StopEvent.class , TicEvent.class}, exported = {ProductionEvent.class})
 public class GroupeElectrogeneModel extends AtomicHIOAwithEquations {
 
 	public static class GroupeElectrogeneModelReport extends AbstractSimulationReport {
@@ -144,7 +146,17 @@ public class GroupeElectrogeneModel extends AtomicHIOAwithEquations {
 	@Override
 	public Vector<EventI>	output()
 	{
-		return null ;
+		if(this.triggerReading) {
+			double reading = this.production.v ; // kW
+
+			Vector<EventI> ret = new Vector<EventI>(1);
+			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
+			ProductionEvent production = new ProductionEvent(currentTime, reading);
+			ret.add(production);
+			return ret;
+		} else  {
+			return null;
+		}
 	}
 	
 	/**
@@ -238,6 +250,11 @@ public class GroupeElectrogeneModel extends AtomicHIOAwithEquations {
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 5");
 		}
+	}
+	
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new GroupeElectrogeneModelReport(this.getURI());
 	}
 
 	/**

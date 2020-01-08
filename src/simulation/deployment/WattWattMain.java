@@ -30,6 +30,14 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.equipements.WattWattModel;
 import simulation.equipements.compteur.models.CompteurModel;
 import simulation.equipements.compteur.models.events.ConsommationEvent;
+import simulation.equipements.compteur.models.events.ProductionEvent;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneCoupledModel;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneModel;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneUserModel;
+import simulation.equipements.groupeelectrogene.models.events.ReplenishEvent;
+import simulation.equipements.groupeelectrogene.models.events.StartEvent;
+import simulation.equipements.groupeelectrogene.models.events.StopEvent;
+import simulation.equipements.groupeelectrogene.tools.GroupeElectrogeneUserBehaviour;
 import simulation.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
 import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
 import simulation.equipements.sechecheveux.models.SecheCheveuxUserModel;
@@ -128,7 +136,53 @@ public class WattWattMain {
 					new CoupledHIOA_Descriptor(SecheCheveuxCoupledModel.class, SecheCheveuxCoupledModel.URI, submodels,
 							null, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
+			
+			// ----------------------------------------------------------------
+			
+			// ----------------------------------------------------------------
 
+			atomicModelDescriptors.put(GroupeElectrogeneModel.URI,
+					AtomicHIOA_Descriptor.create(GroupeElectrogeneModel.class, GroupeElectrogeneModel.URI, TimeUnit.SECONDS,
+							null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+
+			atomicModelDescriptors.put(GroupeElectrogeneUserModel.URI,
+					AtomicModelDescriptor.create(GroupeElectrogeneUserModel.class, GroupeElectrogeneUserModel.URI,
+							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
+					TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			Set<String> submodels3 = new HashSet<String>();
+			submodels3.add(GroupeElectrogeneModel.URI);
+			submodels3.add(GroupeElectrogeneUserModel.URI);
+			submodels3.add(TicModel.URI + "-3");
+			
+			Map<EventSource, EventSink[]> connections3 = new HashMap<EventSource, EventSink[]>();
+			EventSource from31 = new EventSource(GroupeElectrogeneUserModel.URI, StartEvent.class);
+			EventSink[] to31 = new EventSink[] { new EventSink(GroupeElectrogeneModel.URI, StartEvent.class) };
+			connections3.put(from31, to31);
+			EventSource from32 = new EventSource(GroupeElectrogeneUserModel.URI, StopEvent.class);
+			EventSink[] to32 = new EventSink[] { new EventSink(GroupeElectrogeneModel.URI, StopEvent.class) };
+			connections3.put(from32, to32);
+			EventSource from33 = new EventSource(GroupeElectrogeneUserModel.URI, ReplenishEvent.class);
+			EventSink[] to33 = new EventSink[] { new EventSink(GroupeElectrogeneModel.URI, ReplenishEvent.class) };
+			connections3.put(from33, to33);
+			
+			EventSource from5 = new EventSource(TicModel.URI + "-3", TicEvent.class);
+			EventSink[] to5 = new EventSink[] { new EventSink(GroupeElectrogeneModel.URI, TicEvent.class) };
+			connections3.put(from5, to5);
+			
+			Map<Class<? extends EventI>,ReexportedEvent> reexported2 =
+					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			reexported2.put(
+					ProductionEvent.class,
+					new ReexportedEvent(GroupeElectrogeneModel.URI,
+							ProductionEvent.class)) ;
+			
+			coupledModelDescriptors.put(GroupeElectrogeneCoupledModel.URI,
+					new CoupledHIOA_Descriptor(GroupeElectrogeneCoupledModel.class, GroupeElectrogeneCoupledModel.URI, submodels3,
+							null, reexported2, connections3, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+							null));
+			
 			// ----------------------------------------------------------------
 			// Compteur
 			// ----------------------------------------------------------------
@@ -143,6 +197,7 @@ public class WattWattMain {
 			
 			Set<String> submodels2 = new HashSet<String>();
 			submodels2.add(SecheCheveuxCoupledModel.URI);
+			submodels2.add(GroupeElectrogeneCoupledModel.URI);
 			submodels2.add(CompteurModel.URI);
 
 			Map<EventSource, EventSink[]> connections2 = new HashMap<EventSource, EventSink[]>();
@@ -151,6 +206,11 @@ public class WattWattMain {
 			EventSink[] to21 = new EventSink[] {
 					new EventSink(CompteurModel.URI, ConsommationEvent.class) };
 			connections2.put(from21, to21);
+			
+			EventSource from22 = new EventSource(GroupeElectrogeneCoupledModel.URI, ProductionEvent.class);
+			EventSink[] to22 = new EventSink[] {
+					new EventSink(CompteurModel.URI, ProductionEvent.class) };
+			connections2.put(from22, to22);
 			
 			coupledModelDescriptors.put(
 					WattWattModel.URI,
@@ -172,13 +232,43 @@ public class WattWattMain {
 							TimeUnit.SECONDS) ;
 			
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
+
+			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTBU,
+					GroupeElectrogeneUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTW,
+					GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING);
+			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTR,
+					GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL);
 			
-			SimulationEngine se = architecture.constructSimulator() ;
-			se.setDebugLevel(0);
+			
+			simParams.put(
+					GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.ACTION + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("GroupeElectrogeneUserModel", "Time (sec)", "User actions",
+							WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
+
+			simParams.put(
+					GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.PRODUCTION + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
+			simParams.put(
+					GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.QUANTITY + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Litre", WattWattMain.ORIGIN_X,
+							WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
 			
 			String modelURI = TicModel.URI  + "-1" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			
+			modelURI = TicModel.URI  + "-3" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+
 			
 			modelURI = SecheCheveuxCoupledModel.URI ;
 			simParams.put(
@@ -207,11 +297,15 @@ public class WattWattMain {
 							SimulationMain.getPlotterHeight())) ;
 			
 			
+
+			SimulationEngine se = architecture.constructSimulator() ;
+			se.setDebugLevel(0);
+			
 			se.setSimulationRunParameters(simParams) ;
 			
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			long start = System.currentTimeMillis() ;
-			se.doStandAloneSimulation(0.0, 5000.0) ;
+			se.doStandAloneSimulation(0.0, 10000.0) ;
 			long end = System.currentTimeMillis() ;
 			System.out.println(se.getFinalReport()) ;
 			System.out.println("Simulation ends. " + (end - start)) ;
