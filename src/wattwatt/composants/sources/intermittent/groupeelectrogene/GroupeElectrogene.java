@@ -13,6 +13,7 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
+import simulation.equipements.Duree;
 import simulation.equipements.groupeelectrogene.components.GroupeElectrogeneSimulatorPlugin;
 import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneCoupledModel;
 import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneModel;
@@ -157,21 +158,22 @@ public class GroupeElectrogene  extends AbstractCyPhyComponent implements Embedd
 		simParams.put(
 				GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneUserModel", "Time (sec)", "User actions",
-						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "Start / Stop / Refill",
+						2*WattWattMain.getPlotterWidth(),
+						0, WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 
 		simParams.put(
 				GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.PRODUCTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		simParams.put(
 				GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.QUANTITY + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Litre", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
+						2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
@@ -179,7 +181,7 @@ public class GroupeElectrogene  extends AbstractCyPhyComponent implements Embedd
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, 1000.0);
+					asp.doStandAloneSimulation(0.0, Duree.DUREE_SEMAINE);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

@@ -53,7 +53,7 @@ public class WattWattMain {
 				ret = width;
 			}
 		}
-		return (int) (0.25 * ret);
+		return (int) (0.24 * ret);
 	}
 
 	public static int getPlotterHeight() {
@@ -67,7 +67,7 @@ public class WattWattMain {
 				ret = height;
 			}
 		}
-		return (int) (0.2 * ret);
+		return (int) (0.18 * ret);
 	}
 
 	public static void main(String[] args) {

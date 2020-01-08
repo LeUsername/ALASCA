@@ -30,7 +30,7 @@ public class EolienneSensorModel extends AtomicES_Model {
 	protected double initialDelay;
 	protected double interdayDelay;
 	
-	protected static final double MAX_WIND = 17.0;
+	protected static final double MAX_WIND = 14.0;
 	protected static final double MIN_WIND = 3.0;
 	
 	protected double currentWind;
@@ -148,7 +148,8 @@ public class EolienneSensorModel extends AtomicES_Model {
 		
 		Time t = this.getCurrentStateTime().add(d);
 
-		this.currentWind = EolienneSensorModel.MAX_WIND * this.rg.nextBeta(2., 2.);
+		this.currentWind += this.rg.nextInt(0, 2) - 1;
+		
 		if(this.currentWind <= 0.0) {
 			this.currentWind = 0.0;
 		}

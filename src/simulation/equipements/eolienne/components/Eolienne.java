@@ -19,7 +19,7 @@ public class Eolienne extends AbstractCyPhyComponent implements EmbeddingCompone
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
-	protected EolienneSimulatoPlugin asp;
+	protected EolienneSimulatorPlugin asp;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -43,7 +43,7 @@ public class Eolienne extends AbstractCyPhyComponent implements EmbeddingCompone
 		// architecture description.
 		Architecture localArchitecture = this.createLocalArchitecture(null);
 		// Create the appropriate DEVS simulation plug-in.
-		this.asp = new EolienneSimulatoPlugin();
+		this.asp = new EolienneSimulatorPlugin();
 		// Set the URI of the plug-in, using the URI of its associated
 		// simulation model.
 		this.asp.setPluginURI(localArchitecture.getRootModelURI());

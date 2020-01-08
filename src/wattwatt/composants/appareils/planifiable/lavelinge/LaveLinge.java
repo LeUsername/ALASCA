@@ -1,7 +1,6 @@
 package wattwatt.composants.appareils.planifiable.lavelinge;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import fr.sorbonne_u.components.AbstractComponent;
@@ -15,19 +14,13 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
+import simulation.equipements.Duree;
 import simulation.equipements.lavelinge.components.LaveLingeSimulatorPlugin;
 import simulation.equipements.lavelinge.models.LaveLingeCoupledModel;
 import simulation.equipements.lavelinge.models.LaveLingeModel;
 import simulation.equipements.lavelinge.models.LaveLingeUserModel;
 import simulation.equipements.lavelinge.tools.LaveLingeLavage;
 import simulation.equipements.lavelinge.tools.LaveLingeUserBehaviour;
-import simulation.equipements.refrigerateur.models.RefrigerateurModel;
-import simulation.equipements.refrigerateur.models.RefrigerateurSensorModel;
-import simulation.equipements.refrigerateur.models.RefrigerateurUserModel;
-import simulation.equipements.refrigerateur.tools.RefrigerateurConsommation;
-import simulation.equipements.refrigerateur.tools.RefrigerateurPorte;
-import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
-import wattwatt.composants.appareils.suspensible.refrigerateur.Refrigerateur;
 import wattwatt.interfaces.appareils.planifiable.lavelinge.ILaveLinge;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.ports.appareils.planifiable.lavelinge.LaveLingeInPort;
@@ -216,7 +209,7 @@ public class LaveLinge extends AbstractCyPhyComponent implements EmbeddingCompon
 		// following lines show how to set the reference to the embedding
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-
+		simParams.put("componentRef", this);
 		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.MTBU,
 				LaveLingeUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
 		simParams.put(LaveLingeUserModel.URI + ":" + LaveLingeUserModel.MTWE,
@@ -237,26 +230,33 @@ public class LaveLinge extends AbstractCyPhyComponent implements EmbeddingCompon
 				LaveLingeUserModel.URI + ":" + LaveLingeUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
-						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+						0,
+						WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 
 		simParams.put(
 				LaveLingeModel.URI + ":" + LaveLingeModel.INTENSITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)",
+						0,
+						2*WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
+		
+		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, 1000.0);
+					asp.doStandAloneSimulation(0.0, Duree.DUREE_SEMAINE);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
 		});
+		
 		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {

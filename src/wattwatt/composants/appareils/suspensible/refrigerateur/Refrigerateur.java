@@ -13,6 +13,7 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
+import simulation.equipements.Duree;
 import simulation.equipements.refrigerateur.components.RefrigerateurSimulatorPlugin;
 import simulation.equipements.refrigerateur.models.RefrigerateurCoupledModel;
 import simulation.equipements.refrigerateur.models.RefrigerateurModel;
@@ -212,10 +213,10 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				RefrigerateurUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"RefrigerateurUserModel",
-						"Time (sec)",
-						"Opened/Closed",
-						WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y,
+						"Time (min)",
+						"Opened / Closed",
+						WattWattMain.getPlotterWidth(),
+						0,
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
 		
@@ -231,10 +232,9 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				RefrigerateurModel.URI + ":" + RefrigerateurModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"RefrigerateurModel",
-						"Time (sec)",
-						"Temperature (�C)",
-						WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y +
+						"Time (min)",
+						"Temperature (Celcius)",
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
@@ -242,10 +242,9 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				RefrigerateurModel.URI + ":"  + RefrigerateurModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"RefrigerateurModel",
-						"Time (sec)",
-						"Intensity (Watt)",
-						WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y +
+						"Time (min)",
+						"Intensity (W)",
+						WattWattMain.getPlotterWidth(),
 						2*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
@@ -258,10 +257,9 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 				RefrigerateurSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"RefrigerateurSensorModel",
-						"Time (sec)",
-						"Temperature (�C)",
-						WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y +
+						"Time (min)",
+						"Temperature (Celcius)",
+						WattWattMain.getPlotterWidth(),
 						3*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
@@ -271,7 +269,7 @@ public class Refrigerateur extends AbstractCyPhyComponent implements EmbeddingCo
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, 1000.0);
+					asp.doStandAloneSimulation(0.0, Duree.DUREE_SEMAINE);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

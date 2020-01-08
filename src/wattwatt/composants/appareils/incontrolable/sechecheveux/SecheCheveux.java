@@ -12,6 +12,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import simulation.equipements.Duree;
 import simulation.equipements.sechecheveux.components.SecheCheveuxSimulatorPlugin;
 import simulation.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
 import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
@@ -185,7 +186,7 @@ public class SecheCheveux extends AbstractCyPhyComponent implements EmbeddingCom
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, 1000.0);
+					asp.doStandAloneSimulation(0.0, Duree.DUREE_SEMAINE);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

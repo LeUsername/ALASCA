@@ -46,13 +46,13 @@ public class MIL_LaveLinge {
 			simParams.put(
 					LaveLingeModel.URI + ":" + LaveLingeModel.INTENSITY_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("LaveLingeModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+					new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			
 			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0);
-			System.out.println(se.simulatorAsString());
+//			System.out.println(se.simulatorAsString());
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			se.doStandAloneSimulation(0.0, 2*Duree.DUREE_SEMAINE);
 		} catch (Exception e) {

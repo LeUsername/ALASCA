@@ -208,13 +208,13 @@ public class LaveLingeUserModel extends AtomicES_Model {
 			
 
 		} else if (this.nextEvent.equals(PremiumLavageEvent.class)) {
-
 			d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			Time t = this.getCurrentStateTime().add(d);
+			
 			this.scheduleEvent(new StartAtEvent(t,this.startingTimeDelay));
 			
 			Random r = new Random();
-			this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
+			this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
 			
 			if (this.plotter != null) {
 				this.plotter.addData(
@@ -229,7 +229,9 @@ public class LaveLingeUserModel extends AtomicES_Model {
 			
 		} else if (this.nextEvent.equals(EcoLavageEvent.class)) {
 			d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+			
 			this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d),this.startingTimeDelay));
+			
 			Random r = new Random();
 			this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
 			

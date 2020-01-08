@@ -102,9 +102,9 @@ public class SecheCheveuxModel extends AtomicHIOAwithEquations {
 	public SecheCheveuxModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
-		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (sec)", "Intensity (Amp)", 
-				WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
-				WattWattMain.ORIGIN_Y,
+		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (min)", "Intensity (Amp)", 
+				0,
+				0,
 				WattWattMain.getPlotterWidth(),
 				WattWattMain.getPlotterHeight());
 		this.intensityPlotter = new XYPlotter(pd);

@@ -4,7 +4,7 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.equipements.eolienne.models.EolienneModel;
 
-public class EolienneSimulatoPlugin extends AtomicSimulatorPlugin {
+public class EolienneSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;
 
 	/**

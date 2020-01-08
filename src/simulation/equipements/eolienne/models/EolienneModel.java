@@ -18,6 +18,7 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.deployment.WattWattMain;
 import simulation.equipements.eolienne.models.events.AbstractEolienneEvent;
 import simulation.equipements.eolienne.models.events.SwitchOffEvent;
 import simulation.equipements.eolienne.models.events.SwitchOnEvent;
@@ -74,7 +75,7 @@ public class EolienneModel extends AtomicHIOAwithEquations {
 
 	protected static final double tempKelvin = 288.15; // On suppose la temperatur en Kelvin et constante
 
-	protected static final int bladesArea = 12; // m2
+	protected static final int bladesArea = 5; // m2
 
 	protected Time lastWindReadingTime;
 
@@ -89,8 +90,11 @@ public class EolienneModel extends AtomicHIOAwithEquations {
 
 		// creation of a plotter to show the evolution of the intensity over
 		// time during the simulation.
-		PlotterDescription pd = new PlotterDescription("Production", "Time (sec)", "Production (W)", 100, 400, 600,
-				400);
+		PlotterDescription pd = new PlotterDescription("Production", "Time (min)", "Production (W)",
+				3 * WattWattMain.getPlotterWidth(),
+				0,
+				WattWattMain.getPlotterWidth(),
+				WattWattMain.getPlotterHeight());
 		this.productionPlotter = new XYPlotter(pd);
 		this.productionPlotter.createSeries(SERIES);
 
@@ -108,7 +112,7 @@ public class EolienneModel extends AtomicHIOAwithEquations {
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 		// The reference to the embedding component
-		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get("componentRef");
+		//this.componentRef = (EmbeddingComponentStateAccessI) simParams.get("componentRef");
 	}
 
 	/**
@@ -250,7 +254,7 @@ public class EolienneModel extends AtomicHIOAwithEquations {
 
 	public void setProduction(double windSpeed) {
 		this.production.v = 0.5 * (bladesArea
-				* windDensity(tempKelvin)) * windSpeed * windSpeed * windSpeed;
+				* windDensity(tempKelvin)) * windSpeed * windSpeed ;
 	}
 
 	public void switchOn() {

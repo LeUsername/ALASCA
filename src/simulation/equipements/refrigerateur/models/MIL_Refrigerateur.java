@@ -24,8 +24,8 @@ public class MIL_Refrigerateur {
 					RefrigerateurUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurUserModel",
-							"Time (sec)",
-							"Opened/Closed",
+							"Time (min)",
+							"Opened / Closed",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y,
 							WattWattMain.getPlotterWidth(),
@@ -54,8 +54,8 @@ public class MIL_Refrigerateur {
 					RefrigerateurModel.URI + ":"  + RefrigerateurModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurModel",
-							"Time (sec)",
-							"Intensity (Watt)",
+							"Time (min)",
+							"Consommation (W)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
 							2*WattWattMain.getPlotterHeight(),
@@ -70,8 +70,8 @@ public class MIL_Refrigerateur {
 					RefrigerateurSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurSensorModel",
-							"Time (sec)",
-							"Temperature (�C)",
+							"Time (min)",
+							"Temperature (Celcius)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y +
 							3*WattWattMain.getPlotterHeight(),

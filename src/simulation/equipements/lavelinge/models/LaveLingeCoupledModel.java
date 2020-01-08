@@ -77,6 +77,7 @@ public class LaveLingeCoupledModel extends CoupledModel {
 		atomicModelDescriptors.put(LaveLingeUserModel.URI,
 				AtomicModelDescriptor.create(LaveLingeUserModel.class, LaveLingeUserModel.URI,
 						TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		
 		atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
 				TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
