@@ -1,34 +1,84 @@
 package wattwatt.composants.sources.intermittent.groupeelectrogene;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
+import simulation.equipements.groupeelectrogene.components.GroupeElectrogeneSimulatorPlugin;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneCoupledModel;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneModel;
+import simulation.equipements.groupeelectrogene.models.GroupeElectrogeneUserModel;
+import simulation.equipements.groupeelectrogene.tools.GroupeElectrogeneUserBehaviour;
+import simulation.equipements.sechecheveux.models.SecheCheveuxModel;
+import simulation.equipements.sechecheveux.tools.HairDryerPowerLevel;
+import wattwatt.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.interfaces.sources.intermittent.IGroupeElectrogene;
 import wattwatt.ports.sources.intermittent.groupeelectrogene.GroupeElectrogeneInPort;
 import wattwatt.tools.GroupeElectrogene.GroupreElectrogeneReglage;
+import wattwatt.tools.sechecheveux.SecheCheveuxMode;
 
 @OfferedInterfaces(offered = IGroupeElectrogene.class)
 @RequiredInterfaces(required = IControleur.class)
-public class GroupeElectrogene extends AbstractComponent {
+public class GroupeElectrogene  extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
 
 	protected GroupeElectrogeneInPort groupein;
 
 	protected boolean isOn;
 	protected int production;
 	protected int fuelQuantity;
+	
+	protected boolean isOnSim;
+	protected double productionSim;
+	protected double fuelQuantitySim;
+	protected boolean isFull;
+	protected boolean isEmpty;
+	
+	protected GroupeElectrogeneSimulatorPlugin asp;
+	
 
 	protected GroupeElectrogene(String uri, String groupeIn) throws Exception {
 		super(uri, 1, 1);
-
+		this.initialise();
 		this.groupein = new GroupeElectrogeneInPort(groupeIn, this);
 		this.groupein.publishPort();
-
+		
+		this.isOnSim = (Boolean)asp.getModelStateValue(GroupeElectrogeneModel.URI, "isOn");
+		this.isFull = (Boolean)asp.getModelStateValue(GroupeElectrogeneModel.URI, "isFull");
+		this.isEmpty = (Boolean)asp.getModelStateValue(GroupeElectrogeneModel.URI, "isEmpty");
+		
+		this.productionSim = (Double)asp.getModelStateValue(GroupeElectrogeneModel.URI, "production");
+		this.fuelQuantitySim = (Double)asp.getModelStateValue(GroupeElectrogeneModel.URI, "capacity");
+		
 		this.tracer.setRelativePosition(2, 1);
+	}
+	
+	protected void initialise() throws Exception {
+		// The coupled model has been made able to create the simulation
+		// architecture description.
+		Architecture localArchitecture = this.createLocalArchitecture(null);
+		// Create the appropriate DEVS simulation plug-in.
+		this.asp = new GroupeElectrogeneSimulatorPlugin();
+		// Set the URI of the plug-in, using the URI of its associated
+		// simulation model.
+		this.asp.setPluginURI(localArchitecture.getRootModelURI());
+		// Set the simulation architecture.
+		this.asp.setSimulationArchitecture(localArchitecture);
+		// Install the plug-in on the component, starting its own life-cycle.
+		this.installPlugin(this.asp);
+
+		// Toggle logging on to get a log on the screen.
+		this.toggleLogging();
 	}
 
 	public int getEnergie() throws Exception {
@@ -100,6 +150,65 @@ public class GroupeElectrogene extends AbstractComponent {
 	@Override
 	public void execute() throws Exception {
 		super.execute();
+		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+		HashMap<String, Object> simParams = new HashMap<String, Object>();
+		simParams.put("componentRef", this);
+		simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTBU,
+				GroupeElectrogeneUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+		simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTW,
+				GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING);
+		simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTR,
+				GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL);
+		simParams.put(
+				GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.ACTION + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneUserModel", "Time (sec)", "User actions",
+						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+
+		simParams.put(
+				GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.PRODUCTION + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		simParams.put(
+				GroupeElectrogeneModel.URI + ":" + GroupeElectrogeneModel.QUANTITY + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Litre", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		this.asp.setSimulationRunParameters(simParams);
+		// Start the simulation.
+		this.runTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+					asp.doStandAloneSimulation(0.0, 1000.0);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		this.runTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						((GroupeElectrogene) this.getTaskOwner()).isOnSim = ((boolean) asp.getModelStateValue(GroupeElectrogeneModel.URI, "isOn"));
+						((GroupeElectrogene) this.getTaskOwner()).isEmpty = ((boolean) asp.getModelStateValue(GroupeElectrogeneModel.URI, "isEmpty"));
+						((GroupeElectrogene) this.getTaskOwner()).isFull = ((boolean) asp.getModelStateValue(GroupeElectrogeneModel.URI, "isFull"));
+						((GroupeElectrogene) this.getTaskOwner()).fuelQuantitySim = ((double) asp.getModelStateValue(GroupeElectrogeneModel.URI, "capacity"));
+						((GroupeElectrogene) this.getTaskOwner()).productionSim = ((double) asp.getModelStateValue(GroupeElectrogeneModel.URI, "production"));
+						
+						Thread.sleep(1000);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		/*
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
@@ -114,7 +223,7 @@ public class GroupeElectrogene extends AbstractComponent {
 					throw new RuntimeException(e);
 				}
 			}
-		}, 100, TimeUnit.MILLISECONDS);
+		}, 100, TimeUnit.MILLISECONDS);*/
 	}
 
 	@Override
@@ -126,6 +235,16 @@ public class GroupeElectrogene extends AbstractComponent {
 			e.printStackTrace();
 		}
 		super.shutdown();
+	}
+
+	@Override
+	public Object getEmbeddingComponentStateValue(String name) throws Exception {
+		return null;
+	}
+
+	@Override
+	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
+		return GroupeElectrogeneCoupledModel.build();
 	}
 
 }

@@ -351,6 +351,7 @@ extends AtomicHIOAwithDE
 			// receive the corresponding triggering external event.
 			return Duration.INFINITY ;
 		}
+		
 	}
 
 	/**
@@ -467,7 +468,7 @@ extends AtomicHIOAwithDE
 			// visualisation and simulation report.
 			this.temperatureFunction.add(
 				new DoublePiece(this.temperature.time.getSimulatedTime(),
-								oldTemperature,
+								0,
 								this.getCurrentStateTime().getSimulatedTime(),
 								this.temperature.v)) ;
 			if (this.temperaturePlotter != null) {
@@ -479,7 +480,7 @@ extends AtomicHIOAwithDE
 			this.intensityFunction.add(
 					new DoublePiece(
 							this.getCurrentStateTime().getSimulatedTime(),
-							oldIntensity,
+							0,
 							this.getCurrentStateTime().getSimulatedTime(),
 							this.intensity)) ;
 				if (this.intensityPlotter != null) {
