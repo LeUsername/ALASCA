@@ -40,8 +40,8 @@ public class ConsommationEvent extends AbstractCompteurEvent {
 
 	@Override
 	public String eventContentAsString() {
-		return	"time = " + this.getTimeOfOccurrence() + ", " +
-				"level = " + ((Reading)this.getEventInformation()).value
+		return	"temps = " + this.getTimeOfOccurrence() + ", " +
+				"quantite = " + ((Reading)this.getEventInformation()).value
 												+ " mAh";
 	}
 	

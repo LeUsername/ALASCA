@@ -1,4 +1,4 @@
-package simulation.equipements;
+package simulation;
 
 public class Duree {
 	public static final double DUREE_SEMAINE = 10080.0; // en minutes

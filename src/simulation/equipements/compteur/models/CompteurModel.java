@@ -59,15 +59,12 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	public static final String		URI = "CompteurModel" ;
 
 	private static final String		SERIES = "consommation" ;
+	public static final String CONSOMMATION_SERIES = "consommation-series";
 
 	protected Value<Double>	consommationTotale = new Value<Double>(this, 0.0);
-
-	protected double production;
 	
 	/** plotter for the intensity level over time.							*/
 	protected XYPlotter				consommationPlotter ;
-	
-	protected XYPlotter				productionPlotter;
 	
 	protected XYPlotter				totalePlotter;
 
@@ -116,20 +113,6 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 						400) ;
 		this.consommationPlotter = new XYPlotter(pd) ;
 		this.consommationPlotter.createSeries(SERIES) ;
-		
-		PlotterDescription pd2 =
-				new PlotterDescription(
-						"Total production",
-						"Time (sec)",
-						"Production (kW)",
-						100,
-						400,
-						600,
-						400) ;
-		this.productionPlotter= new XYPlotter(pd2) ;
-		this.productionPlotter.createSeries(SERIES) ;
-
-
 		
 		// create a standard logger (logging on the terminal)
 		this.setLogger(new StandardLogger()) ;
@@ -185,13 +168,12 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	@Override
 	protected void		initialiseVariables(Time startTime)
 	{
-		this.production = 0.0;
-		
+
 		// first data in the plotter to start the plot.
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation()+this.production);
+				this.getConsommation());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -267,7 +249,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation()+this.production);
+				this.getConsommation());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -280,7 +262,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		this.consommationPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation()+this.production);
+				this.getConsommation());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -299,7 +281,7 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 		this.consommationPlotter.addData(
 				SERIES,
 				endTime.getSimulatedTime(),
-				this.getConsommation()+this.production) ;
+				this.getConsommation()) ;
 
 		super.endSimulation(endTime) ;
 	}
@@ -330,6 +312,6 @@ public class CompteurModel extends		AtomicHIOAwithEquations
 	
 	public void		setProduction(double p)
 	{
-		this.production = p;
+		// Calcul de prod pas ici
 	}
 }

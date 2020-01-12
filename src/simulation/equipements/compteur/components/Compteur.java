@@ -64,7 +64,7 @@ public class Compteur extends AbstractCyPhyComponent implements EmbeddingCompone
 	 */
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
-		// Utiliser la ligne en dessous uniquement pour le MIL
+		// Utiliser la ligne en dessous uniquement pour le MIL du compteur
 		//return CompteurCoupledModel.build();
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 		atomicModelDescriptors.put(CompteurModel.URI, AtomicHIOA_Descriptor.create(CompteurModel.class,

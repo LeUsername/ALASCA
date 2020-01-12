@@ -138,7 +138,7 @@ public class WattWattMain {
 							null));
 			
 			// ----------------------------------------------------------------
-			
+			// GroupeElectrogene
 			// ----------------------------------------------------------------
 
 			atomicModelDescriptors.put(GroupeElectrogeneModel.URI,
@@ -182,6 +182,52 @@ public class WattWattMain {
 					new CoupledHIOA_Descriptor(GroupeElectrogeneCoupledModel.class, GroupeElectrogeneCoupledModel.URI, submodels3,
 							null, reexported2, connections3, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
+			
+//			// ----------------------------------------------------------------
+//			// Lave linge
+//			// ----------------------------------------------------------------
+//			
+//			atomicModelDescriptors.put(LaveLingeModel.URI,
+//					AtomicHIOA_Descriptor.create(LaveLingeModel.class, LaveLingeModel.URI, TimeUnit.SECONDS,
+//							null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+//
+//			atomicModelDescriptors.put(LaveLingeUserModel.URI,
+//					AtomicModelDescriptor.create(LaveLingeUserModel.class, LaveLingeUserModel.URI,
+//							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+//			
+//			atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
+//					TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+//
+//			Set<String> submodels = new HashSet<String>();
+//			submodels.add(LaveLingeModel.URI);
+//			submodels.add(LaveLingeUserModel.URI);
+//			submodels.add(TicModel.URI + "-3");
+//
+//			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
+//			EventSource from1 = new EventSource(LaveLingeUserModel.URI, StartAtEvent.class);
+//			EventSink[] to1 = new EventSink[] { new EventSink(LaveLingeModel.URI, StartAtEvent.class) };
+//			connections.put(from1, to1);
+//			EventSource from2 = new EventSource(LaveLingeUserModel.URI, EcoLavageEvent.class);
+//			EventSink[] to2 = new EventSink[] { new EventSink(LaveLingeModel.URI, EcoLavageEvent.class) };
+//			connections.put(from2, to2);
+//			EventSource from3 = new EventSource(LaveLingeUserModel.URI, PremiumLavageEvent.class);
+//			EventSink[] to3 = new EventSink[] { new EventSink(LaveLingeModel.URI, PremiumLavageEvent.class) };
+//			connections.put(from3, to3);
+//			
+//			EventSource from5 = new EventSource(TicModel.URI + "-3", TicEvent.class);
+//			EventSink[] to5 = new EventSink[] { new EventSink(LaveLingeModel.URI, TicEvent.class) };
+//			connections.put(from5, to5);
+//			
+//			/*Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
+//			VariableSource source = new VariableSource("fuelCapacity", Double.class, GroupeElectrogeneModel.URI);
+//			VariableSink[] sinks = new VariableSink[] {
+//					new VariableSink("fuelCapacity", Double.class, GroupeElectrogeneUserModel.URI) };
+//			bindings.put(source, sinks);*/
+//
+//			coupledModelDescriptors.put(LaveLingeCoupledModel.URI,
+//					new CoupledHIOA_Descriptor(LaveLingeCoupledModel.class, LaveLingeCoupledModel.URI, submodels,
+//							null, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+//							null));
 			
 			// ----------------------------------------------------------------
 			// Compteur
@@ -231,6 +277,10 @@ public class WattWattMain {
 							coupledModelDescriptors,
 							TimeUnit.SECONDS) ;
 			
+			// ----------------------------------------------------------------
+			// Parametres de simulation
+			// ----------------------------------------------------------------
+			
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 
 			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTBU,
@@ -239,7 +289,6 @@ public class WattWattMain {
 					GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING);
 			simParams.put(GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.MTR,
 					GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL);
-			
 			
 			simParams.put(
 					GroupeElectrogeneUserModel.URI + ":" + GroupeElectrogeneUserModel.ACTION + ":"

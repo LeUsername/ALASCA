@@ -6,8 +6,8 @@ import java.util.Map;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.Duree;
 import simulation.deployment.WattWattMain;
-import simulation.equipements.Duree;
 import simulation.equipements.groupeelectrogene.tools.GroupeElectrogeneUserBehaviour;
 
 public class MIL_GroupeElectrogene {

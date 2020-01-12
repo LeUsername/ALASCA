@@ -40,7 +40,7 @@ public class ProductionEvent extends AbstractCompteurEvent {
 
 	@Override
 	public String eventContentAsString() {
-		return	"time = " + this.getTimeOfOccurrence() + ", " +
+		return	"temps = " + this.getTimeOfOccurrence() + ", " +
 				"production = " + ((Reading)this.getEventInformation()).value
 												+ " W";
 	}

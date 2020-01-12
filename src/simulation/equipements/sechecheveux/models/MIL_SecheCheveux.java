@@ -2,7 +2,7 @@ package simulation.equipements.sechecheveux.models;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.equipements.Duree;
+import simulation.Duree;
 
 public class MIL_SecheCheveux {
 	public static void	main(String[] args)

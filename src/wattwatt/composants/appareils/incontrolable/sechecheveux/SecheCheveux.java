@@ -12,7 +12,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.equipements.Duree;
+import simulation.Duree;
 import simulation.equipements.sechecheveux.components.SecheCheveuxSimulatorPlugin;
 import simulation.equipements.sechecheveux.models.SecheCheveuxCoupledModel;
 import simulation.equipements.sechecheveux.models.SecheCheveuxModel;

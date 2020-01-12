@@ -2,7 +2,7 @@ package simulation.equipements.eolienne.models;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.equipements.Duree;
+import simulation.Duree;
 
 public class MIL_Eolienne {
 	public static void	main(String[] args)

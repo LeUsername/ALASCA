@@ -1,7 +1,6 @@
 package wattwatt.composants.sources.aleatoire.eolienne;
 
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -12,14 +11,11 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.equipements.Duree;
+import simulation.Duree;
 import simulation.equipements.eolienne.components.EolienneSimulatorPlugin;
 import simulation.equipements.eolienne.models.EolienneCoupledModel;
 import simulation.equipements.eolienne.models.EolienneModel;
-import simulation.equipements.lavelinge.components.LaveLingeSimulatorPlugin;
 import simulation.equipements.lavelinge.models.LaveLingeModel;
-import simulation.equipements.lavelinge.tools.LaveLingeLavage;
-import wattwatt.composants.appareils.planifiable.lavelinge.LaveLinge;
 import wattwatt.interfaces.controleur.IControleur;
 import wattwatt.interfaces.sources.aleatoire.eolienne.IEolienne;
 import wattwatt.ports.sources.aleatoire.eolienne.EolienneInPort;
