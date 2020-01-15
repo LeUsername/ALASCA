@@ -2,19 +2,19 @@ package wattwatt.main;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractDistributedCVM;
-import wattwatt.composants.Compteur;
-import wattwatt.composants.Controleur;
-import wattwatt.composants.appareils.incontrolable.sechecheveux.SecheCheveux;
-import wattwatt.composants.appareils.planifiable.lavelinge.LaveLinge;
-import wattwatt.composants.appareils.suspensible.refrigerateur.Refrigerateur;
-import wattwatt.composants.sources.aleatoire.eolienne.Eolienne;
-import wattwatt.composants.sources.intermittent.groupeelectrogene.GroupeElectrogene;
-import wattwatt.connecteurs.CompteurConnector;
-import wattwatt.connecteurs.appareils.incontrolable.sechecheveux.SecheCheveuxConnector;
-import wattwatt.connecteurs.appareils.planifiable.lavelinge.LaveLingeConnector;
-import wattwatt.connecteurs.appareils.suspensibles.refrigerateur.RefrigerateurConnector;
-import wattwatt.connecteurs.sources.aleatoire.eolienne.EolienneConnector;
-import wattwatt.connecteurs.sources.intermittent.groupeelectrogene.GroupeElectrogeneConnector;
+import wattwatt.components.ElectricMeter;
+import wattwatt.components.Controller;
+import wattwatt.components.devices.schedulable.washingmachine.WashingMachine;
+import wattwatt.components.devices.suspendable.fridge.Fridge;
+import wattwatt.components.devices.uncontrollable.hairdryer.HairDryer;
+import wattwatt.components.energyproviders.occasional.enginegenerator.EngineGenerator;
+import wattwatt.components.energyproviders.random.windturbine.WindTurbine;
+import wattwatt.connectors.ElectricMeterConnector;
+import wattwatt.connectors.devices.schedulable.washingmachine.WashingMachineConnector;
+import wattwatt.connectors.devices.suspendables.fridge.FridgeConnector;
+import wattwatt.connectors.devices.uncontrollable.hairdryer.HairDryerConnector;
+import wattwatt.connectors.energyproviders.occasional.enginegenerator.EngineGeneratorConnector;
+import wattwatt.connectors.energyproviders.random.windturbine.WindTurbineConnector;
 import wattwatt.tools.URIS;
 
 public class DistributedCVM extends AbstractDistributedCVM {
@@ -38,67 +38,67 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	@Override
 	public void instantiateAndPublish() throws Exception {
-		if (thisJVMURI.equals(URIS.CONTROLLEUR_URI)) {
+		if (thisJVMURI.equals(URIS.CONTROLLER_URI)) {
 
-			this.controleurUri = AbstractComponent.createComponent(Controleur.class.getCanonicalName(),
-					new Object[] { URIS.CONTROLLEUR_URI, URIS.COMPTEUR_IN_URI, URIS.COMPTEUR_OUT_URI,
-							URIS.REFRIGERATEUR_IN_URI, URIS.REFRIGERATEUR_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
-							URIS.SECHECHEVEUX_OUT_URI, URIS.EOLIENNE_IN_URI, URIS.EOLIENNE_OUT_URI,
-							URIS.LAVELINGE_IN_URI, URIS.LAVELINGE_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
-							URIS.GROUPEELECTRO_OUT_URI });
+			this.controleurUri = AbstractComponent.createComponent(Controller.class.getCanonicalName(),
+					new Object[] { URIS.CONTROLLER_URI, URIS.ELECTRIC_METER_IN_URI, URIS.ELECTRIC_METER_OUT_URI,
+							URIS.FRIDGE_IN_URI, URIS.FRIDGE_OUT_URI, URIS.HAIR_DRYER_IN_URI,
+							URIS.HAIR_DRYER_OUT_URI, URIS.WIND_TURBINE_IN_URI, URIS.WIND_TURBINE_OUT_URI,
+							URIS.WASHING_MACHINE_IN_URI, URIS.WASHING_MACHINE_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI,
+							URIS.ENGINE_GENERATOR_OUT_URI });
 			assert this.isDeployedComponent(this.controleurUri);
 
 			this.toggleTracing(this.controleurUri);
 			this.toggleLogging(this.controleurUri);
 
-		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
+		} else if (thisJVMURI.equals(URIS.ELECTRIC_METER_URI)) {
 
-			this.compteurUri = AbstractComponent.createComponent(Compteur.class.getCanonicalName(),
-					new Object[] { URIS.COMPTEUR_URI, URIS.COMPTEUR_IN_URI });
+			this.compteurUri = AbstractComponent.createComponent(ElectricMeter.class.getCanonicalName(),
+					new Object[] { URIS.ELECTRIC_METER_URI, URIS.ELECTRIC_METER_IN_URI });
 			assert this.isDeployedComponent(this.compteurUri);
 			this.toggleTracing(this.compteurUri);
 			this.toggleLogging(this.compteurUri);
 
-		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
+		} else if (thisJVMURI.equals(URIS.FRIDGE_URI)) {
 
-			this.refriUri = AbstractComponent.createComponent(Refrigerateur.class.getCanonicalName(),
-					new Object[] { URIS.REFRIGERATEUR_URI, URIS.REFRIGERATEUR_IN_URI });
+			this.refriUri = AbstractComponent.createComponent(Fridge.class.getCanonicalName(),
+					new Object[] { URIS.FRIDGE_URI, URIS.FRIDGE_IN_URI });
 			assert this.isDeployedComponent(this.refriUri);
 			assert this.isDeployedComponent(this.refriUri);
 			this.toggleTracing(this.refriUri);
 			this.toggleLogging(this.refriUri);
 
-		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
+		} else if (thisJVMURI.equals(URIS.HAIR_DRYER_URI)) {
 
-			this.secheUri = AbstractComponent.createComponent(SecheCheveux.class.getCanonicalName(),
-					new Object[] { URIS.SECHECHEVEUX_URI, URIS.SECHECHEVEUX_IN_URI });
+			this.secheUri = AbstractComponent.createComponent(HairDryer.class.getCanonicalName(),
+					new Object[] { URIS.HAIR_DRYER_URI, URIS.HAIR_DRYER_IN_URI });
 			assert this.isDeployedComponent(this.secheUri);
 			assert this.isDeployedComponent(this.secheUri);
 			this.toggleTracing(this.secheUri);
 			this.toggleLogging(this.secheUri);
 
-		} else if (thisJVMURI.equals(URIS.EOLIENNE_URI)) {
+		} else if (thisJVMURI.equals(URIS.WIND_TURBINE_URI)) {
 
-			this.eolUri = AbstractComponent.createComponent(Eolienne.class.getCanonicalName(),
-					new Object[] { URIS.EOLIENNE_URI, URIS.EOLIENNE_IN_URI });
+			this.eolUri = AbstractComponent.createComponent(WindTurbine.class.getCanonicalName(),
+					new Object[] { URIS.WIND_TURBINE_URI, URIS.WIND_TURBINE_IN_URI });
 			assert this.isDeployedComponent(this.eolUri);
 			assert this.isDeployedComponent(this.eolUri);
 			this.toggleTracing(this.eolUri);
 			this.toggleLogging(this.eolUri);
 
-		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.WASHING_MACHINE_URI)) {
 
-			this.laveUri = AbstractComponent.createComponent(LaveLinge.class.getCanonicalName(),
-					new Object[] { URIS.LAVELINGE_URI, URIS.LAVELINGE_IN_URI });
+			this.laveUri = AbstractComponent.createComponent(WashingMachine.class.getCanonicalName(),
+					new Object[] { URIS.WASHING_MACHINE_URI, URIS.WASHING_MACHINE_IN_URI });
 			assert this.isDeployedComponent(this.laveUri);
 			assert this.isDeployedComponent(this.laveUri);
 			this.toggleTracing(this.laveUri);
 			this.toggleLogging(this.laveUri);
 
-		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
+		} else if (thisJVMURI.equals(URIS.ENGINE_GENERATOR_URI)) {
 
-			this.groupeUri = AbstractComponent.createComponent(GroupeElectrogene.class.getCanonicalName(),
-					new Object[] { URIS.GROUPEELECTRO_URI, URIS.GROUPEELECTRO_IN_URI });
+			this.groupeUri = AbstractComponent.createComponent(EngineGenerator.class.getCanonicalName(),
+					new Object[] { URIS.ENGINE_GENERATOR_URI, URIS.ENGINE_GENERATOR_IN_URI });
 			assert this.isDeployedComponent(this.groupeUri);
 			assert this.isDeployedComponent(this.groupeUri);
 			this.toggleTracing(this.groupeUri);
@@ -115,32 +115,32 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	@Override
 	public void interconnect() throws Exception {
-		if (thisJVMURI.equals(URIS.CONTROLLEUR_URI)) {
+		if (thisJVMURI.equals(URIS.CONTROLLER_URI)) {
 
-			this.doPortConnection(this.controleurUri, URIS.COMPTEUR_OUT_URI, URIS.COMPTEUR_IN_URI,
-					CompteurConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.ELECTRIC_METER_OUT_URI, URIS.ELECTRIC_METER_IN_URI,
+					ElectricMeterConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.controleurUri, URIS.REFRIGERATEUR_OUT_URI, URIS.REFRIGERATEUR_IN_URI,
-					RefrigerateurConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.FRIDGE_OUT_URI, URIS.FRIDGE_IN_URI,
+					FridgeConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI, URIS.SECHECHEVEUX_IN_URI,
-					SecheCheveuxConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.HAIR_DRYER_OUT_URI, URIS.HAIR_DRYER_IN_URI,
+					HairDryerConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.controleurUri, URIS.EOLIENNE_OUT_URI, URIS.EOLIENNE_IN_URI,
-					EolienneConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI, URIS.WIND_TURBINE_IN_URI,
+					WindTurbineConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.controleurUri, URIS.LAVELINGE_OUT_URI, URIS.LAVELINGE_IN_URI,
-					LaveLingeConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI, URIS.WASHING_MACHINE_IN_URI,
+					WashingMachineConnector.class.getCanonicalName());
 
-			this.doPortConnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI, URIS.GROUPEELECTRO_IN_URI,
-					GroupeElectrogeneConnector.class.getCanonicalName());
+			this.doPortConnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI,
+					EngineGeneratorConnector.class.getCanonicalName());
 
-		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
-		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
-		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
-		} else if (thisJVMURI.equals(URIS.EOLIENNE_URI)) {
+		} else if (thisJVMURI.equals(URIS.ELECTRIC_METER_URI)) {
+		} else if (thisJVMURI.equals(URIS.FRIDGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.HAIR_DRYER_URI)) {
+		} else if (thisJVMURI.equals(URIS.WASHING_MACHINE_URI)) {
+		} else if (thisJVMURI.equals(URIS.ENGINE_GENERATOR_URI)) {
+		} else if (thisJVMURI.equals(URIS.WIND_TURBINE_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -150,20 +150,20 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	@Override
 	public void finalise() throws Exception {
-		if (thisJVMURI.equals(URIS.CONTROLLEUR_URI)) {
-			this.doPortDisconnection(this.controleurUri, URIS.COMPTEUR_OUT_URI);
-			this.doPortDisconnection(this.controleurUri, URIS.REFRIGERATEUR_OUT_URI);
-			this.doPortDisconnection(this.controleurUri, URIS.SECHECHEVEUX_OUT_URI);
-			this.doPortDisconnection(this.controleurUri, URIS.EOLIENNE_OUT_URI);
-			this.doPortDisconnection(this.controleurUri, URIS.LAVELINGE_OUT_URI);
-			this.doPortDisconnection(this.controleurUri, URIS.GROUPEELECTRO_OUT_URI);
+		if (thisJVMURI.equals(URIS.CONTROLLER_URI)) {
+			this.doPortDisconnection(this.controleurUri, URIS.ELECTRIC_METER_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.FRIDGE_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.HAIR_DRYER_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI);
+			this.doPortDisconnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI);
 
-		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
-		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
-		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
-		} else if (thisJVMURI.equals(URIS.EOLIENNE_URI)) {
+		} else if (thisJVMURI.equals(URIS.ELECTRIC_METER_URI)) {
+		} else if (thisJVMURI.equals(URIS.FRIDGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.HAIR_DRYER_URI)) {
+		} else if (thisJVMURI.equals(URIS.WASHING_MACHINE_URI)) {
+		} else if (thisJVMURI.equals(URIS.ENGINE_GENERATOR_URI)) {
+		} else if (thisJVMURI.equals(URIS.WIND_TURBINE_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
@@ -173,12 +173,12 @@ public class DistributedCVM extends AbstractDistributedCVM {
 
 	@Override
 	public void shutdown() throws Exception {
-		if (thisJVMURI.equals(URIS.CONTROLLEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.COMPTEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.REFRIGERATEUR_URI)) {
-		} else if (thisJVMURI.equals(URIS.SECHECHEVEUX_URI)) {
-		} else if (thisJVMURI.equals(URIS.LAVELINGE_URI)) {
-		} else if (thisJVMURI.equals(URIS.GROUPEELECTRO_URI)) {
+		if (thisJVMURI.equals(URIS.CONTROLLER_URI)) {
+		} else if (thisJVMURI.equals(URIS.ELECTRIC_METER_URI)) {
+		} else if (thisJVMURI.equals(URIS.FRIDGE_URI)) {
+		} else if (thisJVMURI.equals(URIS.HAIR_DRYER_URI)) {
+		} else if (thisJVMURI.equals(URIS.WASHING_MACHINE_URI)) {
+		} else if (thisJVMURI.equals(URIS.ENGINE_GENERATOR_URI)) {
 		} else {
 			System.out.println("Unknown JVM URI... " + thisJVMURI);
 		}
