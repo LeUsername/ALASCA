@@ -1,4 +1,4 @@
-package simulation.models.sechecheveux;
+package simulation.models.hairdryer;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -51,6 +51,6 @@ public class ConsumptionEvent extends AbstractElectricMeterEvent {
 		assert	model instanceof ElectricMeterModel ;
 
 		ElectricMeterModel m = (ElectricMeterModel)model ;
-		m.setConsommation(((Reading)this.getEventInformation()).value);
+		m.setConsumption(((Reading)this.getEventInformation()).value);
 	}
 }

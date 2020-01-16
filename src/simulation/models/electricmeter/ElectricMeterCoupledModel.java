@@ -86,17 +86,17 @@ public class ElectricMeterCoupledModel extends CoupledModel {
 
 		atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-		atomicModelDescriptors.put(ElectricMeterSensorModel.URI, AtomicModelDescriptor.create(ElectricMeterSensorModel.class,
-				ElectricMeterSensorModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(ElectricMeterStubModel.URI, AtomicModelDescriptor.create(ElectricMeterStubModel.class,
+				ElectricMeterStubModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterModel.URI);
-		submodels.add(ElectricMeterSensorModel.URI);
+		submodels.add(ElectricMeterStubModel.URI);
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(ElectricMeterSensorModel.URI, ConsumptionEvent.class);
+		EventSource from1 = new EventSource(ElectricMeterStubModel.URI, ConsumptionEvent.class);
 		EventSink[] to1 = new EventSink[] { new EventSink(ElectricMeterModel.URI, ConsumptionEvent.class) };
 		connections.put(from1, to1);
 

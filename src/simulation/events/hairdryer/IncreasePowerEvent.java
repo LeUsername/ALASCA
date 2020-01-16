@@ -4,7 +4,7 @@ import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import simulation.models.sechecheveux.HairDryerModel;
+import simulation.models.hairdryer.HairDryerModel;
 
 public class IncreasePowerEvent extends AbstractHairDryerEvent {
 	// -------------------------------------------------------------------------

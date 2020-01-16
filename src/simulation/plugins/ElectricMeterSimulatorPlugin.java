@@ -18,7 +18,7 @@ public class ElectricMeterSimulatorPlugin extends AtomicSimulatorPlugin {
 
 		assert m instanceof ElectricMeterModel;
 
-		return ((ElectricMeterModel) m).getConsommation();
+		return ((ElectricMeterModel) m).getConsumption();
 	}
 
 }

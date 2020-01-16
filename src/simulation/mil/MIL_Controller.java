@@ -19,16 +19,18 @@ public class MIL_Controller {
 			Architecture localArchitecture = ControllerCoupledModel.build() ;
 			se = localArchitecture.constructSimulator() ;
 			Map<String, Object> simParams = new HashMap<String, Object>();
-			simParams.put(					ControllerModel.URI + ":" + ControllerModel.PRODUCTION + ":"
+			
+			simParams.put(					ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
 					+ PlotterDescription.PLOTTING_PARAM_NAME,
 			new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X,
 					WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 					WattWattMain.getPlotterHeight()));
-			simParams.put(					ControllerModel.URI + ":" + ControllerModel.CONTROLLER_STUB + ":"
+			simParams.put(					ControllerModel.URI + ":" + ControllerModel.CONTROLLER_STUB_SERIES + ":"
 					+ PlotterDescription.PLOTTING_PARAM_NAME,
 			new PlotterDescription("ControllerModel", "Time (sec)", "Decision", WattWattMain.ORIGIN_X,
 					WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 					WattWattMain.getPlotterHeight()));
+			
 			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;

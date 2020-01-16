@@ -1,9 +1,17 @@
 package simulation.mil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import simulation.models.sechecheveux.HairDryerCoupledModel;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
+import simulation.models.hairdryer.HairDryerCoupledModel;
+import simulation.models.hairdryer.HairDryerModel;
+import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.tools.TimeScale;
+import simulation.tools.hairdryer.HairDryerUserBehaviour;
 
 public class MIL_HairDryer {
 	public static void	main(String[] args)
@@ -13,6 +21,36 @@ public class MIL_HairDryer {
 		try {
 			Architecture localArchitecture = HairDryerCoupledModel.build() ;
 			se = localArchitecture.constructSimulator() ;
+			Map<String, Object> simParams = new HashMap<String, Object>() ;
+			
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
+					HairDryerUserBehaviour.INITIAL_DELAY) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
+					HairDryerUserBehaviour.INTERDAY_DELAY) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
+					HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
+					HairDryerUserBehaviour.MEAN_TIME_AT_HIGH) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
+					HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
+			
+			simParams.put(
+					HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Hair dryer model",
+							"Time (min)",
+							"Intensity (Amp)",
+							WattWattMain.ORIGIN_X,
+							WattWattMain.ORIGIN_Y,
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
+			
+			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;

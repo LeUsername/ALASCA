@@ -23,7 +23,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.models.electricmeter.ElectricMeterModel;
-import simulation.models.sechecheveux.HairDryerCoupledModel;
+import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.wattwatt.WattWattModel;
 
 public class WattWattSupervisorComponent extends AbstractComponent {

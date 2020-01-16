@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
-import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
@@ -15,26 +14,26 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
-import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.deployment.WattWattMain;
 import simulation.events.windturbine.AbstractEolienneEvent;
 import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
+import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.windturbine.WindTurbineState;
 
-@ModelExternalEvents(imported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
+@ModelExternalEvents(imported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class },
+					  exported = {WindTurbineProductionEvent.class})
 public class WindTurbineModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	public static class EolienneModelReport extends AbstractSimulationReport {
+	public static class WindTurbineModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public EolienneModelReport(String modelURI) {
+		public WindTurbineModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -43,7 +42,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 		 */
 		@Override
 		public String toString() {
-			return "EolienneModelReport(" + this.getModelURI() + ")";
+			return "WindTurbineModelRepor(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -57,9 +56,22 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 * different URI must be given to each instance.
 	 */
 	public static final String URI = "WindTurbineModel";
+	
+	private static final String PRODUCTION = "production";
+	public static final String PRODUCTION_SERIES = "production-series";
 
-	private static final String SERIES = "production";
+	protected double production;
 
+	protected WindTurbineState state;
+
+	protected static final double KELVIN_TEMP = 288.15; // On suppose la temperatur en Kelvin et constante
+
+	protected static final int BLADES_AREA = 5; // m2
+
+	protected Time lastWindReadingTime;
+
+	protected Time currentWindReadingTime;
+	
 	/** plotter for the production level over time. */
 	protected XYPlotter productionPlotter;
 
@@ -69,37 +81,14 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	protected EmbeddingComponentStateAccessI componentRef;
 
-	protected Value<Double> production = new Value<Double>(this, 0.0);
-
-	protected WindTurbineState state;
-
-	protected static final double tempKelvin = 288.15; // On suppose la temperatur en Kelvin et constante
-
-	protected static final int bladesArea = 5; // m2
-
-	protected Time lastWindReadingTime;
-
-	protected Time currentWindReadingTime;
-
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
 	public WindTurbineModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-
-		// creation of a plotter to show the evolution of the intensity over
-		// time during the simulation.
-		PlotterDescription pd = new PlotterDescription("Production", "Time (min)", "Production (W)",
-				3 * WattWattMain.getPlotterWidth(),
-				0,
-				WattWattMain.getPlotterWidth(),
-				WattWattMain.getPlotterHeight());
-		this.productionPlotter = new XYPlotter(pd);
-		this.productionPlotter.createSeries(SERIES);
-
 		// create a standard logger (logging on the terminal)
-		this.setLogger(new StandardLogger());
+//		this.setLogger(new StandardLogger());
 	}
 
 	// ------------------------------------------------------------------------
@@ -111,8 +100,11 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
-		// The reference to the embedding component
-		//this.componentRef = (EmbeddingComponentStateAccessI) simParams.get("componentRef");
+		// Initialise the look of the plotter
+		String vname = this.getURI() + ":" + WindTurbineModel.PRODUCTION_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pd =(PlotterDescription) simParams.get(vname) ;
+		this.productionPlotter = new XYPlotter(pd);
+		this.productionPlotter.createSeries(PRODUCTION);
 	}
 
 	/**
@@ -120,11 +112,12 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-		// initialisation of the intensity plotter
-		this.productionPlotter.initialise();
-		// show the plotter on the screen
-		this.productionPlotter.showPlotter();
-
+		// initialisation of the production plotter
+		if(this.productionPlotter != null) {
+			this.productionPlotter.initialise();
+			this.productionPlotter.showPlotter();
+		}
+		
 		this.state = WindTurbineState.OFF;
 
 		this.lastWindReadingTime = new Time(0.0, TimeUnit.SECONDS);
@@ -145,8 +138,10 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	protected void initialiseVariables(Time startTime) {
+		this.production = 0.0;
+		
 		// first data in the plotter to start the plot.
-		this.productionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
+		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
 
 		super.initialiseVariables(startTime);
 	}
@@ -207,14 +202,13 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 
 		assert ce instanceof AbstractEolienneEvent;
 
-
 		if (ce instanceof WindReadingEvent) {
 			this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
 		}
 		ce.executeOn(this);
 		// add a new data on the plotter; this data will open a new piece
 
-		this.productionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
+		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
 
 		if (ce instanceof WindReadingEvent) {
 			this.lastWindReadingTime = this.currentWindReadingTime;
@@ -227,7 +221,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
-		this.productionPlotter.addData(SERIES, endTime.getSimulatedTime(), this.getProduction());
+		this.productionPlotter.addData(PRODUCTION, endTime.getSimulatedTime(), this.getProduction());
 
 		super.endSimulation(endTime);
 	}
@@ -237,7 +231,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new EolienneModelReport(this.getURI());
+		return new WindTurbineModelReport(this.getURI());
 	}
 
 	// ------------------------------------------------------------------------
@@ -249,12 +243,12 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	}
 
 	public double getProduction() {
-		return this.production.v;
+		return this.production;
 	}
 
 	public void setProduction(double windSpeed) {
-		this.production.v = 0.5 * (bladesArea
-				* windDensity(tempKelvin)) * windSpeed * windSpeed ;
+		this.production = 0.5 * (BLADES_AREA
+				* windDensity(KELVIN_TEMP)) * windSpeed * windSpeed ;
 	}
 
 	public void switchOn() {

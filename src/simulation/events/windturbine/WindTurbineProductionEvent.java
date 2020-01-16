@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.electricmeter.ElectricMeterModel;
 
-public class ProductionEvent extends AbstractEolienneEvent {
+public class WindTurbineProductionEvent extends AbstractEolienneEvent {
 
 	public static class		Reading
 	implements EventInformationI
@@ -25,11 +25,11 @@ public class ProductionEvent extends AbstractEolienneEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ProductionEvent(Time timeOfOccurrence, EventInformationI content) {
+	public WindTurbineProductionEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
-	public ProductionEvent(Time timeOfOccurrence, double content) {
+	public WindTurbineProductionEvent(Time timeOfOccurrence, double content) {
 		super(timeOfOccurrence, new Reading(content));
 	}
 

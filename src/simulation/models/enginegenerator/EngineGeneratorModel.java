@@ -6,9 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
-import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
-import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
@@ -29,10 +27,10 @@ import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 @ModelExternalEvents(imported = { RefillEvent.class, StartEvent.class, StopEvent.class , TicEvent.class}, exported = {EngineGeneratorProductionEvent.class})
 public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 
-	public static class GroupeElectrogeneModelReport extends AbstractSimulationReport {
+	public static class EngineGeneratorModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public GroupeElectrogeneModelReport(String modelURI) {
+		public EngineGeneratorModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -41,7 +39,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		 */
 		@Override
 		public String toString() {
-			return "GroupeElectrogeneModelReport(" + this.getModelURI() + ")";
+			return "EngineGeneratorModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -53,11 +51,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	public static final String URI = "EngineGeneratorModel";
 
-	public static final String PRODUCTION = "production";
-	public static final String QUANTITY = "quantity";
-	
-	public static final String PRODUCTION_SERIES = "production";
-	public static final String QUANTITY_SERIES = "quantity";
+	private static final String PRODUCTION = "production";
+	public static final String PRODUCTION_SERIES = "production-series";
+	private static final String QUANTITY = "quantity";
+	public static final String QUANTITY_SERIES = "quantity-series";
 	
 	
 	/** true when a external event triggered a reading. */
@@ -75,12 +72,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	protected EmbeddingComponentStateAccessI componentRef;
 
-	protected Value<Double> production = new Value<Double>(this, 0.0);
+	protected double production;
+	protected double fuelCapacity;
 
 	protected EngineGeneratorState state;
-
-	@ExportedVariable(type = Double.class)
-	protected Value<Double> fuelCapacity = new Value<Double>(this, 10.0, 0);
 
 	public EngineGeneratorModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
@@ -92,15 +87,15 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		Map<String, Object> simParams
 		) throws Exception
 	{
-		String vname = this.getURI() + ":" + EngineGeneratorModel.PRODUCTION + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
-		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
-		this.productionPlotter = new XYPlotter(pdTemperature) ;
-		this.productionPlotter.createSeries(EngineGeneratorModel.PRODUCTION_SERIES) ;
+		String vname = this.getURI() + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pdProduction = (PlotterDescription) simParams.get(vname) ;
+		this.productionPlotter = new XYPlotter(pdProduction) ;
+		this.productionPlotter.createSeries(EngineGeneratorModel.PRODUCTION) ;
 		
-		vname = this.getURI() + ":" + EngineGeneratorModel.QUANTITY + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
-		PlotterDescription pdIntensity = (PlotterDescription) simParams.get(vname) ;
-		this.fuelQuantityPlotter = new XYPlotter(pdIntensity) ;
-		this.fuelQuantityPlotter.createSeries(QUANTITY_SERIES) ;
+		vname = this.getURI() + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pdFuelQuantity = (PlotterDescription) simParams.get(vname) ;
+		this.fuelQuantityPlotter = new XYPlotter(pdFuelQuantity) ;
+		this.fuelQuantityPlotter.createSeries(QUANTITY) ;
 	}
 	
 	@Override
@@ -129,8 +124,8 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	{
 		super.initialiseVariables(startTime);
 
-		this.production.v = 0.0 ;
-		this.fuelCapacity.v = EngineGeneratorSetting.FULL_CAPACITY;
+		this.production = 0.0 ;
+		this.fuelCapacity = EngineGeneratorSetting.FULL_CAPACITY;
 	}
 
 
@@ -148,7 +143,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	public Vector<EventI>	output()
 	{
 		if(this.triggerReading) {
-			double reading = this.production.v ; // kW
+			double reading = this.production ; // Watt
 
 			Vector<EventI> ret = new Vector<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
@@ -181,19 +176,19 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			this.productionPlotter.addData(
 				PRODUCTION,
 				this.getCurrentStateTime().getSimulatedTime(), 
-				this.production.v) ;
+				this.production) ;
 		}
 		this.logMessage(this.getCurrentStateTime() +
-				"|internal|production = " + this.production.v + " Watt") ;
+				"|internal|production = " + this.production + " Watt") ;
 		}
 		if (this.fuelQuantityPlotter != null) {
 			this.fuelQuantityPlotter.addData(
 				QUANTITY,
 				this.getCurrentStateTime().getSimulatedTime(), 
-				this.fuelCapacity.v) ;
+				this.fuelCapacity) ;
 		}
 		this.logMessage(this.getCurrentStateTime() +
-				"|internal|temperature = " + this.fuelCapacity.v + " L") ;
+				"|internal|temperature = " + this.fuelCapacity + " L") ;
 		
 	}
 
@@ -220,8 +215,8 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 
 		// the plot is piecewise constant; this data will close the currently
 		// open piece
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production.v);
-		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity.v);
+		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
 
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 3 " + this.state);
@@ -244,8 +239,8 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		 }
 
 		// add a new data on the plotter; this data will open a new piece
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production.v);
-		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity.v);
+		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
 
 		super.userDefinedExternalTransition(elapsedTime);
 		if (this.hasDebugLevel(2)) {
@@ -255,7 +250,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new GroupeElectrogeneModelReport(this.getURI());
+		return new EngineGeneratorModelReport(this.getURI());
 	}
 
 	/**
@@ -263,13 +258,13 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production.v);
-		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity.v);
+		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
 		super.endSimulation(endTime);
 	}
 	
 	public void refill() {
-		this.fuelCapacity.v = EngineGeneratorSetting.FULL_CAPACITY;
+		this.fuelCapacity = EngineGeneratorSetting.FULL_CAPACITY;
 		updateState();
 	}
 	
@@ -289,35 +284,34 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	}
 	
 	public boolean isFull() {
-		return this.fuelCapacity.v == EngineGeneratorSetting.FUEL_CAPACITY;
+		return this.fuelCapacity == EngineGeneratorSetting.FUEL_CAPACITY;
 	}
 	
 	public boolean isEmpty() {
-		return this.fuelCapacity.v == 0.0;
+		return this.fuelCapacity == 0.0;
 	}
 	
 	public double getProduction() {
-		return this.production.v;
+		return this.production;
 	}
 	
 	public double getCapacity() {
-		return this.fuelCapacity.v;
+		return this.fuelCapacity;
 	}
 	
 	public void updateState() {
 		if (this.isOn() && !this.isEmpty()) {
-			this.production.v += EngineGeneratorSetting.PROD_THR;
-			if (this.fuelCapacity.v - EngineGeneratorSetting.PROD_THR <= 0) {
-				this.fuelCapacity.v = 0.0;
+			this.production += EngineGeneratorSetting.PROD_THR;
+			if (this.fuelCapacity - EngineGeneratorSetting.PROD_THR <= 0) {
+				this.fuelCapacity = 0.0;
 			} else {
-				this.fuelCapacity.v -= EngineGeneratorSetting.PROD_THR;
+				this.fuelCapacity -= EngineGeneratorSetting.PROD_THR;
 			}
 		} else {
 			if (this.isEmpty()) {
 				this.state = EngineGeneratorState.OFF;
-				
 			}
-			this.production.v = 0.0;
+			this.production = 0.0;
 		}
 	}
 

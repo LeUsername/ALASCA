@@ -149,12 +149,12 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
 		simParams.put("componentRef", this);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTBU,
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
 				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTW,
-				EngineGeneratorUserBehaviour.MEAN_TIME_WORKING);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTR,
-				EngineGeneratorUserBehaviour.MEAN_TIME_AT_REFILL);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
+				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
+				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
 		simParams.put(
 				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
@@ -164,13 +164,13 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 						WattWattMain.getPlotterHeight()));
 
 		simParams.put(
-				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION + ":"
+				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		simParams.put(
-				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY + ":"
+				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
 						2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),

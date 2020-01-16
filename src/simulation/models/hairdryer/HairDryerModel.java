@@ -1,4 +1,4 @@
-package simulation.models.sechecheveux;
+package simulation.models.hairdryer;
 
 import java.util.Map;
 import java.util.Vector;
@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
-import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
@@ -16,10 +15,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
-import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.deployment.WattWattMain;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.hairdryer.DecreasePowerEvent;
 import simulation.events.hairdryer.IncreasePowerEvent;
@@ -39,10 +36,10 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	public static class SecheCheveuxReport extends AbstractSimulationReport {
+	public static class HairDryerModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public SecheCheveuxReport(String modelURI) {
+		public HairDryerModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -51,7 +48,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		 */
 		@Override
 		public String toString() {
-			return "SecheCheveuxReport(" + this.getModelURI() + ")";
+			return "HairDryerModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -67,6 +64,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	public static final String URI = "HairDryerModel";
 
 	private static final String SERIES = "intensity";
+	public static final String INTENSITY_SERIES = "intensity-series";
 
 	/** nominal tension (in Volts) of the hair dryer. */
 	protected static final double TENSION = 220.0; // Volts
@@ -85,7 +83,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	
 	/** current intensity in Amperes; intensity is power/tension. */
 	//@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentIntensity = new Value<Double>(this, 0.0, 0);
+	protected double currentIntensity;
 	
 	/** Mode dans lequel est le seche cheveux (HOT_AIR, COLD_AIR) */
 	protected HairDryerMode mode;
@@ -102,15 +100,15 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	public HairDryerModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
-		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (min)", "Intensity (Amp)", 
-				0,
-				0,
-				WattWattMain.getPlotterWidth(),
-				WattWattMain.getPlotterHeight());
-		this.intensityPlotter = new XYPlotter(pd);
-		this.intensityPlotter.createSeries(SERIES);
+//		PlotterDescription pd = new PlotterDescription("Intensite seche cheveux", "Time (min)", "Intensity (Amp)", 
+//				0,
+//				0,
+//				WattWattMain.getPlotterWidth(),
+//				WattWattMain.getPlotterHeight());
+//		this.intensityPlotter = new XYPlotter(pd);
+//		this.intensityPlotter.createSeries(INTENSITY_SERIES);
 
-		this.setLogger(new StandardLogger());
+//		this.setLogger(new StandardLogger());
 	}
 
 	// ------------------------------------------------------------------------
@@ -123,6 +121,12 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get("componentRef");
+		
+		// Initialise the look of the plotter
+		String vname = this.getURI() + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
+		this.intensityPlotter = new XYPlotter(pd) ;
+		this.intensityPlotter.createSeries(SERIES) ;
 	}
 
 	/**
@@ -136,9 +140,11 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 
 		this.triggerReading = false;
 
-		this.intensityPlotter.initialise();
-		this.intensityPlotter.showPlotter();
-
+		// initialisation of the intensity plotter on the screen
+		if(this.intensityPlotter != null) {
+			this.intensityPlotter.initialise();
+			this.intensityPlotter.showPlotter();
+		}
 		try {
 			this.setDebugLevel(1);
 		} catch (Exception e) {
@@ -154,7 +160,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	@Override
 	protected void initialiseVariables(Time startTime) {
 		// as the hair dryer starts in mode OFF, its power consumption is 0
-		this.currentIntensity.v = 0.0;
+		this.currentIntensity = 0.0;
 
 		// first data in the plotter to start the plot.
 		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getIntensity());
@@ -168,7 +174,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	@Override
 	public Vector<EventI> output() {
 		if (this.triggerReading) {
-			double reading = this.currentIntensity.v * TENSION / 1000; // kW
+			double reading = this.currentIntensity * TENSION / 1000; // kW
 
 			Vector<EventI> ret = new Vector<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
@@ -211,10 +217,10 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 			this.intensityPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(), 
-				this.currentIntensity.v) ;
+				this.currentIntensity) ;
 		}
 		this.logMessage(this.getCurrentStateTime() +
-				"|internal|temperature = " + this.currentIntensity.v + " �C") ;
+				"|internal|temperature = " + this.currentIntensity + " C") ;
 		}
 	}
 
@@ -234,14 +240,14 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		assert currentEvents != null;
 
 		Event ce = (Event) currentEvents.get(0);
-
+		
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("HairDryerModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
 		}
 
 		// the plot is piecewise constant; this data will close the currently
 		// open piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getIntensity());
+		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
 
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("HairDryerModel::userDefinedExternalTransition 3 " + this.getMode());
@@ -263,7 +269,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		 }
 
 		// add a new data on the plotter; this data will open a new piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getIntensity());
+		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
 
 		super.userDefinedExternalTransition(elapsedTime);
 		if (this.hasDebugLevel(2)) {
@@ -276,7 +282,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
-		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.getIntensity());
+		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.currentIntensity);
 		super.endSimulation(endTime);
 	}
 
@@ -285,7 +291,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new SecheCheveuxReport(this.getURI());
+		return new HairDryerModelReport(this.getURI());
 	}
 
 	// ------------------------------------------------------------------------
@@ -299,7 +305,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 
 	public void switchOff() {
 		this.state = HairDryerState.OFF;
-		this.currentIntensity.v = 0.0;
+		this.currentIntensity = 0.0;
 	}
 
 	public void setMode(HairDryerMode mode) {
@@ -312,7 +318,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	}
 
 	public double getIntensity() {
-		return this.currentIntensity.v;
+		return this.currentIntensity;
 	}
 
 
@@ -345,10 +351,10 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	public void updateIntensity() {
 		switch (this.getMode()) {
 		case HOT_AIR:
-			this.currentIntensity.v = HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue() / TENSION;
+			this.currentIntensity = HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue() / TENSION;
 			break;
 		case COLD_AIR:
-			this.currentIntensity.v = HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue() / TENSION;
+			this.currentIntensity = HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue() / TENSION;
 			break;
 
 		}

@@ -1,5 +1,6 @@
 package simulation.models.windturbine;
 
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -7,11 +8,13 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
+import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
+import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
@@ -21,11 +24,36 @@ import simulation.tools.windturbine.WindTurbineState;
 @ModelExternalEvents(imported = { TicEvent.class }, exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class WindTurbineSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
+	// Inner classes and types
+	// -------------------------------------------------------------------------
+
+	public static class WindTurbineSensorModelReport extends AbstractSimulationReport {
+		private static final long serialVersionUID = 1L;
+
+		public WindTurbineSensorModelReport(String modelURI) {
+			super(modelURI);
+		}
+
+		/**
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "WindTurbineSensorModelReport(" + this.getModelURI() + ")";
+		}
+	}
+
+	
+	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	
 	public static final String URI = "WindTurbineSensorModel";
+	
+	public static final String INITIAL_DELAY = "initial-delay";
+	public static final String INTERDAY_DELAY = "interday-delay";
 
 	protected double initialDelay;
 	protected double interdayDelay;
@@ -61,13 +89,26 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void			setSimulationRunParameters(
+		Map<String, Object> simParams
+		) throws Exception
+	{
+		// Get the values of the run parameters in the map using their names
+		// and set the model implementation variables accordingly
+		String vname = this.getURI() + ":" + WindTurbineSensorModel.INITIAL_DELAY;
+		this.initialDelay = (double) simParams.get(vname);
+		vname = this.getURI() + ":" + WindTurbineSensorModel.INTERDAY_DELAY;
+		this.interdayDelay = (double) simParams.get(vname);
+	}
+	
+	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-		this.initialDelay = 10.0;
-		this.interdayDelay = 100.0;
-		
 		this.state = WindTurbineState.OFF;
 		
 		this.currentWind = WindTurbineSensorModel.MAX_WIND * this.rg.nextBeta(2., 2.);
@@ -103,7 +144,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 		// model is given by the earliest time among the currently scheduled
 		// events.
 		Duration d = super.timeAdvance();
-		this.logMessage("EolienneSensorModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
+		this.logMessage("WindTurbineSensorModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
 		return d;
 	}
 
@@ -132,7 +173,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 		// to keep it for the internal transition)
 		this.nextEvent = ret.get(0).getClass();
 
-		this.logMessage("EolienneSensorModel::output() " + this.nextEvent.getCanonicalName());
+		this.logMessage("WindTurbineSensorModel::output() " + this.nextEvent.getCanonicalName());
 		return ret;
 	}
 
@@ -174,5 +215,13 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 		d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
 		this.scheduleEvent(new WindReadingEvent(this.getCurrentStateTime().add(d), this.currentWind));
 
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
+	 */
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new WindTurbineSensorModelReport(this.getURI());
 	}
 }

@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
-import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
@@ -15,26 +14,24 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
-import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.electricmeter.AbstractElectricMeterEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
-import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 
-@ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class })
+@ModelExternalEvents(imported = { ConsumptionEvent.class })
 public class ElectricMeterModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	public static class		CompteurModelReport
+	public static class		ElectricMeterModelReport
 	extends		AbstractSimulationReport
 	{
 		private static final long serialVersionUID = 1L;
 		
-		public			CompteurModelReport(String modelURI)
+		public			ElectricMeterModelReport(String modelURI)
 		{
 			super(modelURI);
 		}
@@ -45,7 +42,7 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 		@Override
 		public String	toString()
 		{
-			return "CompteurModelReport(" + this.getModelURI() + ")" ;
+			return "ElectricMeterModelReport(" + this.getModelURI() + ")" ;
 		}
 	}
 
@@ -58,16 +55,14 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	 *  otherwise a different URI must be given to each instance.			*/
 	public static final String		URI = "ElectricMeterModel" ;
 
-	private static final String		SERIES = "consommation" ;
-	public static final String CONSOMMATION_SERIES = "consommation-series";
+	private static final String		SERIES = "consumption" ;
+	public static final String CONSUMPTION_SERIES = "consumption-series";
 
-	protected Value<Double>	consommationTotale = new Value<Double>(this, 0.0);
+	protected double totalConsumption;
 	
-	/** plotter for the intensity level over time.							*/
-	protected XYPlotter				consommationPlotter ;
+	/** plotter for the consumption level over time.						*/
+	protected XYPlotter	consumptionPlotter ;
 	
-	protected XYPlotter				totalePlotter;
-
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
 	protected EmbeddingComponentStateAccessI componentRef ;
@@ -77,7 +72,7 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a hair dryer model instance.
+	 * create an electric meter model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -102,20 +97,20 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 
 		// creation of a plotter to show the evolution of the intensity over
 		// time during the simulation.
-		PlotterDescription pd =
-				new PlotterDescription(
-						"Total consommation",
-						"Time (min)",
-						"Consommation (kW)",
-						100,
-						400,
-						600,
-						400) ;
-		this.consommationPlotter = new XYPlotter(pd) ;
-		this.consommationPlotter.createSeries(SERIES) ;
-		
-		// create a standard logger (logging on the terminal)
-		this.setLogger(new StandardLogger()) ;
+//		PlotterDescription pd =
+//				new PlotterDescription(
+//						"Total consommation",
+//						"Time (min)",
+//						"Consommation (kW)",
+//						100,
+//						400,
+//						600,
+//						400) ;
+//		this.consumptionPlotter = new XYPlotter(pd) ;
+//		this.consumptionPlotter.createSeries(SERIES) ;
+//		
+//		// create a standard logger (logging on the terminal)
+//		this.setLogger(new StandardLogger()) ;
 	}
 
 	// ------------------------------------------------------------------------
@@ -130,9 +125,11 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 		Map<String, Object> simParams
 		) throws Exception
 	{
-		// The reference to the embedding component
-		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get("componentRef") ;
+		// Initialise the look of the plotter
+		String vname = this.getURI() + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
+		this.consumptionPlotter = new XYPlotter(pd) ;
+		this.consumptionPlotter.createSeries(SERIES) ;
 	}
 
 	/**
@@ -141,10 +138,11 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	@Override
 	public void			initialiseState(Time initialTime)
 	{
-		// initialisation of the intensity plotter 
-		this.consommationPlotter.initialise() ;
-		// show the plotter on the screen
-		this.consommationPlotter.showPlotter() ;
+		// initialisation of the intensity plotter on the screen
+		if(this.consumptionPlotter != null) {
+			this.consumptionPlotter.initialise();
+			this.consumptionPlotter.showPlotter();
+		}
 
 //		// initialisation of the intensity plotter 
 //		this.productionPlotter.initialise() ;
@@ -170,10 +168,10 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	{
 
 		// first data in the plotter to start the plot.
-		this.consommationPlotter.addData(
+		this.consumptionPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsumption());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -242,14 +240,15 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 
 		Event ce = (Event) currentEvents.get(0) ;
 
+		System.out.println(ce);
 		assert ce instanceof AbstractElectricMeterEvent;
 		
 		System.out.println(ce.getClass());
 		
-		this.consommationPlotter.addData(
+		this.consumptionPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsumption());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -259,10 +258,10 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 		ce.executeOn(this) ;
 		// add a new data on the plotter; this data will open a new piece
 				
-		this.consommationPlotter.addData(
+		this.consumptionPlotter.addData(
 				SERIES,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.getConsommation());
+				this.getConsumption());
 		
 //		this.productionPlotter.addData(
 //				SERIES,
@@ -278,10 +277,10 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	@Override
 	public void			endSimulation(Time endTime) throws Exception
 	{
-		this.consommationPlotter.addData(
+		this.consumptionPlotter.addData(
 				SERIES,
 				endTime.getSimulatedTime(),
-				this.getConsommation()) ;
+				this.getConsumption()) ;
 
 		super.endSimulation(endTime) ;
 	}
@@ -292,21 +291,21 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 	@Override
 	public SimulationReportI	getFinalReport() throws Exception
 	{
-		return new CompteurModelReport(this.getURI()) ;
+		return new ElectricMeterModelReport(this.getURI()) ;
 	}
 
 	// ------------------------------------------------------------------------
 	// Model-specific methods
 	// ------------------------------------------------------------------------
 	
-	public double		getConsommation()
+	public double		getConsumption()
 	{
-		return this.consommationTotale.v;
+		return this.totalConsumption;
 	}
 	
-	public void		setConsommation(double c)
+	public void		setConsumption(double c)
 	{
-		this.consommationTotale.v = 1000 * c;
+		this.totalConsumption = 1000 * c;
 	}
 	
 	

@@ -1,5 +1,6 @@
-package simulation.models.sechecheveux;
+package simulation.models.hairdryer;
 
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
@@ -13,23 +14,21 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
-import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.hairdryer.DecreasePowerEvent;
 import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
-import simulation.tools.hairdryer.HairDryerUserBehaviour;
 import wattwatt.tools.hairdryer.HairDryerMode;
 
 @ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
 		IncreasePowerEvent.class, DecreasePowerEvent.class })
 public class HairDryerUserModel extends AtomicES_Model {
 
-	public static class SecheCheveuxUserModelReport extends AbstractSimulationReport {
+	public static class HairDryerUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public SecheCheveuxUserModelReport(String modelURI) {
+		public HairDryerUserModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -38,7 +37,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 		 */
 		@Override
 		public String toString() {
-			return "SecheCheveuxUserModelReport(" + this.getModelURI() + ")";
+			return "HairDryerUserModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -47,8 +46,15 @@ public class HairDryerUserModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	
 	public static final String URI = "HairDryerUserModel";
-
+	
+	public static final String INITIAL_DELAY = "initial-delay";
+	public static final String INTERDAY_DELAY = "interday-delay";
+	public static final String MEAN_TIME_BETWEEN_USAGES = "mean-time-between-usages";
+	public static final String MEAN_TIME_AT_HIGH = "mean-time-at-high";
+	public static final String MEAN_TIME_AT_LOW = "mean-time-at-low";
+	
 	/** initial delay before sending the first switch on event. */
 	protected double initialDelay;
 	
@@ -106,7 +112,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 		this.rg = new RandomDataGenerator();
 
 		// create a standard logger (logging on the terminal)
-		this.setLogger(new StandardLogger());
+//		this.setLogger(new StandardLogger());
 	}
 
 	// -------------------------------------------------------------------------
@@ -114,16 +120,32 @@ public class HairDryerUserModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void			setSimulationRunParameters(
+		Map<String, Object> simParams
+		) throws Exception
+	{
+		// Get the values of the run parameters in the map using their names
+		// and set the model implementation variables accordingly
+		String vname = this.getURI() + ":" + HairDryerUserModel.INITIAL_DELAY;
+		this.initialDelay = (double) simParams.get(vname);
+		vname = this.getURI() + ":" + HairDryerUserModel.INTERDAY_DELAY;
+		this.interdayDelay = (double) simParams.get(vname);
+		vname = this.getURI() + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES;
+		this.meanTimeBetweenUsages = (double) simParams.get(vname);
+		vname = this.getURI() + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH;
+		this.meanTimeAtHigh = (double) simParams.get(vname);
+		vname = this.getURI() + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW;
+		this.meanTimeAtLow = (double) simParams.get(vname);		
+	}
+	
+	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-		this.initialDelay = HairDryerUserBehaviour.INITIAL_DELAY;
-		this.interdayDelay = HairDryerUserBehaviour.INTER_DAY_DELAY;
-		this.meanTimeBetweenUsages = HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES;
-		this.meanTimeAtHigh = HairDryerUserBehaviour.MEAN_TIME_AT_HIGH;
-		this.meanTimeAtLow = HairDryerUserBehaviour.MEAN_TIME_AT_LOW;
-
 		this.rg.reSeedSecure();
 
 		// Initialise to get the correct current time.
@@ -215,17 +237,22 @@ public class HairDryerUserModel extends AtomicES_Model {
 
 			d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			this.scheduleEvent(new IncreasePowerEvent(this.getCurrentStateTime().add(d)));
+			
 		} else if (this.nextEvent.equals(IncreasePowerEvent.class)) {
 
 			d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			this.scheduleEvent(new DecreasePowerEvent(this.getCurrentStateTime().add(d)));
+			
 		} else if (this.nextEvent.equals(DecreasePowerEvent.class)) {
 
 			d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
+			
 		} else if(this.nextEvent.equals(SwitchOffEvent.class)) {
+			
 			d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
 			this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
+			
 		}
 
 	}
@@ -235,6 +262,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new SecheCheveuxUserModelReport(this.getURI());
+		return new HairDryerUserModelReport(this.getURI());
 	}
 }

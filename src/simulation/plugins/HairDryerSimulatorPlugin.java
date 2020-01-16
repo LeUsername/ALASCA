@@ -2,7 +2,7 @@ package simulation.plugins;
 
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
-import simulation.models.sechecheveux.HairDryerModel;
+import simulation.models.hairdryer.HairDryerModel;
 
 public class HairDryerSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;

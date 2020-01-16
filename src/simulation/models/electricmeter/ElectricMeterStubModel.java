@@ -15,12 +15,13 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.electricmeter.ConsumptionEvent;
 
 @ModelExternalEvents(exported = { ConsumptionEvent.class })
-public class ElectricMeterSensorModel extends AtomicES_Model {
+public class ElectricMeterStubModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	
 	public static final String URI = "ElectricMeterSensorModel";
 
 	protected double initialDelay;
@@ -36,7 +37,7 @@ public class ElectricMeterSensorModel extends AtomicES_Model {
 	// Constructors
 	// -------------------------------------------------------------------------
 
-	public ElectricMeterSensorModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
+	public ElectricMeterStubModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
 		this.rg = new RandomDataGenerator();

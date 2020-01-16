@@ -26,10 +26,10 @@ public class ControllerStubModel extends AtomicES_Model {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static class ControleurBouchonModelReport extends AbstractSimulationReport {
+	public static class ControllerStubModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public ControleurBouchonModelReport(String modelURI) {
+		public ControllerStubModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -38,7 +38,7 @@ public class ControllerStubModel extends AtomicES_Model {
 		 */
 		@Override
 		public String toString() {
-			return "ControleurBouchonModelReport(" + this.getModelURI() + ")";
+			return "ControllerStubModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -86,8 +86,8 @@ public class ControllerStubModel extends AtomicES_Model {
 		this.meanTimeBetweenUsages = 150;
 		this.meanTimeWorking = 20;
 		this.meanTimeAtRefill = 20;
-		this.production = 100.0;
-		this.consommation = 100.0;
+		this.production = 5.0;
+		this.consommation = 5.0;
 
 		this.rg.reSeedSecure();
 
@@ -159,7 +159,7 @@ public class ControllerStubModel extends AtomicES_Model {
 
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new ControleurBouchonModelReport(this.getURI());
+		return new ControllerStubModelReport(this.getURI());
 	}
 
 }

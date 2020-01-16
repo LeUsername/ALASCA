@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
-import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
@@ -35,15 +34,20 @@ import simulation.events.enginegenerator.StopEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
+import simulation.events.windturbine.WindReadingEvent;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
 import simulation.models.enginegenerator.EngineGeneratorModel;
 import simulation.models.enginegenerator.EngineGeneratorUserModel;
-import simulation.models.sechecheveux.HairDryerCoupledModel;
-import simulation.models.sechecheveux.HairDryerModel;
-import simulation.models.sechecheveux.HairDryerUserModel;
+import simulation.models.hairdryer.HairDryerCoupledModel;
+import simulation.models.hairdryer.HairDryerModel;
+import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.models.wattwatt.WattWattModel;
+import simulation.models.windturbine.WindTurbineCoupledModel;
+import simulation.models.windturbine.WindTurbineModel;
+import simulation.models.windturbine.WindTurbineSensorModel;
 import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
+import simulation.tools.hairdryer.HairDryerUserBehaviour;
 
 public class WattWattMain {
 	public static final String MOLENE_MODEL_URI = "WattWattModel";
@@ -81,7 +85,7 @@ public class WattWattMain {
 	public static void main(String[] args) {
 		try {
 			// ----------------------------------------------------------------
-			// Seche cheveux
+			// Hair dryer
 			// ----------------------------------------------------------------
 			Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
@@ -101,44 +105,44 @@ public class WattWattMain {
 
 			Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
-			Set<String> submodels = new HashSet<String>();
-			submodels.add(HairDryerModel.URI);
-			submodels.add(HairDryerUserModel.URI);
-			submodels.add(TicModel.URI + "-1") ;
+			Set<String> submodels1 = new HashSet<String>();
+			submodels1.add(HairDryerModel.URI);
+			submodels1.add(HairDryerUserModel.URI);
+			submodels1.add(TicModel.URI + "-1") ;
 
-			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-			EventSource from1 = new EventSource(HairDryerUserModel.URI, SwitchOnEvent.class);
-			EventSink[] to1 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOnEvent.class) };
-			connections.put(from1, to1);
-			EventSource from2 = new EventSource(HairDryerUserModel.URI, SwitchOffEvent.class);
-			EventSink[] to2 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOffEvent.class) };
-			connections.put(from2, to2);
-			EventSource from3 = new EventSource(HairDryerUserModel.URI, SwitchModeEvent.class);
-			EventSink[] to3 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchModeEvent.class) };
-			connections.put(from3, to3);
-			EventSource from4 =
+			Map<EventSource, EventSink[]> connections1 = new HashMap<EventSource, EventSink[]>();
+			EventSource from11 = new EventSource(HairDryerUserModel.URI, SwitchOnEvent.class);
+			EventSink[] to11 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOnEvent.class) };
+			connections1.put(from11, to11);
+			EventSource from12 = new EventSource(HairDryerUserModel.URI, SwitchOffEvent.class);
+			EventSink[] to12 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOffEvent.class) };
+			connections1.put(from12, to12);
+			EventSource from13 = new EventSource(HairDryerUserModel.URI, SwitchModeEvent.class);
+			EventSink[] to13 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchModeEvent.class) };
+			connections1.put(from13, to13);
+			EventSource from14 =
 					new EventSource(TicModel.URI + "-1",
 									TicEvent.class) ;
-			EventSink[] to4 =
+			EventSink[] to14 =
 					new EventSink[] {
 						new EventSink(HairDryerModel.URI,
 									  TicEvent.class)} ;
-			connections.put(from4, to4);
+			connections1.put(from14, to14);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported =
+			Map<Class<? extends EventI>,ReexportedEvent> reexported1 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported.put(
+			reexported1.put(
 					ConsumptionEvent.class,
 					new ReexportedEvent(HairDryerModel.URI,
 							ConsumptionEvent.class)) ;
 
 			coupledModelDescriptors.put(HairDryerCoupledModel.URI,
-					new CoupledHIOA_Descriptor(HairDryerCoupledModel.class, HairDryerCoupledModel.URI, submodels,
-							null, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+					new CoupledHIOA_Descriptor(HairDryerCoupledModel.class, HairDryerCoupledModel.URI, submodels1,
+							null, reexported1, connections1, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
 			
 			// ----------------------------------------------------------------
-			// GroupeElectrogene
+			// Engine generator
 			// ----------------------------------------------------------------
 
 			atomicModelDescriptors.put(EngineGeneratorModel.URI,
@@ -183,8 +187,39 @@ public class WattWattMain {
 							null, reexported2, connections3, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
 			
+			// ----------------------------------------------------------------
+			// Wind turbine
+			// ----------------------------------------------------------------
+			
+			atomicModelDescriptors.put(WindTurbineModel.URI, AtomicHIOA_Descriptor.create(WindTurbineModel.class,
+					WindTurbineModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(WindTurbineSensorModel.URI, AtomicModelDescriptor.create(WindTurbineSensorModel.class,
+					WindTurbineSensorModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+
+			Set<String> submodels5 = new HashSet<String>();
+			submodels5.add(WindTurbineModel.URI);
+			submodels5.add(WindTurbineSensorModel.URI);
+
+			Map<EventSource, EventSink[]> connections5 = new HashMap<EventSource, EventSink[]>();
+			EventSource from51 = new EventSource(WindTurbineSensorModel.URI, WindReadingEvent.class);
+			EventSink[] to51 = new EventSink[] { new EventSink(WindTurbineModel.URI, WindReadingEvent.class) };
+			connections5.put(from51, to51);
+			
+			EventSource from52 = new EventSource(WindTurbineSensorModel.URI, SwitchOffEvent.class);
+			EventSink[] to52 = new EventSink[] { new EventSink(WindTurbineModel.URI, SwitchOffEvent.class) };
+			connections5.put(from52, to52);
+			
+			EventSource from53 = new EventSource(WindTurbineSensorModel.URI, SwitchOnEvent.class);
+			EventSink[] to53 = new EventSink[] { new EventSink(WindTurbineModel.URI, SwitchOnEvent.class) };
+			connections5.put(from53, to53);
+
+			coupledModelDescriptors.put(WindTurbineCoupledModel.URI,
+					new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels5, null, null,
+							connections5, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));
+
+			
 //			// ----------------------------------------------------------------
-//			// Lave linge
+//			// Wshing machine
 //			// ----------------------------------------------------------------
 //			
 //			atomicModelDescriptors.put(LaveLingeModel.URI,
@@ -230,7 +265,7 @@ public class WattWattMain {
 //							null));
 			
 			// ----------------------------------------------------------------
-			// Compteur
+			// Electric meter
 			// ----------------------------------------------------------------
 			
 			atomicModelDescriptors.put(ElectricMeterModel.URI,
@@ -238,35 +273,31 @@ public class WattWattMain {
 					ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 			// ----------------------------------------------------------------
-			// Assemblage
+			// Full architecture
 			// ----------------------------------------------------------------
 			
-			Set<String> submodels2 = new HashSet<String>();
-			submodels2.add(HairDryerCoupledModel.URI);
-			submodels2.add(EngineGeneratorCoupledModel.URI);
-			submodels2.add(ElectricMeterModel.URI);
+			Set<String> submodels = new HashSet<String>();
+			submodels.add(HairDryerCoupledModel.URI);
+			submodels.add(EngineGeneratorCoupledModel.URI);
+			submodels.add(WindTurbineCoupledModel.URI);
+			submodels.add(ElectricMeterModel.URI);
 
-			Map<EventSource, EventSink[]> connections2 = new HashMap<EventSource, EventSink[]>();
+			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 
-			EventSource from21 = new EventSource(HairDryerCoupledModel.URI, ConsumptionEvent.class);
-			EventSink[] to21 = new EventSink[] {
+			EventSource from1 = new EventSource(HairDryerCoupledModel.URI, ConsumptionEvent.class);
+			EventSink[] to1 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, ConsumptionEvent.class) };
-			connections2.put(from21, to21);
-			
-			EventSource from22 = new EventSource(EngineGeneratorCoupledModel.URI, EngineGeneratorProductionEvent.class);
-			EventSink[] to22 = new EventSink[] {
-					new EventSink(ElectricMeterModel.URI, EngineGeneratorProductionEvent.class) };
-			connections2.put(from22, to22);
+			connections.put(from1, to1);
 			
 			coupledModelDescriptors.put(
 					WattWattModel.URI,
 					new CoupledModelDescriptor(
 							WattWattModel.class,
 							WattWattModel.URI,
-							submodels2,
+							submodels,
 							null,
 							null,
-							connections2,
+							connections,
 							null,
 							SimulationEngineCreationMode.COORDINATION_ENGINE)) ;
 			
@@ -278,75 +309,120 @@ public class WattWattMain {
 							TimeUnit.SECONDS) ;
 			
 			// ----------------------------------------------------------------
-			// Parametres de simulation
+			// Simulation parameters
 			// ----------------------------------------------------------------
 			
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTBU,
+			String modelURI = TicModel.URI  + "-1" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			modelURI = TicModel.URI  + "-3" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			
+			
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
+					HairDryerUserBehaviour.INITIAL_DELAY) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
+					HairDryerUserBehaviour.INTERDAY_DELAY) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
+					HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
+					HairDryerUserBehaviour.MEAN_TIME_AT_HIGH) ;
+			simParams.put(
+					HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
+					HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
+			
+			
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
+					EngineGeneratorUserBehaviour.INITIAL_DELAY);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
+					EngineGeneratorUserBehaviour.INTERDAY_DELAY);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
 					EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTW,
-					EngineGeneratorUserBehaviour.MEAN_TIME_WORKING);
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTR,
-					EngineGeneratorUserBehaviour.MEAN_TIME_AT_REFILL);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
+					EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
+					EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
+			
+			
+			simParams.put(
+					WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
+					10.0) ;
+			simParams.put(
+					WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
+					100.0) ;
+			
+			// ----------------------------------------------------------------
+			// Plotters parameters
+			// ----------------------------------------------------------------
+			
+			simParams.put(
+					HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"HairDryerModel",
+							"Time (sec)",
+							"Intensity (Amp)",
+							WattWattMain.ORIGIN_X +
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y +
+								WattWattMain.getPlotterHeight(),
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
+			
 			
 			simParams.put(
 					EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneUserModel", "Time (sec)", "User actions",
+					new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
 							WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
-
 			simParams.put(
-					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION + ":"
+					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Power (Watt)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			simParams.put(
-					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY + ":"
+					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Liter", WattWattMain.ORIGIN_X,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Volume (Liters)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			
-			String modelURI = TicModel.URI  + "-1" ;
-			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
-						  new Duration(10.0, TimeUnit.SECONDS)) ;
 			
-			modelURI = TicModel.URI  + "-3" ;
-			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
-						  new Duration(10.0, TimeUnit.SECONDS)) ;
-
-			
-			modelURI = HairDryerCoupledModel.URI ;
 			simParams.put(
-					modelURI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
-							"SecheCheveuxCoupledModel",
+							"Electric meter model",
 							"Time (sec)",
-							"Bandwidth (Mbps)",
-							SimulationMain.ORIGIN_X,
-							SimulationMain.ORIGIN_Y +
-								SimulationMain.getPlotterHeight(),
-							SimulationMain.getPlotterWidth(),
-							SimulationMain.getPlotterHeight())) ;
-
-			modelURI = ElectricMeterModel.URI ;
+							"Consumption (Watt)",
+							WattWattMain.ORIGIN_X +
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y +
+								2*WattWattMain.getPlotterHeight(),
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
+			
+			
 			simParams.put(
-					modelURI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
-							"CompteurModel",
-							"Time (sec)",
-							"Bandwidth (Mbps)",
-							SimulationMain.ORIGIN_X,
-							SimulationMain.ORIGIN_Y +
-								2*SimulationMain.getPlotterHeight(),
-							SimulationMain.getPlotterWidth(),
-							SimulationMain.getPlotterHeight())) ;
+							"Wind turbine model",
+							"Time (min)",
+							"Production (Watt)",
+							WattWattMain.ORIGIN_X +
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y,
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
 			
-			
-
+	
 			SimulationEngine se = architecture.constructSimulator() ;
 			se.setDebugLevel(0);
 			

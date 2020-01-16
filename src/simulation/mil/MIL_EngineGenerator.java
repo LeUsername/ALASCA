@@ -22,31 +22,33 @@ public class MIL_EngineGenerator {
 			se = localArchitecture.constructSimulator();
 			Map<String, Object> simParams = new HashMap<String, Object>();
 
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTBU,
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
+					EngineGeneratorUserBehaviour.INITIAL_DELAY);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
+					EngineGeneratorUserBehaviour.INTERDAY_DELAY);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
 					EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTW,
-					EngineGeneratorUserBehaviour.MEAN_TIME_WORKING);
-			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MTR,
-					EngineGeneratorUserBehaviour.MEAN_TIME_AT_REFILL);
-			
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
+					EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
+			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
+					EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
 			
 			simParams.put(
 					EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneUserModel", "Time (sec)", "User actions",
+					new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
 							WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
-
 			simParams.put(
-					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION + ":"
+					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Watt", WattWattMain.ORIGIN_X,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (Watt)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			simParams.put(
-					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY + ":"
+					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (sec)", "Litre", WattWattMain.ORIGIN_X,
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel quantity (Liters)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 

@@ -17,7 +17,7 @@ import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.fridge.FridgeModel;
 import simulation.models.fridge.FridgeSensorModel;
 import simulation.models.fridge.FridgeUserModel;
-import simulation.models.sechecheveux.HairDryerModel;
+import simulation.models.hairdryer.HairDryerModel;
 import simulation.plugins.FridgeSimulatorPlugin;
 import simulation.tools.TimeScale;
 import simulation.tools.fridge.FridgeConsumption;

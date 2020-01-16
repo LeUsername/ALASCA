@@ -20,6 +20,7 @@ import simulation.events.controller.StartEngineGenerator;
 import simulation.events.controller.StopEngineGenerator;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
+import simulation.models.hairdryer.HairDryerModel.HairDryerModelReport;
 import simulation.tools.controller.Decision;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 
@@ -69,7 +70,7 @@ public class ControllerModel extends AtomicModel {
 		 */
 		@Override
 		public String toString() {
-			return "ControllerModelReport(" + this.getModelURI() + ")";
+			return "ControllerModel(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -84,24 +85,23 @@ public class ControllerModel extends AtomicModel {
 	 */
 	public static final String URI = "ControllerModel";
 	
-	public static final String PRODUCTION = "production";
-	public static final String ENGINE_GENERATOR = "engine-generator";
-	public static final String CONTROLLER_STUB = "controller-stub";
-
-	private static final String PRODUCTION_SERIES = "production";
-	private static final String ENGINE_GENERATOR_SERIES = "engine-generator";
-	public static final String CONTROLLER_STUB_SERIES = "controller-stub";
+	private static final String PRODUCTION = "production";
+	public static final String PRODUCTION_SERIES = "production-series";
+	private static final String ENGINE_GENERATOR = "engine-generator";
+	public static final String ENGINE_GENERATOR_SERIES = "engine-generator-series";
+	private static final String CONTROLLER_STUB = "controller-stub";
+	public static final String CONTROLLER_STUB_SERIES = "controller-stub-series";
 	
 	protected double production;
-	protected double consommation;
+	protected double consumption;
 	
 	protected EngineGeneratorState EGState;
 	
 	protected boolean mustTransmitDecision;
 	
 	protected Decision triggeredDecision;
-	protected Decision lastDecisions;
-	protected double lastDecisionsTime;
+	protected Decision lastDecision;
+	protected double lastDecisionTime;
 	protected final Vector<DecisionPiece> decisionFunction;
 
 	protected XYPlotter productionPlotter;
@@ -119,7 +119,6 @@ public class ControllerModel extends AtomicModel {
 		this.decisionFunction = new Vector<ControllerModel.DecisionPiece>();
 		this.modelsPlotter = new HashMap<String, XYPlotter>();
 		
-		
 //		this.setLogger(new StandardLogger());
 	}
 
@@ -136,19 +135,18 @@ public class ControllerModel extends AtomicModel {
 		) throws Exception
 	{
 		String vname =
-				this.getURI() + ":" + ControllerModel.PRODUCTION + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+				this.getURI() + ":" + ControllerModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pd1 = (PlotterDescription) simParams.get(vname) ;
 		this.productionPlotter = new XYPlotter(pd1) ;
-		this.productionPlotter.createSeries(ControllerModel.PRODUCTION_SERIES) ;
+		this.productionPlotter.createSeries(ControllerModel.PRODUCTION) ;
 		
-		vname =
-				this.getURI() + ":" + ControllerModel.CONTROLLER_STUB + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
-		PlotterDescription pd2 = (PlotterDescription) simParams.get(vname) ;
-		this.modelsPlotter.put(ControllerModel.CONTROLLER_STUB, new XYPlotter(pd2));
-		this.modelsPlotter.get(ControllerModel.CONTROLLER_STUB).createSeries(ControllerModel.CONTROLLER_STUB_SERIES);
-		
-		
-		
+		if(simParams.containsKey(ControllerModel.CONTROLLER_STUB_SERIES)) {
+			vname =
+					this.getURI() + ":" + ControllerModel.CONTROLLER_STUB_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+			PlotterDescription pd2 = (PlotterDescription) simParams.get(vname) ;
+			this.modelsPlotter.put(ControllerModel.CONTROLLER_STUB, new XYPlotter(pd2));
+			this.modelsPlotter.get(ControllerModel.CONTROLLER_STUB).createSeries(ControllerModel.CONTROLLER_STUB);
+		}
 	}
 
 	/**
@@ -160,11 +158,11 @@ public class ControllerModel extends AtomicModel {
 		super.initialiseState(initialTime) ;
 
 		this.triggeredDecision = Decision.STOP_ENGINE;
-		this.lastDecisions = Decision.STOP_ENGINE;
+		this.lastDecision = Decision.STOP_ENGINE;
 		this.EGState = EngineGeneratorState.OFF;
 		this.mustTransmitDecision = false;
-		this.lastDecisionsTime = initialTime.getSimulatedTime();
-		this.consommation = 0.0;
+		this.lastDecisionTime = initialTime.getSimulatedTime();
+		this.consumption = 0.0;
 		this.production = 0.0;
 		this.decisionFunction.clear();
 		
@@ -172,7 +170,7 @@ public class ControllerModel extends AtomicModel {
 			this.productionPlotter.initialise() ;
 			this.productionPlotter.showPlotter() ;
 			this.productionPlotter.addData(
-					ControllerModel.PRODUCTION_SERIES,
+					ControllerModel.PRODUCTION,
 					this.getCurrentStateTime().getSimulatedTime(),
 					this.production) ;
 		}
@@ -184,7 +182,7 @@ public class ControllerModel extends AtomicModel {
 				elt.getValue().addData(
 						elt.getKey(),
 						this.getCurrentStateTime().getSimulatedTime(),
-						this.decisionToInteger(this.lastDecisions)) ;
+						this.decisionToInteger(this.lastDecision)) ;
 			}
 		}
 	}
@@ -202,16 +200,17 @@ public class ControllerModel extends AtomicModel {
 	 * @param s	a state for the controller.
 	 * @return	an integer representation to ease the plotting.
 	 */
-	protected double		decisionToInteger(Decision d)
+	protected int		decisionToInteger(Decision d)
 	{
 		assert	d != null ;
 
 		if (d == Decision.START_ENGINE) {
-			return 1.0 ;
+			return 1 ;
 		} else if (d == Decision.STOP_ENGINE) {
-			return 0.0 ;
+			return 0 ;
 		} else {
-			return -1.0;
+			// Need to add other decisions
+			return -1;
 		}
 	}
 
@@ -223,28 +222,26 @@ public class ControllerModel extends AtomicModel {
 	{
 		if (this.hasDebugLevel(1)) {
 			this.logMessage("output|"
-							+ this.lastDecisions + " "
+							+ this.lastDecision + " "
 							+ this.triggeredDecision) ;
 		}
+		
 		Vector<EventI> ret = null ;
 		ret = new Vector<EventI>(1) ;
+		
 		if (this.triggeredDecision == Decision.START_ENGINE) {
 			ret.add(new StartEngineGenerator(this.getCurrentStateTime())) ;
 		} else if (this.triggeredDecision == Decision.STOP_ENGINE) {
 			ret.add(new StopEngineGenerator(this.getCurrentStateTime())) ;
-		} 
-//		else {
-//			assert	this.triggeredDecision == Decision.BATTERY_TOO_LOW ;
-//			ret.add(new LowBattery(this.getCurrentStateTime(), null)) ;
-//		}
+		}
 	
 		this.decisionFunction.add(
-				new DecisionPiece(this.lastDecisionsTime,
+				new DecisionPiece(this.lastDecisionTime,
 							  this.getCurrentStateTime().getSimulatedTime(),
-							  this.lastDecisions)) ;
+							  this.lastDecision)) ;
 
-		this.lastDecisions = this.triggeredDecision ;
-		this.lastDecisionsTime =
+		this.lastDecision = this.triggeredDecision ;
+		this.lastDecisionTime =
 							this.getCurrentStateTime().getSimulatedTime() ;
 		this.mustTransmitDecision = false ;
 		return ret ;
@@ -273,7 +270,9 @@ public class ControllerModel extends AtomicModel {
 			this.logMessage("userDefinedExternalTransition|"
 								+ this.EGState + ">>>>>>>>>>>>>>>") ;
 		}
+		
 		Vector<EventI> current = this.getStoredEventAndReset() ;
+		
 		for (int i = 0 ; i < current.size() ; i++) {
 			if (current.get(i) instanceof EngineGeneratorProductionEvent) {
 				this.production =
@@ -285,7 +284,7 @@ public class ControllerModel extends AtomicModel {
 						+ "|EG production = " + this.production) ;
 			}
 			if (current.get(i) instanceof ConsumptionEvent) {
-				this.consommation =
+				this.consumption =
 						((ConsumptionEvent.Reading)
 							((ConsumptionEvent)current.get(i)).
 											getEventInformation()).value ;
@@ -304,7 +303,7 @@ public class ControllerModel extends AtomicModel {
 		}
 //		GroupeElectrogeneState oldState = this.EGState ;
 		if (this.EGState == EngineGeneratorState.ON) {
-			if (this.production > this.consommation) {
+			if (this.production > this.consumption) {
 				// on l'eteint
 				this.triggeredDecision = Decision.STOP_ENGINE;
 				this.EGState = EngineGeneratorState.OFF ;
@@ -317,8 +316,8 @@ public class ControllerModel extends AtomicModel {
 			}
 		} else{
 			assert	this.EGState == EngineGeneratorState.OFF;
-			if (this.production <= this.consommation) {
-				// on l'eteint
+			if (this.production <= this.consumption) {
+				// on l'allume
 				this.triggeredDecision = Decision.START_ENGINE;
 				this.EGState = EngineGeneratorState.ON ;
 				
@@ -330,11 +329,11 @@ public class ControllerModel extends AtomicModel {
 			}
 		} 
 		this.productionPlotter.addData(
-				PRODUCTION_SERIES,
+				PRODUCTION,
 				this.getCurrentStateTime().getSimulatedTime(),
 				this.production) ;
 		this.productionPlotter.addData(
-				PRODUCTION_SERIES,
+				PRODUCTION,
 				this.getCurrentStateTime().getSimulatedTime(),
 				this.production) ;
 		
@@ -343,7 +342,7 @@ public class ControllerModel extends AtomicModel {
 				elt.getValue().addData(
 					elt.getKey(),
 					this.getCurrentStateTime().getSimulatedTime(),
-					this.decisionToInteger(this.lastDecisions)) ;
+					this.decisionToInteger(this.lastDecision)) ;
 			}
 		}
 		
@@ -361,7 +360,7 @@ public class ControllerModel extends AtomicModel {
 	{
 		if (this.productionPlotter != null) {
 			this.productionPlotter.addData(
-					ControllerModel.PRODUCTION_SERIES,
+					ControllerModel.PRODUCTION,
 					this.getCurrentStateTime().getSimulatedTime(),
 					this.production) ;
 		}
@@ -371,7 +370,7 @@ public class ControllerModel extends AtomicModel {
 				elt.getValue().addData(
 						elt.getKey(),
 						this.getCurrentStateTime().getSimulatedTime(),
-						this.decisionToInteger(this.lastDecisions)) ;
+						this.decisionToInteger(this.lastDecision)) ;
 			}
 		}
 		super.endSimulation(endTime) ;
@@ -381,16 +380,8 @@ public class ControllerModel extends AtomicModel {
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
 	 */
 	@Override
-	public SimulationReportI		getFinalReport() throws Exception
-	{
-		final String uri = this.uri ;
-		return new SimulationReportI() {
-					private static final long serialVersionUID = 1L;
-					@Override
-					public String getModelURI() {
-						return uri ;
-					}				
-				};
+	public SimulationReportI getFinalReport() throws Exception {
+		return new ControllerModelReport(this.getURI());
 	}
 }
 // -----------------------------------------------------------------------------
