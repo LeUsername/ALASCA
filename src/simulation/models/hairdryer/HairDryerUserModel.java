@@ -21,8 +21,11 @@ import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
 import wattwatt.tools.hairdryer.HairDryerMode;
 
-@ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
-		IncreasePowerEvent.class, DecreasePowerEvent.class })
+@ModelExternalEvents(exported = { SwitchOnEvent.class, 
+								  SwitchOffEvent.class, 
+								  SwitchModeEvent.class,
+								  IncreasePowerEvent.class, 
+								  DecreasePowerEvent.class })
 public class HairDryerUserModel extends AtomicES_Model {
 
 	public static class HairDryerUserModelReport extends AbstractSimulationReport {

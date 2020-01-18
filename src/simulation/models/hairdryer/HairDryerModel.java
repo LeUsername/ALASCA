@@ -28,8 +28,13 @@ import simulation.tools.hairdryer.HairDryerState;
 import wattwatt.tools.hairdryer.HairDryerMode;
 import wattwatt.tools.hairdryer.HairDryerSetting;
 
-@ModelExternalEvents(imported = { TicEvent.class, SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
-		IncreasePowerEvent.class, DecreasePowerEvent.class }, exported = { ConsumptionEvent.class })
+@ModelExternalEvents(imported = { SwitchOnEvent.class, 
+								  SwitchOffEvent.class, 
+								  SwitchModeEvent.class,
+								  IncreasePowerEvent.class, 
+								  DecreasePowerEvent.class,
+								  TicEvent.class}, 
+					 exported = { ConsumptionEvent.class })
 public class HairDryerModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
@@ -254,7 +259,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		}
 
 		// execute the current external event on this model, changing its state
-		// and intensity level
+		// and intensity level except if it's a tic
 		if (ce instanceof TicEvent) {
 			ticReceived = true;
 		} else {
@@ -264,9 +269,9 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 			this.triggerReading = true;
 			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
 		}
-		 if (this.hasDebugLevel(1)) {
-		 this.logMessage("HairDryerModel::userDefinedExternalTransition 4 ");
-		 }
+		if (this.hasDebugLevel(1)) {
+			this.logMessage("HairDryerModel::userDefinedExternalTransition 4 ");
+		}
 
 		// add a new data on the plotter; this data will open a new piece
 		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);

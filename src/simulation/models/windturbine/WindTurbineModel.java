@@ -23,8 +23,10 @@ import simulation.events.windturbine.WindReadingEvent;
 import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.windturbine.WindTurbineState;
 
-@ModelExternalEvents(imported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class },
-					  exported = { WindTurbineProductionEvent.class })
+@ModelExternalEvents(imported = { WindReadingEvent.class, 
+								  SwitchOffEvent.class, 
+								  SwitchOnEvent.class },
+					 exported = { WindTurbineProductionEvent.class })
 public class WindTurbineModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
 	// Inner classes and types

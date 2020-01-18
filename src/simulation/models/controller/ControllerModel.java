@@ -248,6 +248,8 @@ public class ControllerModel extends AtomicModel {
 		Vector<EventI> ret = null ;
 		ret = new Vector<EventI>(1) ;
 		
+		assert ret != null;
+		
 		if (this.triggeredDecisionEngineGenerator == Decision.START_ENGINE) {
 			ret.add(new StartEngineGenerator(this.getCurrentStateTime())) ;
 		} else if (this.triggeredDecisionEngineGenerator == Decision.STOP_ENGINE) {

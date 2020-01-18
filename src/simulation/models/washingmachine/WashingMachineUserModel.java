@@ -22,7 +22,9 @@ import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
 import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 
-@ModelExternalEvents(exported = {StartAtEvent.class, EcoModeEvent.class, PremiumModeEvent.class})
+@ModelExternalEvents(exported = { StartAtEvent.class, 
+								  EcoModeEvent.class, 
+								  PremiumModeEvent.class})
 public class WashingMachineUserModel extends AtomicES_Model {
 
 	public static class LaveLingeUserModelReport extends AbstractSimulationReport {

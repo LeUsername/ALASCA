@@ -27,7 +27,10 @@ import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.tools.washingmachine.WashingMachineSetting;
 import wattwatt.tools.washingmachine.WashingMachineMode;
 
-@ModelExternalEvents(imported = { EcoModeEvent.class, PremiumModeEvent.class, StartAtEvent.class , TicEvent.class})
+@ModelExternalEvents(imported = { EcoModeEvent.class, 
+								  PremiumModeEvent.class, 
+								  StartAtEvent.class, 
+								  TicEvent.class})
 public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------

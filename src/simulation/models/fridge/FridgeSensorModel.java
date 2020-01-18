@@ -21,7 +21,9 @@ import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
 import simulation.events.fridge.TemperatureReadingEvent;
 
-@ModelExternalEvents(imported = { TicEvent.class }, exported = {ResumeEvent.class, SuspendEvent.class})
+@ModelExternalEvents(imported = { TicEvent.class }, 
+					 exported = { ResumeEvent.class,
+							 	  SuspendEvent.class})
 public class FridgeSensorModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------
