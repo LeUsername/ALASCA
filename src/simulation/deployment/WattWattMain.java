@@ -35,6 +35,8 @@ import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
+import simulation.events.windturbine.WindTurbineProductionEvent;
+import simulation.models.controller.ControllerModel;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
 import simulation.models.enginegenerator.EngineGeneratorModel;
@@ -205,16 +207,23 @@ public class WattWattMain {
 			EventSink[] to51 = new EventSink[] { new EventSink(WindTurbineModel.URI, WindReadingEvent.class) };
 			connections5.put(from51, to51);
 			
-			EventSource from52 = new EventSource(WindTurbineSensorModel.URI, SwitchOffEvent.class);
-			EventSink[] to52 = new EventSink[] { new EventSink(WindTurbineModel.URI, SwitchOffEvent.class) };
+			EventSource from52 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOnEvent.class);
+			EventSink[] to52 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOnEvent.class) };
 			connections5.put(from52, to52);
 			
-			EventSource from53 = new EventSource(WindTurbineSensorModel.URI, SwitchOnEvent.class);
-			EventSink[] to53 = new EventSink[] { new EventSink(WindTurbineModel.URI, SwitchOnEvent.class) };
+			EventSource from53 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOffEvent.class);
+			EventSink[] to53 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOffEvent.class) };
 			connections5.put(from53, to53);
+			
+			Map<Class<? extends EventI>,ReexportedEvent> reexported5 =
+					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			reexported5.put(
+					WindTurbineProductionEvent.class,
+					new ReexportedEvent(WindTurbineModel.URI,
+							WindTurbineProductionEvent.class)) ;
 
 			coupledModelDescriptors.put(WindTurbineCoupledModel.URI,
-					new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels5, null, null,
+					new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels5, null, reexported5,
 							connections5, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));
 
 			
@@ -265,13 +274,21 @@ public class WattWattMain {
 //							null));
 			
 			// ----------------------------------------------------------------
+			// Controller
+			// ----------------------------------------------------------------
+
+			atomicModelDescriptors.put(ControllerModel.URI,
+					AtomicModelDescriptor.create(ControllerModel.class,
+							ControllerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
+			// ----------------------------------------------------------------
 			// Electric meter
 			// ----------------------------------------------------------------
 			
 			atomicModelDescriptors.put(ElectricMeterModel.URI,
 					AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
-					ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-
+							ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			
 			// ----------------------------------------------------------------
 			// Full architecture
 			// ----------------------------------------------------------------
@@ -281,6 +298,7 @@ public class WattWattMain {
 			submodels.add(EngineGeneratorCoupledModel.URI);
 			submodels.add(WindTurbineCoupledModel.URI);
 			submodels.add(ElectricMeterModel.URI);
+			submodels.add(ControllerModel.URI);
 
 			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 
@@ -288,6 +306,14 @@ public class WattWattMain {
 			EventSink[] to1 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, ConsumptionEvent.class) };
 			connections.put(from1, to1);
+			EventSource from2 = new EventSource(EngineGeneratorCoupledModel.URI, EngineGeneratorProductionEvent.class);
+			EventSink[] to2 = new EventSink[] {
+					new EventSink(ControllerModel.URI, EngineGeneratorProductionEvent.class) };
+			connections.put(from2, to2);
+			EventSource from3 = new EventSource(WindTurbineCoupledModel.URI, WindTurbineProductionEvent.class);
+			EventSink[] to3 = new EventSink[] {
+					new EventSink(ControllerModel.URI, WindTurbineProductionEvent.class) };
+			connections.put(from3, to3);
 			
 			coupledModelDescriptors.put(
 					WattWattModel.URI,
@@ -397,6 +423,33 @@ public class WattWattMain {
 			
 			
 			simParams.put(
+					WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription(
+							"Wind turbine model",
+							"Time (min)",
+							"Production (Watt)",
+							WattWattMain.ORIGIN_X +
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y,
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight())) ;
+			
+			
+			simParams.put(					
+					ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
+			simParams.put(
+					ControllerModel.URI + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
+			
+			
+			simParams.put(
 					ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Electric meter model",
@@ -406,19 +459,6 @@ public class WattWattMain {
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y +
 								2*WattWattMain.getPlotterHeight(),
-							WattWattMain.getPlotterWidth(),
-							WattWattMain.getPlotterHeight())) ;
-			
-			
-			simParams.put(
-					WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription(
-							"Wind turbine model",
-							"Time (min)",
-							"Production (Watt)",
-							WattWattMain.ORIGIN_X +
-							WattWattMain.getPlotterWidth(),
-							WattWattMain.ORIGIN_Y,
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
 			

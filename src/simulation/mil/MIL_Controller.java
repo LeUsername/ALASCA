@@ -23,12 +23,12 @@ public class MIL_Controller {
 			simParams.put(					ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
 					+ PlotterDescription.PLOTTING_PARAM_NAME,
 			new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X,
-					WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+					WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
 					WattWattMain.getPlotterHeight()));
 			simParams.put(					ControllerModel.URI + ":" + ControllerModel.CONTROLLER_STUB_SERIES + ":"
 					+ PlotterDescription.PLOTTING_PARAM_NAME,
 			new PlotterDescription("ControllerModel", "Time (sec)", "Decision", WattWattMain.ORIGIN_X,
-					WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+					WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 					WattWattMain.getPlotterHeight()));
 			
 			se.setSimulationRunParameters(simParams);

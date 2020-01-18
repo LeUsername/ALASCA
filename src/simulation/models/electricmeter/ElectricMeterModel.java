@@ -240,10 +240,7 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 
 		Event ce = (Event) currentEvents.get(0) ;
 
-		System.out.println(ce);
 		assert ce instanceof AbstractElectricMeterEvent;
-		
-		System.out.println(ce.getClass());
 		
 		this.consumptionPlotter.addData(
 				SERIES,

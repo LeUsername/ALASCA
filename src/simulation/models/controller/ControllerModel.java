@@ -20,11 +20,11 @@ import simulation.events.controller.StartEngineGenerator;
 import simulation.events.controller.StopEngineGenerator;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
-import simulation.models.hairdryer.HairDryerModel.HairDryerModelReport;
+import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.controller.Decision;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 
-@ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class})
+@ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class, WindTurbineProductionEvent.class})
 public class ControllerModel extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -92,20 +92,20 @@ public class ControllerModel extends AtomicModel {
 	private static final String CONTROLLER_STUB = "controller-stub";
 	public static final String CONTROLLER_STUB_SERIES = "controller-stub-series";
 	
-	protected double production;
+	protected boolean mustTransmitDecision;
 	protected double consumption;
+	protected double productionEngineGenerator;
+	protected double productionWindTurbine;
 	
 	protected EngineGeneratorState EGState;
 	
-	protected boolean mustTransmitDecision;
-	
-	protected Decision triggeredDecision;
-	protected Decision lastDecision;
-	protected double lastDecisionTime;
-	protected final Vector<DecisionPiece> decisionFunction;
+	protected Decision triggeredDecisionEngineGenerator;
+	protected Decision lastDecisionEngineGenerator;
+	protected double lastDecisionTimeEngineGenerator;
+	protected final Vector<DecisionPiece> decisionFunctionEngineGenerator;
 
 	protected XYPlotter productionPlotter;
-	protected Map<String, XYPlotter> modelsPlotter;
+	protected final Map<String, XYPlotter> modelsPlotter;
 
 	protected EmbeddingComponentStateAccessI componentRef;
 	
@@ -116,7 +116,7 @@ public class ControllerModel extends AtomicModel {
 	public ControllerModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		
-		this.decisionFunction = new Vector<ControllerModel.DecisionPiece>();
+		this.decisionFunctionEngineGenerator = new Vector<>();
 		this.modelsPlotter = new HashMap<String, XYPlotter>();
 		
 //		this.setLogger(new StandardLogger());
@@ -140,12 +140,19 @@ public class ControllerModel extends AtomicModel {
 		this.productionPlotter = new XYPlotter(pd1) ;
 		this.productionPlotter.createSeries(ControllerModel.PRODUCTION) ;
 		
-		if(simParams.containsKey(ControllerModel.CONTROLLER_STUB_SERIES)) {
-			vname =
-					this.getURI() + ":" + ControllerModel.CONTROLLER_STUB_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+		vname =
+				this.getURI() + ":" + ControllerModel.CONTROLLER_STUB_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+		// if this key is in simParams, it's the MIL that's running
+		if(simParams.containsKey(vname)) {
 			PlotterDescription pd2 = (PlotterDescription) simParams.get(vname) ;
 			this.modelsPlotter.put(ControllerModel.CONTROLLER_STUB, new XYPlotter(pd2));
 			this.modelsPlotter.get(ControllerModel.CONTROLLER_STUB).createSeries(ControllerModel.CONTROLLER_STUB);
+		} else {
+			vname =
+					this.getURI() + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
+			PlotterDescription pd2 = (PlotterDescription) simParams.get(vname) ;
+			this.modelsPlotter.put(ControllerModel.ENGINE_GENERATOR, new XYPlotter(pd2));
+			this.modelsPlotter.get(ControllerModel.ENGINE_GENERATOR).createSeries(ControllerModel.ENGINE_GENERATOR);
 		}
 	}
 
@@ -157,14 +164,16 @@ public class ControllerModel extends AtomicModel {
 	{
 		super.initialiseState(initialTime) ;
 
-		this.triggeredDecision = Decision.STOP_ENGINE;
-		this.lastDecision = Decision.STOP_ENGINE;
-		this.EGState = EngineGeneratorState.OFF;
 		this.mustTransmitDecision = false;
-		this.lastDecisionTime = initialTime.getSimulatedTime();
 		this.consumption = 0.0;
-		this.production = 0.0;
-		this.decisionFunction.clear();
+		this.productionEngineGenerator = 0.0;
+		this.productionWindTurbine = 0.0;
+		
+		this.EGState = EngineGeneratorState.OFF;
+		this.triggeredDecisionEngineGenerator = Decision.STOP_ENGINE;
+		this.lastDecisionEngineGenerator = Decision.STOP_ENGINE;
+		this.lastDecisionTimeEngineGenerator = initialTime.getSimulatedTime();
+		this.decisionFunctionEngineGenerator.clear();
 		
 		if (this.productionPlotter != null) {
 			this.productionPlotter.initialise() ;
@@ -172,17 +181,27 @@ public class ControllerModel extends AtomicModel {
 			this.productionPlotter.addData(
 					ControllerModel.PRODUCTION,
 					this.getCurrentStateTime().getSimulatedTime(),
-					this.production) ;
+					0.0) ;
 		}
 
 		for(Map.Entry<String, XYPlotter> elt: modelsPlotter.entrySet()) {
-			if (elt.getValue() != null) {
-				elt.getValue().initialise() ;
-				elt.getValue().showPlotter() ;
-				elt.getValue().addData(
-						elt.getKey(),
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.decisionToInteger(this.lastDecision)) ;
+			String URI = elt.getKey();
+			XYPlotter plotter = elt.getValue();
+			if (plotter != null) {
+				plotter.initialise() ;
+				plotter.showPlotter() ;
+				if(URI == ControllerModel.ENGINE_GENERATOR) {
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				} else {
+					assert URI.equals(ControllerModel.CONTROLLER_STUB);
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				}
 			}
 		}
 	}
@@ -222,26 +241,26 @@ public class ControllerModel extends AtomicModel {
 	{
 		if (this.hasDebugLevel(1)) {
 			this.logMessage("output|"
-							+ this.lastDecision + " "
-							+ this.triggeredDecision) ;
+							+ this.lastDecisionEngineGenerator + " "
+							+ this.triggeredDecisionEngineGenerator) ;
 		}
 		
 		Vector<EventI> ret = null ;
 		ret = new Vector<EventI>(1) ;
 		
-		if (this.triggeredDecision == Decision.START_ENGINE) {
+		if (this.triggeredDecisionEngineGenerator == Decision.START_ENGINE) {
 			ret.add(new StartEngineGenerator(this.getCurrentStateTime())) ;
-		} else if (this.triggeredDecision == Decision.STOP_ENGINE) {
+		} else if (this.triggeredDecisionEngineGenerator == Decision.STOP_ENGINE) {
 			ret.add(new StopEngineGenerator(this.getCurrentStateTime())) ;
 		}
 	
-		this.decisionFunction.add(
-				new DecisionPiece(this.lastDecisionTime,
+		this.decisionFunctionEngineGenerator.add(
+				new DecisionPiece(this.lastDecisionTimeEngineGenerator,
 							  this.getCurrentStateTime().getSimulatedTime(),
-							  this.lastDecision)) ;
+							  this.lastDecisionEngineGenerator)) ;
 
-		this.lastDecision = this.triggeredDecision ;
-		this.lastDecisionTime =
+		this.lastDecisionEngineGenerator = this.triggeredDecisionEngineGenerator ;
+		this.lastDecisionTimeEngineGenerator =
 							this.getCurrentStateTime().getSimulatedTime() ;
 		this.mustTransmitDecision = false ;
 		return ret ;
@@ -275,13 +294,21 @@ public class ControllerModel extends AtomicModel {
 		
 		for (int i = 0 ; i < current.size() ; i++) {
 			if (current.get(i) instanceof EngineGeneratorProductionEvent) {
-				this.production =
+				this.productionEngineGenerator =
 						((EngineGeneratorProductionEvent.Reading)
 							((EngineGeneratorProductionEvent)current.get(i)).
 											getEventInformation()).value ;
 				this.logMessage("userDefinedExternalTransition|"
 						+ this.getCurrentStateTime()
-						+ "|EG production = " + this.production) ;
+						+ "|EG production = " + this.productionEngineGenerator) ;
+			} else if (current.get(i) instanceof WindTurbineProductionEvent){
+				this.productionWindTurbine =
+						((WindTurbineProductionEvent.Reading)
+							((WindTurbineProductionEvent)current.get(i)).
+											getEventInformation()).value ;
+				this.logMessage("userDefinedExternalTransition|"
+						+ this.getCurrentStateTime()
+						+ "|WT production = " + this.productionWindTurbine) ;
 			}
 			if (current.get(i) instanceof ConsumptionEvent) {
 				this.consumption =
@@ -302,10 +329,11 @@ public class ControllerModel extends AtomicModel {
 //			}
 		}
 //		GroupeElectrogeneState oldState = this.EGState ;
+		double production = this.productionEngineGenerator + this.productionWindTurbine ;
 		if (this.EGState == EngineGeneratorState.ON) {
-			if (this.production > this.consumption) {
+			if (production > this.consumption) {
 				// on l'eteint
-				this.triggeredDecision = Decision.STOP_ENGINE;
+				this.triggeredDecisionEngineGenerator = Decision.STOP_ENGINE;
 				this.EGState = EngineGeneratorState.OFF ;
 				
 				this.mustTransmitDecision = true ;
@@ -316,9 +344,9 @@ public class ControllerModel extends AtomicModel {
 			}
 		} else{
 			assert	this.EGState == EngineGeneratorState.OFF;
-			if (this.production <= this.consumption) {
+			if (production <= this.consumption) {
 				// on l'allume
-				this.triggeredDecision = Decision.START_ENGINE;
+				this.triggeredDecisionEngineGenerator = Decision.START_ENGINE;
 				this.EGState = EngineGeneratorState.ON ;
 				
 				this.mustTransmitDecision = true ;
@@ -331,18 +359,28 @@ public class ControllerModel extends AtomicModel {
 		this.productionPlotter.addData(
 				PRODUCTION,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.production) ;
+				production) ;
 		this.productionPlotter.addData(
 				PRODUCTION,
 				this.getCurrentStateTime().getSimulatedTime(),
-				this.production) ;
+				production) ;
 		
 		for(Map.Entry<String, XYPlotter> elt: modelsPlotter.entrySet()) {
-			if (elt.getValue() != null) {
-				elt.getValue().addData(
-					elt.getKey(),
-					this.getCurrentStateTime().getSimulatedTime(),
-					this.decisionToInteger(this.lastDecision)) ;
+			String URI = elt.getKey();
+			XYPlotter plotter = elt.getValue();
+			if (plotter != null) {
+				if(URI == ControllerModel.ENGINE_GENERATOR) {
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				} else {
+					assert URI.equals(ControllerModel.CONTROLLER_STUB);
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				}
 			}
 		}
 		
@@ -362,15 +400,25 @@ public class ControllerModel extends AtomicModel {
 			this.productionPlotter.addData(
 					ControllerModel.PRODUCTION,
 					this.getCurrentStateTime().getSimulatedTime(),
-					this.production) ;
+					this.productionEngineGenerator + this.productionWindTurbine) ;
 		}
 
 		for(Map.Entry<String, XYPlotter> elt: modelsPlotter.entrySet()) {
-			if (elt.getValue() != null) {
-				elt.getValue().addData(
-						elt.getKey(),
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.decisionToInteger(this.lastDecision)) ;
+			String URI = elt.getKey();
+			XYPlotter plotter = elt.getValue();
+			if (plotter != null) {
+				if(URI == ControllerModel.ENGINE_GENERATOR) {
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				} else {
+					assert URI.equals(ControllerModel.CONTROLLER_STUB);
+					plotter.addData(
+							URI,
+							this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionEngineGenerator)) ;
+				}
 			}
 		}
 		super.endSimulation(endTime) ;
