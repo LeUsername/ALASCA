@@ -18,6 +18,7 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.electricmeter.ConsumptionEvent;
+import simulation.events.hairdryer.AbstractHairDryerEvent;
 import simulation.events.hairdryer.DecreasePowerEvent;
 import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
@@ -263,6 +264,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		if (ce instanceof TicEvent) {
 			ticReceived = true;
 		} else {
+			assert ce instanceof AbstractHairDryerEvent;
 			ce.executeOn(this);
 		}
 		if (ticReceived) {

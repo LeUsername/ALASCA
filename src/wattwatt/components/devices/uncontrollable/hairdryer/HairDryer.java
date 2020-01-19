@@ -12,11 +12,15 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
+import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.plugins.HairDryerSimulatorPlugin;
 import simulation.tools.TimeScale;
 import simulation.tools.hairdryer.HairDryerPowerLevel;
+import simulation.tools.hairdryer.HairDryerUserBehaviour;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.uncontrollable.hairdryer.IHairDryer;
 import wattwatt.ports.devices.uncontrollable.hairdryer.HairDryerInPort;
@@ -180,6 +184,32 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
 		simParams.put("componentRef", this);
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
+				HairDryerUserBehaviour.INITIAL_DELAY) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
+				HairDryerUserBehaviour.INTERDAY_DELAY) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
+				HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
+				HairDryerUserBehaviour.MEAN_TIME_AT_HIGH) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
+				HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
+		
+		simParams.put(
+				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"Hair dryer model",
+						"Time (min)",
+						"Intensity (Amp)",
+						0,
+						0,
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {

@@ -14,6 +14,7 @@ import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
+import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
@@ -154,13 +155,13 @@ public class WattWattMain {
 			atomicModelDescriptors.put(EngineGeneratorUserModel.URI,
 					AtomicModelDescriptor.create(EngineGeneratorUserModel.class, EngineGeneratorUserModel.URI,
 							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-			atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
-					TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(TicModel.URI + "-2", AtomicModelDescriptor.create(TicModel.class,
+					TicModel.URI + "-2", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			Set<String> submodels3 = new HashSet<String>();
 			submodels3.add(EngineGeneratorModel.URI);
 			submodels3.add(EngineGeneratorUserModel.URI);
-			submodels3.add(TicModel.URI + "-3");
+			submodels3.add(TicModel.URI + "-2");
 			
 			Map<EventSource, EventSink[]> connections3 = new HashMap<EventSource, EventSink[]>();
 			EventSource from31 = new EventSource(EngineGeneratorUserModel.URI, StartEvent.class);
@@ -172,10 +173,14 @@ public class WattWattMain {
 			EventSource from33 = new EventSource(EngineGeneratorUserModel.URI, RefillEvent.class);
 			EventSink[] to33 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, RefillEvent.class) };
 			connections3.put(from33, to33);
-			
-			EventSource from5 = new EventSource(TicModel.URI + "-3", TicEvent.class);
-			EventSink[] to5 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, TicEvent.class) };
-			connections3.put(from5, to5);
+			EventSource from34 =
+					new EventSource(TicModel.URI + "-2",
+									TicEvent.class) ;
+			EventSink[] to34 =
+					new EventSink[] {
+						new EventSink(EngineGeneratorModel.URI,
+									  TicEvent.class)} ;
+			connections3.put(from34, to34);
 			
 			Map<Class<? extends EventI>,ReexportedEvent> reexported2 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
@@ -197,23 +202,32 @@ public class WattWattMain {
 					WindTurbineModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			atomicModelDescriptors.put(WindTurbineSensorModel.URI, AtomicModelDescriptor.create(WindTurbineSensorModel.class,
 					WindTurbineSensorModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+			atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
+					TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 			Set<String> submodels5 = new HashSet<String>();
 			submodels5.add(WindTurbineModel.URI);
 			submodels5.add(WindTurbineSensorModel.URI);
+			submodels5.add(TicModel.URI + "-3");
 
 			Map<EventSource, EventSink[]> connections5 = new HashMap<EventSource, EventSink[]>();
 			EventSource from51 = new EventSource(WindTurbineSensorModel.URI, WindReadingEvent.class);
 			EventSink[] to51 = new EventSink[] { new EventSink(WindTurbineModel.URI, WindReadingEvent.class) };
 			connections5.put(from51, to51);
-			
 			EventSource from52 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOnEvent.class);
 			EventSink[] to52 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOnEvent.class) };
 			connections5.put(from52, to52);
-			
 			EventSource from53 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOffEvent.class);
 			EventSink[] to53 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOffEvent.class) };
 			connections5.put(from53, to53);
+			EventSource from54 =
+					new EventSource(TicModel.URI + "-3",
+									TicEvent.class) ;
+			EventSink[] to54 =
+					new EventSink[] {
+						new EventSink(WindTurbineModel.URI,
+									  TicEvent.class)} ;
+			connections5.put(from54, to54);
 			
 			Map<Class<? extends EventI>,ReexportedEvent> reexported5 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
@@ -276,9 +290,16 @@ public class WattWattMain {
 			// ----------------------------------------------------------------
 			// Controller
 			// ----------------------------------------------------------------
-
+			
+			Class<? extends EventI>[] imported6 =
+					new Class<? extends EventI>[];
+			imported6.put(
+					WindTurbineProductionEvent.class,
+					new EventSink(WindTurbineModel.URI,
+							WindTurbineProductionEvent.class)) ;
+			
 			atomicModelDescriptors.put(ControllerModel.URI,
-					AtomicModelDescriptor.create(ControllerModel.class,
+					AtomicModelDescriptor.create(ControllerModel.class, 
 							ControllerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
 			// ----------------------------------------------------------------
@@ -341,6 +362,9 @@ public class WattWattMain {
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 
 			String modelURI = TicModel.URI  + "-1" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			modelURI = TicModel.URI  + "-2" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(10.0, TimeUnit.SECONDS)) ;
 			modelURI = TicModel.URI  + "-3" ;

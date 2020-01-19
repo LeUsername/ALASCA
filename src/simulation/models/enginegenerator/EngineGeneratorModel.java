@@ -17,6 +17,10 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.events.controller.AbstractControllerEvent;
+import simulation.events.controller.StartEngineGenerator;
+import simulation.events.controller.StopEngineGenerator;
+import simulation.events.enginegenerator.AbstractEngineGeneratorEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
@@ -26,7 +30,9 @@ import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
 @ModelExternalEvents(imported = { RefillEvent.class, 
 								  StartEvent.class, 
-								  StopEvent.class, 
+								  StopEvent.class,
+								  StartEngineGenerator.class,
+								  StopEngineGenerator.class,
 								  TicEvent.class},
 					 exported = {EngineGeneratorProductionEvent.class})
 public class EngineGeneratorModel extends AtomicHIOAwithEquations {
@@ -230,8 +236,8 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		// and intensity level
 		if (ce instanceof TicEvent) {
 			ticReceived = true;
-			
 		} else {
+			assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
 			ce.executeOn(this);
 		}
 		if (ticReceived) {

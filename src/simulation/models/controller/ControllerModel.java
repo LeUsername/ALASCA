@@ -293,7 +293,6 @@ public class ControllerModel extends AtomicModel {
 		}
 		
 		Vector<EventI> current = this.getStoredEventAndReset() ;
-		
 		for (int i = 0 ; i < current.size() ; i++) {
 			if (current.get(i) instanceof EngineGeneratorProductionEvent) {
 				this.productionEngineGenerator =

@@ -40,12 +40,19 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	protected boolean isWorking;
 	protected int conso;
 
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
 	protected boolean isOnSim;
 	protected WashingMachineMode state;
 	protected boolean isWorkingSim;
 	protected double consoSim;	
 	
 	protected WashingMachineSimulatorPlugin asp;
+	
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 	
 	protected WashingMachine(String uri, String laveIn) throws Exception {
 		super(uri, 2, 1);

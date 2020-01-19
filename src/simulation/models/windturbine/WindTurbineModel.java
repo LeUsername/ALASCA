@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -25,7 +26,8 @@ import simulation.tools.windturbine.WindTurbineState;
 
 @ModelExternalEvents(imported = { WindReadingEvent.class, 
 								  SwitchOffEvent.class, 
-								  SwitchOnEvent.class },
+								  SwitchOnEvent.class, 
+								  TicEvent.class },
 					 exported = { WindTurbineProductionEvent.class })
 public class WindTurbineModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
@@ -61,6 +63,9 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	
 	private static final String PRODUCTION = "production";
 	public static final String PRODUCTION_SERIES = "production-series";
+	
+	/** true when a external event triggered a reading. */
+	protected boolean triggerReading;
 
 	protected double production;
 
@@ -124,6 +129,8 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 
 		this.lastWindReadingTime = new Time(0.0, TimeUnit.SECONDS);
 		this.currentWindReadingTime = new Time(0.0, TimeUnit.SECONDS);
+		
+		this.triggerReading = false;
 
 		try {
 			// set the debug level triggering the production of log messages.
@@ -153,8 +160,19 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Vector<EventI> output() {
-		// the model does not export any event.
-		return null;
+		if (this.triggerReading) {
+			double reading = this.production; // kW
+
+			Vector<EventI> ret = new Vector<EventI>(1);
+			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
+			WindTurbineProductionEvent production = new WindTurbineProductionEvent(currentTime, reading);
+			ret.add(production);
+
+			this.triggerReading = false;
+			return ret;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -162,13 +180,18 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Duration timeAdvance() {
-		if (this.componentRef == null) {
-			// the model has no internal event, however, its state will evolve
-			// upon reception of external events.
+//		if (this.componentRef == null) {
+//			// the model has no internal event, however, its state will evolve
+//			// upon reception of external events.
+//			return Duration.INFINITY;
+//		} else {
+//			// This is to test the embedding component access facility.
+//			return new Duration(10.0, TimeUnit.SECONDS);
+//		}
+		if (!this.triggerReading) {
 			return Duration.INFINITY;
 		} else {
-			// This is to test the embedding component access facility.
-			return new Duration(10.0, TimeUnit.SECONDS);
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
 
@@ -201,13 +224,22 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 		assert currentEvents != null && currentEvents.size() == 1;
 
 		Event ce = (Event) currentEvents.get(0);
+		boolean ticReceived = false;
 
-		assert ce instanceof AbstractEolienneEvent;
-
-		if (ce instanceof WindReadingEvent) {
-			this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
+		if (ce instanceof TicEvent) {
+			ticReceived = true;
+		} else {
+			assert ce instanceof AbstractEolienneEvent;
+			if (ce instanceof WindReadingEvent) {
+				this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
+			}
+			ce.executeOn(this);
 		}
-		ce.executeOn(this);
+		if (ticReceived) {
+			this.triggerReading = true;
+			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+		}
+		
 		// add a new data on the plotter; this data will open a new piece
 
 		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
