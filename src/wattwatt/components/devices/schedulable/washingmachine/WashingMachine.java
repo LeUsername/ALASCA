@@ -215,7 +215,8 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 		// following lines show how to set the reference to the embedding
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		// Set the component ref to another key
+		simParams.put(WashingMachineModel.URI, this);
 		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,
 				WashingMachineUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
 		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWE,
@@ -249,7 +250,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 						2*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
-		
+//		this.asp.setDebugLevel(99);
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
@@ -303,8 +304,11 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		if(name.equals("consumption")) {
+			return this.consoSim;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

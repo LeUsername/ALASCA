@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -19,7 +20,9 @@ import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.electricmeter.AbstractElectricMeterEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 
-@ModelExternalEvents(imported = { ConsumptionEvent.class })
+@ModelExternalEvents(imported = { ConsumptionEvent.class,
+								  TicEvent.class },
+					 exported = { ConsumptionEvent.class })
 public class ElectricMeterModel extends		AtomicHIOAwithEquations
 {
 	// -------------------------------------------------------------------------

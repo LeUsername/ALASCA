@@ -126,13 +126,16 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
-		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get("componentRef");
 		
 		// Initialise the look of the plotter
 		String vname = this.getURI() + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
 		this.intensityPlotter = new XYPlotter(pd) ;
 		this.intensityPlotter.createSeries(SERIES) ;
+		
+		// The reference to the embedding component
+		this.componentRef =
+			(EmbeddingComponentStateAccessI) simParams.get(HairDryerModel.URI) ;
 	}
 
 	/**
@@ -227,6 +230,19 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		}
 		this.logMessage(this.getCurrentStateTime() +
 				"|internal|temperature = " + this.currentIntensity + " C") ;
+		}
+		if (this.componentRef != null) {
+			// This is an example showing how to access the component state
+			// from a simulation model; this must be done with care and here
+			// we are not synchronising with other potential component threads
+			// that may access the state of the component object at the same
+			// time.
+			try {
+				this.logMessage("component state = " +
+						componentRef.getEmbeddingComponentStateValue("mode")) ;
+			} catch (Exception e) {
+				throw new RuntimeException(e) ;
+			}
 		}
 	}
 

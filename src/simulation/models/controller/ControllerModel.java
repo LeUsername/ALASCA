@@ -24,7 +24,9 @@ import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.controller.Decision;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 
-@ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class, WindTurbineProductionEvent.class})
+@ModelExternalEvents(imported = { ConsumptionEvent.class, 
+								  EngineGeneratorProductionEvent.class, 
+								  WindTurbineProductionEvent.class})
 public class ControllerModel extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -265,6 +267,7 @@ public class ControllerModel extends AtomicModel {
 		this.lastDecisionTimeEngineGenerator =
 							this.getCurrentStateTime().getSimulatedTime() ;
 		this.mustTransmitDecision = false ;
+		System.out.println(consumption);
 		return ret ;
 	}
 

@@ -139,6 +139,10 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
 		this.intensityPlotter = new XYPlotter(pdTemperature) ;
 		this.intensityPlotter.createSeries(WashingMachineModel.SERIES) ;
+		
+		// The reference to the embedding component
+		this.componentRef =
+			(EmbeddingComponentStateAccessI) simParams.get(WashingMachineModel.URI) ;
 	}
 
 	/**
@@ -198,6 +202,18 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			this.updateState();
 			this.triggerReading = false;
 		}
+		if (this.componentRef != null) {
+			// This is an example showing how to access the component state
+			// from a simulation model; this must be done with care and here
+			// we are not synchronising with other potential component threads
+			// that may access the state of the component object at the same
+			// time.
+			try {
+				this.logMessage("component state = " + componentRef.getEmbeddingComponentStateValue("consumption"));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
 			super.userDefinedInternalTransition(elapsedTime);
 
@@ -250,7 +266,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
 		}
 		if (this.hasDebugLevel(1)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 4 ");
+			this.logMessage("LaveLingeModel::userDefinedExternalTransition 4 ");
 		}
 
 		// add a new data on the plotter; this data will open a new piece

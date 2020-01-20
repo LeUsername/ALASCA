@@ -14,7 +14,6 @@ import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
-import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
@@ -291,13 +290,6 @@ public class WattWattMain {
 			// Controller
 			// ----------------------------------------------------------------
 			
-			Class<? extends EventI>[] imported6 =
-					new Class<? extends EventI>[];
-			imported6.put(
-					WindTurbineProductionEvent.class,
-					new EventSink(WindTurbineModel.URI,
-							WindTurbineProductionEvent.class)) ;
-			
 			atomicModelDescriptors.put(ControllerModel.URI,
 					AtomicModelDescriptor.create(ControllerModel.class, 
 							ControllerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
@@ -335,6 +327,10 @@ public class WattWattMain {
 			EventSink[] to3 = new EventSink[] {
 					new EventSink(ControllerModel.URI, WindTurbineProductionEvent.class) };
 			connections.put(from3, to3);
+			EventSource from4 = new EventSource(ElectricMeterModel.URI, ConsumptionEvent.class);
+			EventSink[] to4 = new EventSink[] {
+					new EventSink(ControllerModel.URI, ConsumptionEvent.class) };
+			connections.put(from4, to4);
 			
 			coupledModelDescriptors.put(
 					WattWattModel.URI,

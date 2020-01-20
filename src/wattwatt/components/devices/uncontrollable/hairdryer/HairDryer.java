@@ -183,7 +183,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		// following lines show how to set the reference to the embedding
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		simParams.put(HairDryerModel.URI, this);
 		simParams.put(
 				HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
 				HairDryerUserBehaviour.INITIAL_DELAY) ;
@@ -210,6 +210,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 						0,
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
+		this.asp.setDebugLevel(0);
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
