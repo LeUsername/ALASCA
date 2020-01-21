@@ -25,6 +25,7 @@ import simulation.tools.fridge.FridgeDoor;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
 import wattwatt.ports.devices.suspendable.fridge.FridgeInPort;
+import wattwatt.tools.URIS;
 import wattwatt.tools.fridge.FridgeSetting;
 
 @OfferedInterfaces(offered = IFridge.class)
@@ -206,7 +207,7 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		// following lines show how to set the reference to the embedding
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		simParams.put(URIS.FRIDGE_URI, this);
 		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
 		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 		simParams.put(

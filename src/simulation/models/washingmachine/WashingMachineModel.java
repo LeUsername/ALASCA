@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
-import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
@@ -24,8 +23,9 @@ import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
 import simulation.tools.washingmachine.WashingMachineState;
-import wattwatt.tools.washingmachine.WashingMachineSetting;
+import wattwatt.tools.URIS;
 import wattwatt.tools.washingmachine.WashingMachineMode;
+import wattwatt.tools.washingmachine.WashingMachineSetting;
 
 @ModelExternalEvents(imported = { EcoModeEvent.class, 
 								  PremiumModeEvent.class, 
@@ -82,7 +82,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	protected XYPlotter intensityPlotter;
 
 	/** current intensity in Amperes; intensity is power/tension. */
-	protected final Value<Double> currentIntensity = new Value<Double>(this, 0.0, 0);
+	protected double currentIntensity;
 
 	/**
 	 * reference on the object representing the component that holds the model;
@@ -142,7 +142,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(WashingMachineModel.URI) ;
+			(EmbeddingComponentStateAccessI) simParams.get(URIS.WASHING_MACHINE_URI) ;
 	}
 
 	/**
@@ -169,9 +169,9 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	@Override
 	protected void initialiseVariables(Time startTime) {
-		this.currentIntensity.v = 0.0;
+		this.currentIntensity = 0.0;
 
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity.v);
+		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
 
 		super.initialiseVariables(startTime);
 	}
@@ -201,27 +201,31 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		if (this.triggerReading) {
 			this.updateState();
 			this.triggerReading = false;
-		}
-		if (this.componentRef != null) {
-			// This is an example showing how to access the component state
-			// from a simulation model; this must be done with care and here
-			// we are not synchronising with other potential component threads
-			// that may access the state of the component object at the same
-			// time.
-			try {
-				this.logMessage("component state = " + componentRef.getEmbeddingComponentStateValue("consumption"));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+		} else {
+			if (this.componentRef != null) {
+				// This is an example showing how to access the component state
+				// from a simulation model; this must be done with care and here
+				// we are not synchronising with other potential component threads
+				// that may access the state of the component object at the same
+				// time.
+				try {
+					this.currentIntensity = (double)componentRef.getEmbeddingComponentStateValue("consumption");
+					this.logMessage("component state = " + this.currentIntensity);
+					this.lavage = (WashingMachineMode)componentRef.getEmbeddingComponentStateValue("mode");
+					this.logMessage("component state = " + this.lavage);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 			}
-		}
-		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-			super.userDefinedInternalTransition(elapsedTime);
-
-			if (this.intensityPlotter != null) {
-				this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
-						this.currentIntensity.v);
+			if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+				super.userDefinedInternalTransition(elapsedTime);
+	
+				if (this.intensityPlotter != null) {
+					this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
+							this.currentIntensity);
+				}
+				this.logMessage(this.getCurrentStateTime() + "|internal|intensity = " + this.currentIntensity + " Amp");
 			}
-			this.logMessage(this.getCurrentStateTime() + "|internal|intensity = " + this.currentIntensity.v + " Amp");
 		}
 	}
 
@@ -248,7 +252,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 		// the plot is piecewise constant; this data will close the currently
 		// open piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity.v);
+		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
 
 		if (this.hasDebugLevel(2)) {
 			this.logMessage("LaveLingeModel::userDefinedExternalTransition 3 " + this.state);
@@ -270,7 +274,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		}
 
 		// add a new data on the plotter; this data will open a new piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity.v);
+		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
 
 		super.userDefinedExternalTransition(elapsedTime);
 		if (this.hasDebugLevel(2)) {
@@ -283,7 +287,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
-		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.currentIntensity.v);
+		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.currentIntensity);
 		super.endSimulation(endTime);
 	}
 
@@ -296,7 +300,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	}
 	
 	public double getIntensity() {
-		return this.currentIntensity.v;
+		return this.currentIntensity;
 	}
 	
 	public WashingMachineMode getLavage() {
@@ -335,14 +339,14 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	private void updateState() {
 		if(this.state == WashingMachineState.WORKING) {
 			if(this.lavage == WashingMachineMode.ECO) {
-				this.currentIntensity.v += WashingMachineSetting.CONSO_ECO_MODE_SIM;
+				this.currentIntensity += WashingMachineSetting.CONSO_ECO_MODE_SIM;
 			}
 			else {
-				this.currentIntensity.v += WashingMachineSetting.CONSO_PREMIUM_MODE;
+				this.currentIntensity += WashingMachineSetting.CONSO_PREMIUM_MODE;
 			}
 		}
 		else {
-			this.currentIntensity.v = 0.0;
+			this.currentIntensity = 0.0;
 		}
 	}
 

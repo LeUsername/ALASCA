@@ -22,6 +22,7 @@ import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 import wattwatt.ports.energyproviders.occasional.enginegenerator.EngineGeneratorInPort;
+import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
 @OfferedInterfaces(offered = IEngineGenerator.class)
@@ -148,7 +149,11 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		super.execute();
 		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		simParams.put(URIS.ENGINE_GENERATOR_URI, this);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
+				EngineGeneratorUserBehaviour.INITIAL_DELAY);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
+				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
 		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
 				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
 		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,

@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.utils.DoublePiece;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithDE;
@@ -26,6 +27,7 @@ import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
 import simulation.tools.fridge.FridgeConsumption;
 import simulation.tools.fridge.FridgeDoor;
+import wattwatt.tools.URIS;
 import wattwatt.tools.fridge.FridgeSetting;
 
 
@@ -167,6 +169,9 @@ extends AtomicHIOAwithDE
 	protected XYPlotter					temperaturePlotter ;
 	/** Frame used to plot the intensity during the simulation.				*/
 	protected XYPlotter					intensityPlotter ;
+	/** reference on the object representing the component that holds the
+	 *  model; enables the model to access the state of this component.		*/
+	protected EmbeddingComponentStateAccessI componentRef ;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -269,6 +274,10 @@ extends AtomicHIOAwithDE
 		PlotterDescription pdIntensity = (PlotterDescription) simParams.get(vname) ;
 		this.intensityPlotter = new XYPlotter(pdIntensity) ;
 		this.intensityPlotter.createSeries(INTENSITY_SERIES) ;
+		
+		// The reference to the embedding component
+		this.componentRef =
+			(EmbeddingComponentStateAccessI) simParams.get(URIS.FRIDGE_URI) ;
 	}
 
 	/**

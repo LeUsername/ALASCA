@@ -97,12 +97,14 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		Map<String, Object> simParams
 		) throws Exception
 	{
-		String vname = this.getURI() + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		String vname = this.getURI() + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
+				+ PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pdProduction = (PlotterDescription) simParams.get(vname) ;
 		this.productionPlotter = new XYPlotter(pdProduction) ;
 		this.productionPlotter.createSeries(EngineGeneratorModel.PRODUCTION) ;
 		
-		vname = this.getURI() + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		vname = this.getURI() + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
+				+ PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pdFuelQuantity = (PlotterDescription) simParams.get(vname) ;
 		this.fuelQuantityPlotter = new XYPlotter(pdFuelQuantity) ;
 		this.fuelQuantityPlotter.createSeries(QUANTITY) ;
@@ -114,14 +116,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		this.state = EngineGeneratorState.OFF ;
 		this.triggerReading = false;
 		
-		if (this.productionPlotter != null) {
 			this.productionPlotter.initialise() ;
 			this.productionPlotter.showPlotter() ;
-		}
-		if (this.fuelQuantityPlotter != null) {
 			this.fuelQuantityPlotter.initialise() ;
 			this.fuelQuantityPlotter.showPlotter() ;
-		}
 
 		super.initialiseState(initialTime) ;
 	}

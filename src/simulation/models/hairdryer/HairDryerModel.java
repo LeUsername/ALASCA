@@ -26,6 +26,7 @@ import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
 import simulation.tools.hairdryer.HairDryerPowerLevel;
 import simulation.tools.hairdryer.HairDryerState;
+import wattwatt.tools.URIS;
 import wattwatt.tools.hairdryer.HairDryerMode;
 import wattwatt.tools.hairdryer.HairDryerSetting;
 
@@ -135,7 +136,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(HairDryerModel.URI) ;
+			(EmbeddingComponentStateAccessI) simParams.get(URIS.HAIR_DRYER_URI) ;
 	}
 
 	/**
@@ -202,10 +203,11 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Duration timeAdvance() {
-		if (!this.triggerReading) {
+//		if (!this.triggerReading) {
+		if (this.componentRef == null) {
 			return Duration.INFINITY;
 		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
+			return new Duration(10.0, TimeUnit.SECONDS) ;
 		}
 	}
 
@@ -218,32 +220,60 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 			this.logMessage("SecheCheveuxModel#userDefinedInternalTransition "
 							+ elapsedTime) ;
 		}
-		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-			super.userDefinedInternalTransition(elapsedTime) ;
-
-
-		if (this.intensityPlotter != null) {
-			this.intensityPlotter.addData(
-				SERIES,
-				this.getCurrentStateTime().getSimulatedTime(), 
-				this.currentIntensity) ;
-		}
-		this.logMessage(this.getCurrentStateTime() +
-				"|internal|temperature = " + this.currentIntensity + " C") ;
-		}
+		
 		if (this.componentRef != null) {
 			// This is an example showing how to access the component state
 			// from a simulation model; this must be done with care and here
 			// we are not synchronising with other potential component threads
 			// that may access the state of the component object at the same
 			// time.
+			this.intensityPlotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.currentIntensity);
 			try {
+				this.currentIntensity = (double)componentRef.getEmbeddingComponentStateValue("intensity");
+				
 				this.logMessage("component state = " +
-						componentRef.getEmbeddingComponentStateValue("mode")) ;
+						this.currentIntensity) ;
+				
 			} catch (Exception e) {
 				throw new RuntimeException(e) ;
 			}
+			this.intensityPlotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.currentIntensity);
+
 		}
+		
+//		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+//			super.userDefinedInternalTransition(elapsedTime) ;
+//
+//
+//		if (this.intensityPlotter != null) {
+//			this.intensityPlotter.addData(
+//				SERIES,
+//				this.getCurrentStateTime().getSimulatedTime(), 
+//				this.currentIntensity) ;
+//		}
+//		this.logMessage(this.getCurrentStateTime() +
+//				"|internal|temperature = " + this.currentIntensity + " C") ;
+//		}
+//		
+//		if (this.componentRef != null) {
+//			// This is an example showing how to access the component state
+//			// from a simulation model; this must be done with care and here
+//			// we are not synchronising with other potential component threads
+//			// that may access the state of the component object at the same
+//			// time.
+//			try {
+//				this.logMessage("component state = " +
+//						componentRef.getEmbeddingComponentStateValue("intensity")) ;
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
 	}
 
 	/**

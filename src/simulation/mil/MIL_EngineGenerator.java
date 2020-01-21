@@ -32,24 +32,24 @@ public class MIL_EngineGenerator {
 					EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
 			simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
 					EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
-			
 			simParams.put(
 					EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
-							WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+					new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "Start / Stop / Refill",
+							2*WattWattMain.getPlotterWidth(),
+							0, WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			simParams.put(
 					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (Watt)", WattWattMain.ORIGIN_X,
-							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			simParams.put(
 					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel quantity (Liters)", WattWattMain.ORIGIN_X,
-							WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
+							2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 
 			se.setSimulationRunParameters(simParams);

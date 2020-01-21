@@ -11,14 +11,18 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.deployment.WattWattMain;
 import simulation.models.washingmachine.WashingMachineModel;
 import simulation.models.windturbine.WindTurbineCoupledModel;
 import simulation.models.windturbine.WindTurbineModel;
+import simulation.models.windturbine.WindTurbineSensorModel;
 import simulation.plugins.WindTurbineSimulatorPlugin;
 import simulation.tools.TimeScale;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.random.windturbine.IWindTurbine;
 import wattwatt.ports.energyproviders.random.windturbine.WindTurbineInPort;
+import wattwatt.tools.URIS;
 import wattwatt.tools.windturbine.WindTurbineSetting;
 
 @OfferedInterfaces(offered = IWindTurbine.class)
@@ -116,7 +120,20 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 		super.execute();
 		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		simParams.put(URIS.WIND_TURBINE_URI, this);
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
+				10.0) ;
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
+				100.0) ;
+		simParams.put(
+				WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("Production", "Time (min)", "Production (W)",
+						3 * WattWattMain.getPlotterWidth(),
+						0,
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
 		
 		this.asp.setSimulationRunParameters(simParams);
 		this.runTask(new AbstractComponent.AbstractTask() {

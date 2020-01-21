@@ -23,6 +23,7 @@ import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 import wattwatt.ports.devices.schedulable.washingmachine.WashingMachineInPort;
+import wattwatt.tools.URIS;
 import wattwatt.tools.washingmachine.WashingMachineMode;
 import wattwatt.tools.washingmachine.WashingMachineSetting;
 
@@ -46,31 +47,31 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	protected boolean isOnSim;
 	protected WashingMachineMode state;
 	protected boolean isWorkingSim;
-	protected double consoSim;	
-	
+	protected double consoSim;
+
 	protected WashingMachineSimulatorPlugin asp;
-	
+
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
-	
+
 	protected WashingMachine(String uri, String laveIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
 		this.lavein = new WashingMachineInPort(laveIn, this);
 		this.lavein.publishPort();
 
-		this.isOnSim = (boolean)this.asp.getModelStateValue(WashingMachineModel.URI, "isOn");
-		this.state = (WashingMachineMode)this.asp.getModelStateValue(WashingMachineModel.URI, "lavageMode");
-		this.isWorkingSim = (boolean)this.asp.getModelStateValue(WashingMachineModel.URI, "isWorking");
-		this.consoSim = (double)this.asp.getModelStateValue(WashingMachineModel.URI, "consommation");
-		
+		this.isOnSim = (boolean) this.asp.getModelStateValue(WashingMachineModel.URI, "isOn");
+		this.state = (WashingMachineMode) this.asp.getModelStateValue(WashingMachineModel.URI, "lavageMode");
+		this.isWorkingSim = (boolean) this.asp.getModelStateValue(WashingMachineModel.URI, "isWorking");
+		this.consoSim = (double) this.asp.getModelStateValue(WashingMachineModel.URI, "consommation");
+
 		ecoLavage();
 		this.startingTime = WashingMachineSetting.START;
 		this.tracer.setRelativePosition(1, 2);
 
 	}
-	
+
 	protected void initialise() throws Exception {
 		// The coupled model has been made able to create the simulation
 		// architecture description.
@@ -216,41 +217,35 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
 		// Set the component ref to another key
-		simParams.put(WashingMachineModel.URI, this);
+		simParams.put(URIS.WASHING_MACHINE_URI, this);
 		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,
 				WashingMachineUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
 		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWE,
 				WashingMachineUserBehaviour.MEAN_TIME_WORKING_ECO);
 		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWP,
 				WashingMachineUserBehaviour.MEAN_TIME_WORKING_PREMIUM);
-		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.STD,
-				10.0);
-		
+		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.STD, 10.0);
+
 		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_ECO,
 				WashingMachineSetting.CONSO_ECO_MODE_SIM);
 		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_PREMIUM,
 				WashingMachineSetting.CONSO_PREMIUM_MODE_SIM);
-		simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD,
-				10.0);
-		
+		simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD, 10.0);
+
 		simParams.put(
 				WashingMachineUserModel.URI + ":" + WashingMachineUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
-						0,
-						WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
+				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions", 0,
+						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 
 		simParams.put(
 				WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)",
-						0,
-						2*WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
+				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", 0,
+						2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
-//		this.asp.setDebugLevel(99);
+		// this.asp.setDebugLevel(99);
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
@@ -263,20 +258,20 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 				}
 			}
 		});
-		
+
 		this.runTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
 					while (true) {
-						((WashingMachine) this.getTaskOwner()).isOnSim = 
-								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isOn")));
-						((WashingMachine) this.getTaskOwner()).isWorkingSim = 
-								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isWorking")));
-						((WashingMachine) this.getTaskOwner()).consoSim = 
-								(((double) asp.getModelStateValue(WashingMachineModel.URI, "consomation")));
-						((WashingMachine) this.getTaskOwner()).state = 
-								(((WashingMachineMode) asp.getModelStateValue(WashingMachineModel.URI, "lavageMode")));
+						((WashingMachine) this.getTaskOwner()).isOnSim = (((boolean) asp
+								.getModelStateValue(WashingMachineModel.URI, "isOn")));
+						((WashingMachine) this.getTaskOwner()).isWorkingSim = (((boolean) asp
+								.getModelStateValue(WashingMachineModel.URI, "isWorking")));
+						((WashingMachine) this.getTaskOwner()).consoSim = (((double) asp
+								.getModelStateValue(WashingMachineModel.URI, "consomation")));
+						((WashingMachine) this.getTaskOwner()).state = (((WashingMachineMode) asp
+								.getModelStateValue(WashingMachineModel.URI, "lavageMode")));
 						Thread.sleep(1000);
 					}
 				} catch (Exception e) {
@@ -304,10 +299,13 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		if(name.equals("consumption")) {
-			return this.consoSim;
+		if (name.equals("consumption")) {
+			return new Double(this.consoSim);
+		} else if (name.equals("mode")) {
+			return this.mode;
 		} else {
-			return null;
+			assert name.equals("isOn");
+			return new Boolean(this.isOn);
 		}
 	}
 

@@ -54,9 +54,9 @@ public class SwitchModeEvent extends AbstractHairDryerEvent {
 		
 		HairDryerModel m = (HairDryerModel) model;
 		if (m.getMode() == HairDryerMode.COLD_AIR) {
-			m.setMode(HairDryerMode.HOT_AIR);
+			//m.setMode(HairDryerMode.HOT_AIR);
 		} else {
-			m.setMode(HairDryerMode.COLD_AIR);
+			//m.setMode(HairDryerMode.COLD_AIR);
 		}
 	}
 }

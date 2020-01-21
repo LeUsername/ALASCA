@@ -25,6 +25,7 @@ import simulation.tools.TimeScale;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.electricmeter.IElectricMeter;
 import wattwatt.ports.electricmeter.ElectricMeterInPort;
+import wattwatt.tools.URIS;
 import wattwatt.tools.electricmeter.ElectricMeterSetting;
 
 @OfferedInterfaces(offered = IElectricMeter.class)
@@ -99,15 +100,15 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		super.execute();
 		
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put("componentRef", this);
+		simParams.put(URIS.ELECTRIC_METER_URI, this);
 		simParams.put(
 				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"Electric meter model",
-						"Time (sec)",
+						"Time (min)",
 						"Consumption (Watt)",
 						2 * WattWattMain.getPlotterWidth(),
-						0,
+						3 * WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
 		
@@ -124,33 +125,33 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 			}
 		});
 		
-		this.runTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						((ElectricMeter) this.getTaskOwner()).consumptionSim = 
-								(((double) asp.getModelStateValue(ElectricMeterModel.URI, "consumption")));
-						Thread.sleep(1000);
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-//		this.scheduleTask(new AbstractComponent.AbstractTask() {
+//		this.runTask(new AbstractComponent.AbstractTask() {
 //			@Override
 //			public void run() {
 //				try {
 //					while (true) {
-//						((ElectricMeter) this.getTaskOwner()).majConso();
-//						Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
+//						((ElectricMeter) this.getTaskOwner()).consumptionSim = 
+//								(((double) asp.getModelStateValue(ElectricMeterModel.URI, "consumption")));
+//						Thread.sleep(1000);
 //					}
 //				} catch (Exception e) {
 //					throw new RuntimeException(e);
 //				}
 //			}
-//		}, 100, TimeUnit.MILLISECONDS);
+//		});
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+					while (true) {
+						((ElectricMeter) this.getTaskOwner()).majConso();
+						Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -172,7 +173,8 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		return null;
+		assert name.equals("consumption");
+		return new Double(this.consomation);
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.electricmeter.AbstractElectricMeterEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { ConsumptionEvent.class,
 								  TicEvent.class },
@@ -133,6 +134,10 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
 		this.consumptionPlotter = new XYPlotter(pd) ;
 		this.consumptionPlotter.createSeries(SERIES) ;
+		
+		// The reference to the embedding component
+		this.componentRef =
+			(EmbeddingComponentStateAccessI) simParams.get(URIS.ELECTRIC_METER_URI) ;
 	}
 
 	/**
@@ -222,12 +227,24 @@ public class ElectricMeterModel extends		AtomicHIOAwithEquations
 			// we are not synchronising with other potential component threads
 			// that may access the state of the component object at the same
 			// time.
+			this.consumptionPlotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.getConsumption());
 			try {
+				this.totalConsumption = (double)componentRef.getEmbeddingComponentStateValue("consumption");
+				;
 				this.logMessage("component state = " +
-						componentRef.getEmbeddingComponentStateValue("consommation")) ;
+						this.totalConsumption) ;
+				
 			} catch (Exception e) {
 				throw new RuntimeException(e) ;
 			}
+			this.consumptionPlotter.addData(
+					SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.getConsumption());
+
 		}
 	}
 
