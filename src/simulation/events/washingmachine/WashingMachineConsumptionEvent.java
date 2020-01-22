@@ -1,10 +1,11 @@
-package simulation.events.enginegenerator;
+package simulation.events.washingmachine;
 
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
+import simulation.models.electricmeter.ElectricMeterModel;
 
-public class EngineGeneratorProductionEvent extends AbstractEngineGeneratorEvent {
+public class WashingMachineConsumptionEvent extends AbstractWashingMachineEvent {
 
 	public static class		Reading
 	implements EventInformationI
@@ -23,33 +24,34 @@ public class EngineGeneratorProductionEvent extends AbstractEngineGeneratorEvent
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public EngineGeneratorProductionEvent(Time timeOfOccurrence, EventInformationI content) {
+	
+	public WashingMachineConsumptionEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
-	public EngineGeneratorProductionEvent(Time timeOfOccurrence, double content) {
+	public WashingMachineConsumptionEvent(Time timeOfOccurrence, double content) {
 		super(timeOfOccurrence, new Reading(content));
 	}
-
+	
 	@Override
 	public String eventAsString() {
-		return "Engine generator(" + this.eventContentAsString() + ")";
+		return "Washing Machine(" + this.eventContentAsString() + ")";
 	}
 
 	@Override
 	public String eventContentAsString() {
 		return	"time = " + this.getTimeOfOccurrence() + ", " +
-				"production = " + ((Reading)this.getEventInformation()).value
-												+ " W";
+				"quantity = " + ((Reading)this.getEventInformation()).value
+												+ " mAh";
 	}
 	
 	@Override
 	public void	executeOn(AtomicModel model)
 	{
-//		assert	model instanceof ElectricMeterModel ;
-//
-//		ElectricMeterModel m = (ElectricMeterModel)model ;
-//		m.setProduction(((Reading)this.getEventInformation()).value);
+		assert	model instanceof ElectricMeterModel ;
+
+		ElectricMeterModel m = (ElectricMeterModel)model ;
+		m.setWashingMachineConsumption(((Reading)this.getEventInformation()).value);
 	}
+
 }

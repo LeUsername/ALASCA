@@ -1,6 +1,7 @@
 package wattwatt.components.energyproviders.occasional.enginegenerator;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -192,24 +193,21 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 				}
 			}
 		});
-		this.runTask(new AbstractComponent.AbstractTask() {
+		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-					while (true) {
 						((EngineGenerator) this.getTaskOwner()).isOnSim = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isOn"));
 						((EngineGenerator) this.getTaskOwner()).isEmpty = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isEmpty"));
 						((EngineGenerator) this.getTaskOwner()).isFull = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isFull"));
 						((EngineGenerator) this.getTaskOwner()).fuelQuantitySim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "capacity"));
 						((EngineGenerator) this.getTaskOwner()).productionSim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "production"));
 						
-						Thread.sleep(1000);
-					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		});
+		}, 0, 1000, TimeUnit.MILLISECONDS);
 		/*
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override

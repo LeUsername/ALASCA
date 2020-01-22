@@ -4,7 +4,6 @@ import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.hairdryer.HairDryerModel;
-import wattwatt.tools.hairdryer.HairDryerMode;
 
 public class SwitchModeEvent extends AbstractHairDryerEvent {
 	// -------------------------------------------------------------------------
@@ -53,10 +52,6 @@ public class SwitchModeEvent extends AbstractHairDryerEvent {
 		assert model instanceof HairDryerModel;
 		
 		HairDryerModel m = (HairDryerModel) model;
-		if (m.getMode() == HairDryerMode.COLD_AIR) {
-			//m.setMode(HairDryerMode.HOT_AIR);
-		} else {
-			//m.setMode(HairDryerMode.COLD_AIR);
-		}
+		m.switchMode();
 	}
 }

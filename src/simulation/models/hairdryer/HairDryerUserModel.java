@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -19,13 +20,11 @@ import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
+import wattwatt.tools.URIS;
 import wattwatt.tools.hairdryer.HairDryerMode;
 
-@ModelExternalEvents(exported = { SwitchOnEvent.class, 
-								  SwitchOffEvent.class, 
-								  SwitchModeEvent.class,
-								  IncreasePowerEvent.class, 
-								  DecreasePowerEvent.class })
+@ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
+		IncreasePowerEvent.class, DecreasePowerEvent.class })
 public class HairDryerUserModel extends AtomicES_Model {
 
 	public static class HairDryerUserModelReport extends AbstractSimulationReport {
@@ -49,38 +48,44 @@ public class HairDryerUserModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String URI = "HairDryerUserModel";
-	
+
 	public static final String INITIAL_DELAY = "initial-delay";
 	public static final String INTERDAY_DELAY = "interday-delay";
 	public static final String MEAN_TIME_BETWEEN_USAGES = "mean-time-between-usages";
 	public static final String MEAN_TIME_AT_HIGH = "mean-time-at-high";
 	public static final String MEAN_TIME_AT_LOW = "mean-time-at-low";
-	
+
 	/** initial delay before sending the first switch on event. */
 	protected double initialDelay;
-	
+
 	/** delay between uses of the hair dryer from one day to another. */
 	protected double interdayDelay;
-	
+
 	/** mean time between uses of the hair dryer in the same day. */
 	protected double meanTimeBetweenUsages;
-	
+
 	/** during one use, mean time the hair dryer is at high temperature. */
 	protected double meanTimeAtHigh;
-	
+
 	/** during one use, mean time the hair dryer is at low temperature. */
 	protected double meanTimeAtLow;
-	
+
 	/** next event to be sent. */
 	protected Class<?> nextEvent;
 
 	/** a random number generator from common math library. */
 	protected final RandomDataGenerator rg;
-	
+
 	/** the current state of the hair dryer simulation model. */
 	protected HairDryerMode mode;
+
+	/**
+	 * reference on the object representing the component that holds the model;
+	 * enables the model to access the state of this component.
+	 */
+	protected EmbeddingComponentStateAccessI componentRef;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -104,10 +109,14 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 * 			this.getSimulationEngine().equals(simulationEngine)
 	 * </pre>
 	 *
-	 * @param uri               unique identifier of the model.
-	 * @param simulatedTimeUnit time unit used for the simulation clock.
-	 * @param simulationEngine  simulation engine enacting the model.
-	 * @throws Exception <i>TODO</i>.
+	 * @param uri
+	 *            unique identifier of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation clock.
+	 * @param simulationEngine
+	 *            simulation engine enacting the model.
+	 * @throws Exception
+	 *             <i>TODO</i>.
 	 */
 	public HairDryerUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
@@ -115,7 +124,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 		this.rg = new RandomDataGenerator();
 
 		// create a standard logger (logging on the terminal)
-//		this.setLogger(new StandardLogger());
+		// this.setLogger(new StandardLogger());
 	}
 
 	// -------------------------------------------------------------------------
@@ -126,10 +135,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
 	 */
 	@Override
-	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws Exception
-	{
+	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 		// Get the values of the run parameters in the map using their names
 		// and set the model implementation variables accordingly
 		String vname = this.getURI() + ":" + HairDryerUserModel.INITIAL_DELAY;
@@ -141,9 +147,13 @@ public class HairDryerUserModel extends AtomicES_Model {
 		vname = this.getURI() + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH;
 		this.meanTimeAtHigh = (double) simParams.get(vname);
 		vname = this.getURI() + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW;
-		this.meanTimeAtLow = (double) simParams.get(vname);		
+		this.meanTimeAtLow = (double) simParams.get(vname);
+
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get(URIS.HAIR_DRYER_URI);
+
 	}
-	
+
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
@@ -156,7 +166,9 @@ public class HairDryerUserModel extends AtomicES_Model {
 
 		// Schedule the first SwitchOn event.
 		Duration d1 = new Duration(this.initialDelay, this.getSimulatedTimeUnit());
-		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),this.getSimulatedTimeUnit());
+		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
+				this.getSimulatedTimeUnit());
+		
 		Time t = this.getCurrentStateTime().add(d1).add(d2);
 		this.scheduleEvent(new SwitchOnEvent(t));
 
@@ -191,28 +203,33 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 */
 	@Override
 	public Vector<EventI> output() {
-		// output is called just before executing an internal transition
-		// in ES models, this corresponds to having at least one event in
-		// the event list which time of occurrence corresponds to the current
-		// simulation time when performing the internal transition.
+		if (componentRef != null) {
+			this.nextEvent = super.output().get(0).getClass();
+			return null;
+		} else {
+			// output is called just before executing an internal transition
+			// in ES models, this corresponds to having at least one event in
+			// the event list which time of occurrence corresponds to the current
+			// simulation time when performing the internal transition.
 
-		// when called, there must be an event to be executed and it will
-		// be sent to other models when they are external events.
-		assert !this.eventList.isEmpty();
-		// produce the set of such events by calling the super method
-		Vector<EventI> ret = super.output();
-		// by construction, there will be only one such event
-		assert ret.size() == 1;
+			// when called, there must be an event to be executed and it will
+			// be sent to other models when they are external events.
+			assert !this.eventList.isEmpty();
+			// produce the set of such events by calling the super method
+			Vector<EventI> ret = super.output();
+			// by construction, there will be only one such event
+			assert ret.size() == 1;
 
-		// remember which external event was sent (in ES model, events are
-		// either internal or external, hence an external event is removed
-		// from the event list to be sent and it will not be accessible to
-		// the internal transition method; hence, we store the information
-		// to keep it for the internal transition)
-		this.nextEvent = ret.get(0).getClass();
+			// remember which external event was sent (in ES model, events are
+			// either internal or external, hence an external event is removed
+			// from the event list to be sent and it will not be accessible to
+			// the internal transition method; hence, we store the information
+			// to keep it for the internal transition)
+			this.nextEvent = ret.get(0).getClass();
 
-		this.logMessage("HairDryerUserModel::output() " + this.nextEvent.getCanonicalName());
-		return ret;
+//			this.logMessage("HairDryerUserModel::output() " + this.nextEvent.getCanonicalName());
+			return ret;
+		}
 	}
 
 	/**
@@ -220,44 +237,87 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		// This method implements a usage scenario for the hair dryer.
-		// Here, we assume that the hair dryer is used once each cycle (day)
-		// and then it starts in low mode, is set in high mode shortly after,
-		// used for a while in high mode and then set back in low mode to
-		// complete the drying.
+		if (componentRef == null) {
+			// We are in MIL
+			// This method implements a usage scenario for the hair dryer.
+			// Here, we assume that the hair dryer is used once each cycle (day)
+			// and then it starts in low mode, is set in high mode shortly after,
+			// used for a while in high mode and then set back in low mode to
+			// complete the drying.
 
-		Duration d;
-		// See what is the type of event to be executed
-		if (this.nextEvent.equals(SwitchOnEvent.class)) {
+			Duration d;
+			// See what is the type of event to be executed
+			if (this.nextEvent.equals(SwitchOnEvent.class)) {
 
-			d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			// compute the time of occurrence (in the future)
-			Time t = this.getCurrentStateTime().add(d);
+				d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				// compute the time of occurrence (in the future)
+				Time t = this.getCurrentStateTime().add(d);
 
-			this.scheduleEvent(new SwitchModeEvent(t));
+				this.scheduleEvent(new SwitchModeEvent(t));
 
-		} else if (this.nextEvent.equals(SwitchModeEvent.class)) {
+			} else if (this.nextEvent.equals(SwitchModeEvent.class)) {
 
-			d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new IncreasePowerEvent(this.getCurrentStateTime().add(d)));
-			
-		} else if (this.nextEvent.equals(IncreasePowerEvent.class)) {
+				d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				this.scheduleEvent(new IncreasePowerEvent(this.getCurrentStateTime().add(d)));
 
-			d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new DecreasePowerEvent(this.getCurrentStateTime().add(d)));
-			
-		} else if (this.nextEvent.equals(DecreasePowerEvent.class)) {
+			} else if (this.nextEvent.equals(IncreasePowerEvent.class)) {
 
-			d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
-			
-		} else if(this.nextEvent.equals(SwitchOffEvent.class)) {
-			
-			d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
-			this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
-			
+				d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				this.scheduleEvent(new DecreasePowerEvent(this.getCurrentStateTime().add(d)));
+
+			} else if (this.nextEvent.equals(DecreasePowerEvent.class)) {
+
+				d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
+
+			} else if (this.nextEvent.equals(SwitchOffEvent.class)) {
+
+				d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
+				this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
+			}
+		} else {
+			// This method implements a usage scenario for the hair dryer.
+			// Here, we assume that the hair dryer is used once each cycle (day)
+			// and then it starts in low mode, is set in high mode shortly after,
+			// used for a while in high mode and then set back in low mode to
+			// complete the drying.
+			Duration d;
+			// See what is the type of event to be executed
+			try {
+				if (this.nextEvent.equals(SwitchOnEvent.class)) {
+					this.componentRef.getEmbeddingComponentStateValue("switchOn");
+
+					d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+					this.scheduleEvent(new SwitchModeEvent(this.getCurrentStateTime().add(d)));
+					
+				} else if (this.nextEvent.equals(SwitchModeEvent.class)) {
+					this.componentRef.getEmbeddingComponentStateValue("switchMode");
+					d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					this.scheduleEvent(new IncreasePowerEvent(this.getCurrentStateTime().add(d)));
+				} else if (this.nextEvent.equals(IncreasePowerEvent.class)) {
+					this.componentRef.getEmbeddingComponentStateValue("increasePower");
+
+					d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					this.scheduleEvent(new DecreasePowerEvent(this.getCurrentStateTime().add(d)));
+				} else if (this.nextEvent.equals(DecreasePowerEvent.class)) {
+					this.componentRef.getEmbeddingComponentStateValue("decreasePower");
+
+					d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
+				} else if (this.nextEvent.equals(SwitchOffEvent.class)) {
+					this.componentRef.getEmbeddingComponentStateValue("switchOff");
+
+					d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
+					this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
-
 	}
 
 	/**

@@ -44,7 +44,7 @@ public class MIL_HairDryer {
 					new PlotterDescription(
 							"Hair dryer model",
 							"Time (min)",
-							"Intensity (Amp)",
+							"Intensity (Watt)",
 							WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y,
 							WattWattMain.getPlotterWidth(),

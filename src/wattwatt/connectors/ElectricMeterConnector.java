@@ -6,7 +6,7 @@ import wattwatt.interfaces.electricmeter.IElectricMeter;
 public class ElectricMeterConnector extends AbstractConnector implements IElectricMeter {
 
 	@Override
-	public int getAllConso() throws Exception {
+	public double getAllConso() throws Exception {
 		return ((IElectricMeter) this.offering).getAllConso();
 	}
 

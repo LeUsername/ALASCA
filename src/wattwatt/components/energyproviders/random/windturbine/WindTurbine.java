@@ -1,6 +1,7 @@
 package wattwatt.components.energyproviders.random.windturbine;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -147,22 +148,19 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 			}
 		});
 		
-		this.runTask(new AbstractComponent.AbstractTask() {
+		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-					while (true) {
 						((WindTurbine) this.getTaskOwner()).isOnSim = 
 								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isOn")));
 						((WindTurbine) this.getTaskOwner()).productionSim = 
 								(((double) asp.getModelStateValue(WashingMachineModel.URI, "production")));
-						Thread.sleep(1000);
-					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		});
+		}, 0, 1000, TimeUnit.MILLISECONDS);
 		/*
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override

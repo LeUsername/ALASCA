@@ -16,9 +16,16 @@ public class ElectricMeterSimulatorPlugin extends AtomicSimulatorPlugin {
 
 		ModelDescriptionI m = this.simulator.getDescendentModel(modelURI);
 
-		assert m instanceof ElectricMeterModel && name.equals("consumption");
+		assert m instanceof ElectricMeterModel;
+		ElectricMeterModel model = (ElectricMeterModel) m;
 
-		return ((ElectricMeterModel) m).getConsumption();
+		if (name.equals("fridgeConsumption")) {
+			return model.getFridgeConsumption();
+		} else if (name.equals("hairDryerConsumption")) {
+			return model.getHairDryerConsumption();
+		} else {
+			assert name.equals("washingMachineConsumption");
+			return model.getWashingMachineConsumption();
+		}
 	}
-
 }

@@ -58,7 +58,7 @@ public class IncreasePowerEvent extends AbstractHairDryerEvent {
 		assert model instanceof HairDryerModel;
 
 		HairDryerModel m = (HairDryerModel) model;
-		//m.increasePower();
+		m.increasePower();
 	}
 
 }

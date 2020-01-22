@@ -1,6 +1,7 @@
 package wattwatt.components.devices.suspendable.fridge;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -26,6 +27,7 @@ import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
 import wattwatt.ports.devices.suspendable.fridge.FridgeInPort;
 import wattwatt.tools.URIS;
+import wattwatt.tools.controller.ControllerSetting;
 import wattwatt.tools.fridge.FridgeSetting;
 
 @OfferedInterfaces(offered = IFridge.class)
@@ -276,11 +278,10 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 				}
 			}
 		});
-		this.runTask(new AbstractComponent.AbstractTask() {
+		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-					while (true) {
 						((Fridge) this.getTaskOwner()).setDoorState(
 								(((FridgeDoor) asp.getModelStateValue(FridgeModel.URI, "door"))));
 						((Fridge) this.getTaskOwner()).setConsumptionState((((FridgeConsumption) asp
@@ -289,13 +290,11 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 								((double) asp.getModelStateValue(FridgeModel.URI, "temperature")));
 						((Fridge) this.getTaskOwner())
 								.setIntensity(((double) asp.getModelStateValue(FridgeModel.URI, "intensity")));
-						Thread.sleep(1000);
-					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		});
+		}, 0, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

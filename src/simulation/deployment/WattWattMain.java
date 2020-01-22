@@ -31,6 +31,7 @@ import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
 import simulation.events.enginegenerator.StopEvent;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
@@ -134,9 +135,9 @@ public class WattWattMain {
 			Map<Class<? extends EventI>,ReexportedEvent> reexported1 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
 			reexported1.put(
-					ConsumptionEvent.class,
+					HairDryerConsumptionEvent.class,
 					new ReexportedEvent(HairDryerModel.URI,
-							ConsumptionEvent.class)) ;
+							HairDryerConsumptionEvent.class)) ;
 
 			coupledModelDescriptors.put(HairDryerCoupledModel.URI,
 					new CoupledHIOA_Descriptor(HairDryerCoupledModel.class, HairDryerCoupledModel.URI, submodels1,
@@ -315,9 +316,9 @@ public class WattWattMain {
 
 			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 
-			EventSource from1 = new EventSource(HairDryerCoupledModel.URI, ConsumptionEvent.class);
+			EventSource from1 = new EventSource(HairDryerCoupledModel.URI, HairDryerConsumptionEvent.class);
 			EventSink[] to1 = new EventSink[] {
-					new EventSink(ElectricMeterModel.URI, ConsumptionEvent.class) };
+					new EventSink(ElectricMeterModel.URI, HairDryerConsumptionEvent.class) };
 			connections.put(from1, to1);
 			EventSource from2 = new EventSource(EngineGeneratorCoupledModel.URI, EngineGeneratorProductionEvent.class);
 			EventSink[] to2 = new EventSink[] {
@@ -413,7 +414,7 @@ public class WattWattMain {
 					new PlotterDescription(
 							"HairDryerModel",
 							"Time (sec)",
-							"Intensity (Amp)",
+							"Intensity (Watt)",
 							WattWattMain.ORIGIN_X +
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y +

@@ -1,8 +1,9 @@
 package wattwatt.components.devices.uncontrollable.hairdryer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -12,15 +13,19 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
+import fr.sorbonne_u.devs_simulation.models.events.CallableEventAtomicSink;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
+import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
 import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.plugins.HairDryerSimulatorPlugin;
 import simulation.tools.TimeScale;
 import simulation.tools.hairdryer.HairDryerPowerLevel;
+import simulation.tools.hairdryer.HairDryerState;
 import simulation.tools.hairdryer.HairDryerUserBehaviour;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.uncontrollable.hairdryer.IHairDryer;
@@ -35,9 +40,8 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	protected HairDryerMode mode;
 	protected HairDryerPowerLevel powerLvl;
 
-	protected boolean isOn;
+	protected HairDryerState isOn;
 	protected int conso;
-
 
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -58,7 +62,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 
 		this.mode = HairDryerMode.HOT_AIR;
 		this.powerLvl = HairDryerPowerLevel.LOW;
-		this.isOn = false;
+		this.isOn = HairDryerState.OFF;
 
 		this.tracer.setRelativePosition(1, 1);
 	}
@@ -69,6 +73,9 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		Architecture localArchitecture = this.createLocalArchitecture(null);
 		// Create the appropriate DEVS simulation plug-in.
 		this.asp = new HairDryerSimulatorPlugin();
+		
+		
+		
 		// Set the URI of the plug-in, using the URI of its associated
 		// simulation model.
 		this.asp.setPluginURI(localArchitecture.getRootModelURI());
@@ -76,21 +83,25 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		this.asp.setSimulationArchitecture(localArchitecture);
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
+		
+//		Set<CallableEventAtomicSink> sink = new HashSet<>();
+//		
+//		CallableEventAtomicSink ceas = new CallableEventAtomicSink(HairDryerModel.URI, HairDryerConsumptionEvent.class, HairDryerConsumptionEvent.class, this.asp.getAtomicEngineReference(HairDryerModel.URI));
+//		
+//		sink.add(ceas);
+//		
+//		this.asp.addInfluencees(HairDryerModel.URI, HairDryerConsumptionEvent.class, sink);
 
 		// Toggle logging on to get a log on the screen.
 		this.toggleLogging();
 	}
 
 	public void on() {
-		this.isOn = true;
+		this.isOn = HairDryerState.ON;
 	}
 
 	public void off() {
-		this.isOn = false;
-	}
-
-	protected void setOn(boolean isOn) {
-		this.isOn = isOn;
+		this.isOn = HairDryerState.OFF;
 	}
 
 	public int giveConso() {
@@ -98,7 +109,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	}
 
 	public boolean isOn() {
-		return isOn;
+		return this.isOn == HairDryerState.ON;
 	}
 
 	public void switchMode() {
@@ -116,7 +127,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	public void increasePower() {
 		if (this.powerLvl == HairDryerPowerLevel.LOW) {
 			this.powerLvl = HairDryerPowerLevel.MEDIUM;
-		} else if(this.powerLvl == HairDryerPowerLevel.MEDIUM){
+		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
 			this.powerLvl = HairDryerPowerLevel.HIGH;
 		}
 
@@ -125,14 +136,14 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	public void decreasePower() {
 		if (this.powerLvl == HairDryerPowerLevel.HIGH) {
 			this.powerLvl = HairDryerPowerLevel.MEDIUM;
-		} else if(this.powerLvl == HairDryerPowerLevel.MEDIUM){
+		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
 			this.powerLvl = HairDryerPowerLevel.LOW;
 		}
 	}
 
 	protected void setPowerLevel(HairDryerPowerLevel powerLeveLValue) {
 		this.powerLvl = powerLeveLValue;
-		
+
 	}
 
 	@Override
@@ -147,7 +158,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	}
 
 	public void behave(Random rand) {
-		if (this.isOn) {
+		if (this.isOn == HairDryerState.ON) {
 			if (rand.nextBoolean()) {
 				this.switchMode();
 				if (rand.nextBoolean()) {
@@ -187,32 +198,22 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		// component or a proxy responding to the access calls.
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
 		simParams.put(URIS.HAIR_DRYER_URI, this);
+		simParams.put(HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
+				HairDryerUserBehaviour.INITIAL_DELAY);
+		simParams.put(HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
+				HairDryerUserBehaviour.INTERDAY_DELAY);
+		simParams.put(HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
+				HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+		simParams.put(HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
+				HairDryerUserBehaviour.MEAN_TIME_AT_HIGH);
+		simParams.put(HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
+				HairDryerUserBehaviour.MEAN_TIME_AT_LOW);
+
 		simParams.put(
-				HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
-				HairDryerUserBehaviour.INITIAL_DELAY) ;
-		simParams.put(
-				HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
-				HairDryerUserBehaviour.INTERDAY_DELAY) ;
-		simParams.put(
-				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
-				HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES) ;
-		simParams.put(
-				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
-				HairDryerUserBehaviour.MEAN_TIME_AT_HIGH) ;
-		simParams.put(
-				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
-				HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
-		
-		simParams.put(
-				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"Hair dryer model",
-						"Time (min)",
-						"Intensity (Amp)",
-						0,
-						0,
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
+				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("Hair dryer model", "Time (min)", "Intensity (Watt)", 0, 0,
+						WattWattMain.getPlotterWidth(), WattWattMain.getPlotterHeight()));
 		this.asp.setDebugLevel(0);
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
@@ -226,57 +227,6 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 				}
 			}
 		});
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					while (true) {
-//						((HairDryer) this.getTaskOwner())
-//								.setOn((boolean) asp.getModelStateValue(HairDryerModel.URI, "isOn"));
-//						if (isOn) {
-//							((HairDryer) this.getTaskOwner())
-//									.setMode((HairDryerMode) asp.getModelStateValue(HairDryerModel.URI, "mode"));
-//							((HairDryer) this.getTaskOwner()).setPowerLevel(
-//									(HairDryerPowerLevel) asp.getModelStateValue(HairDryerModel.URI, "powerLevel"));
-//						}
-//						Thread.sleep(1000);
-//					}
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				Random rand = new Random();
-				int useTime = 0;
-				try {
-					while (true) {
-						if (rand.nextInt(100) > 98 && useTime == 0) {
-							((HairDryer) this.getTaskOwner()).on();
-							useTime = HairDryerSetting.MIN_USE_TIME + rand.nextInt(HairDryerSetting.MAX_USE_TIME);
-							((HairDryer) this.getTaskOwner()).logMessage("seche cheveux ON for : " + useTime);
-						} else {
-							((HairDryer) this.getTaskOwner()).behave(rand); // 
-							if (useTime - 1 <= 0) {
-								useTime = 0;
-							} else {
-								useTime--;
-							}
-							Thread.sleep(HairDryerSetting.REGUL_RATE);
-							if (useTime <= 0) {
-								((HairDryer) this.getTaskOwner()).logMessage("seche cheveux OFF");
-								((HairDryer) this.getTaskOwner()).off();
-							}
-						}
-
-					}
-				} 
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			} }, 10, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -312,10 +262,30 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	 */
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
+		System.out.println("ICI + " + name);
+		
 		if (name.equals("mode")) {
 			return this.mode;
 		} else if (name.equals("isOn")) {
-			return new Boolean(this.isOn);
+			return this.isOn;
+		} else if (name.equals("powerLevel")) {
+			return this.powerLvl;
+		} else if (name.equals("switchOn")) {
+			this.on();
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+			return null;
+		} else if (name.equals("switchOff")) {
+			this.off();
+			return null;
+		} else if (name.equals("increasePower")) {
+			this.increasePower();
+			return null;
+		} else if (name.equals("decreasePower")) {
+			this.decreasePower();
+			return null;
+		} else if (name.equals("switchMode")) {
+			this.switchMode();
+			return null;
 		} else {
 			return new Double(this.conso);
 		}

@@ -47,6 +47,6 @@ public class SwitchOnEvent extends AbstractHairDryerEvent {
 	public void executeOn(AtomicModel model) {
 		assert model instanceof HairDryerModel;
 
-		//((HairDryerModel) model).switchOn();
+		((HairDryerModel) model).switchOn();
 	}
 }

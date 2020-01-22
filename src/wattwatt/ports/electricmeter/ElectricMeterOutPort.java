@@ -16,7 +16,7 @@ public class ElectricMeterOutPort extends AbstractOutboundPort implements IElect
 	}
 
 	@Override
-	public int getAllConso() throws Exception {
+	public double getAllConso() throws Exception {
 		return ((IElectricMeter)this.connector).getAllConso();
 	}
 

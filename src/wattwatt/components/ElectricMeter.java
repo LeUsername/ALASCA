@@ -23,24 +23,39 @@ import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.plugins.ElectricMeterSimulatorPlugin;
 import simulation.tools.TimeScale;
 import wattwatt.interfaces.controller.IController;
+import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
+import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
+import wattwatt.interfaces.devices.uncontrollable.hairdryer.IHairDryer;
 import wattwatt.interfaces.electricmeter.IElectricMeter;
+import wattwatt.ports.devices.schedulable.washingmachine.WashingMachineOutPort;
+import wattwatt.ports.devices.suspendable.fridge.FridgeOutPort;
+import wattwatt.ports.devices.uncontrollable.hairdryer.HairDryerOutPort;
 import wattwatt.ports.electricmeter.ElectricMeterInPort;
 import wattwatt.tools.URIS;
 import wattwatt.tools.electricmeter.ElectricMeterSetting;
 
 @OfferedInterfaces(offered = IElectricMeter.class)
-@RequiredInterfaces(required = IController.class)
+@RequiredInterfaces(required = { IController.class, IFridge.class, IHairDryer.class, IWashingMachine.class })
 public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
-	protected int consomation;
+
 	protected ElectricMeterInPort cptin;
-	
+
+	protected FridgeOutPort refriout;
+	protected HairDryerOutPort sechout;
+	protected WashingMachineOutPort laveout;
+
+	protected double consomation;
+	protected double fridgeConsumption;
+	protected double hairDryerConsumption;
+	protected double washingMachineConsumption;
+
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 	protected double consumptionSim;
 
 	protected ElectricMeterSimulatorPlugin asp;
-	
+
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -50,12 +65,29 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		this.initialise();
 		this.cptin = new ElectricMeterInPort(compteurIn, this);
 		this.cptin.publishPort();
-		
-		this.consumptionSim = (double)this.asp.getModelStateValue(ElectricMeterModel.URI, "consumption");
 
 		this.tracer.setRelativePosition(0, 1);
 	}
-	
+
+	protected ElectricMeter(String uri, String compteurIn, String refriOut, String sechOut, String laveOut)
+			throws Exception {
+		super(uri, 2, 3);
+		this.initialise();
+		this.cptin = new ElectricMeterInPort(compteurIn, this);
+		this.cptin.publishPort();
+
+		this.refriout = new FridgeOutPort(refriOut, this);
+		this.refriout.publishPort();
+
+		this.laveout = new WashingMachineOutPort(laveOut, this);
+		this.laveout.publishPort();
+
+		this.sechout = new HairDryerOutPort(sechOut, this);
+		this.sechout.publishPort();
+
+		this.tracer.setRelativePosition(0, 1);
+	}
+
 	protected void initialise() throws Exception {
 		// The coupled model has been made able to create the simulation
 		// architecture description.
@@ -74,14 +106,14 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		this.toggleLogging();
 	}
 
-	public int giveConso() throws Exception {
+	public double giveConso() throws Exception {
 		return consomation;
 	}
 
 	public void majConso() {
 		Random rand = new Random();
-		this.consomation = ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION
-				+ rand.nextInt(ElectricMeterSetting.MAX_THR_HOUSE_CONSUMPTION - ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION);
+		this.consomation = ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION + rand.nextInt(
+				ElectricMeterSetting.MAX_THR_HOUSE_CONSUMPTION - ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION);
 	}
 
 	@Override
@@ -98,20 +130,16 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		
+
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
 		simParams.put(URIS.ELECTRIC_METER_URI, this);
 		simParams.put(
-				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"Electric meter model",
-						"Time (min)",
-						"Consumption (Watt)",
-						2 * WattWattMain.getPlotterWidth(),
-						3 * WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-		
+				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("Electric meter model", "Time (min)", "Consumption (Watt)",
+						2 * WattWattMain.getPlotterWidth(), 3 * WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(), WattWattMain.getPlotterHeight()));
+
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
@@ -124,34 +152,34 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 				}
 			}
 		});
-		
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					while (true) {
-//						((ElectricMeter) this.getTaskOwner()).consumptionSim = 
-//								(((double) asp.getModelStateValue(ElectricMeterModel.URI, "consumption")));
-//						Thread.sleep(1000);
-//					}
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						((ElectricMeter) this.getTaskOwner()).majConso();
-						Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 100, TimeUnit.MILLISECONDS);
+
+		// this.runTask(new AbstractComponent.AbstractTask() {
+		// @Override
+		// public void run() {
+		// try {
+		// while (true) {
+		// ((ElectricMeter) this.getTaskOwner()).consumptionSim =
+		// (((double) asp.getModelStateValue(ElectricMeterModel.URI, "consumption")));
+		// Thread.sleep(1000);
+		// }
+		// } catch (Exception e) {
+		// throw new RuntimeException(e);
+		// }
+		// }
+		// });
+		// this.scheduleTask(new AbstractComponent.AbstractTask() {
+		// @Override
+		// public void run() {
+		// try {
+		// while (true) {
+		// ((ElectricMeter) this.getTaskOwner()).majConso();
+		// Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
+		// }
+		// } catch (Exception e) {
+		// throw new RuntimeException(e);
+		// }
+		// }
+		// }, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -159,6 +187,9 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		this.logMessage("Compteur shutdown");
 		try {
 			this.cptin.unpublishPort();
+			this.sechout.unpublishPort();
+			this.laveout.unpublishPort();
+			this.refriout.unpublishPort();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -167,14 +198,33 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 	@Override
 	public void finalise() throws Exception {
-
 		super.finalise();
 	}
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		assert name.equals("consumption");
-		return new Double(this.consomation);
+		if (name.equals("fridgeConsumption")) {
+			return new Double(this.fridgeConsumption);
+		} else if (name.equals("hairDryerConsumption")) {
+			return new Double(this.hairDryerConsumption);
+		} else if (name.equals("washingMachineConsumption")) {
+			return new Double(this.washingMachineConsumption);
+		} else if (name.equals("totalConsumption")) {
+			return new Double(this.consomation);
+		} else if (name.equals("setFridgeConsumption")) {
+			this.fridgeConsumption = (double) this.asp.getModelStateValue(ElectricMeterModel.URI, "fridgeConsumption");
+			return null;
+		} else if (name.equals("setHairDryerConsumption")) {
+			this.hairDryerConsumption = (double) this.asp.getModelStateValue(ElectricMeterModel.URI,
+					"hairDryerConsumption");
+			return null;
+		} else if (name.equals("setWashingMachineConsumption")) {
+			this.washingMachineConsumption = (double) this.asp.getModelStateValue(ElectricMeterModel.URI,
+					"washingMachineConsumption");
+			return null;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -183,10 +233,11 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 		atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-		
+
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
-		
-		return new Architecture(ElectricMeterModel.URI, atomicModelDescriptors, coupledModelDescriptors, TimeUnit.SECONDS);
+
+		return new Architecture(ElectricMeterModel.URI, atomicModelDescriptors, coupledModelDescriptors,
+				TimeUnit.SECONDS);
 	}
 
 }

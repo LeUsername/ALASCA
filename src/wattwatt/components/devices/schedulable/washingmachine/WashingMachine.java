@@ -2,6 +2,7 @@ package wattwatt.components.devices.schedulable.washingmachine;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -24,6 +25,7 @@ import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 import wattwatt.ports.devices.schedulable.washingmachine.WashingMachineInPort;
 import wattwatt.tools.URIS;
+import wattwatt.tools.controller.ControllerSetting;
 import wattwatt.tools.washingmachine.WashingMachineMode;
 import wattwatt.tools.washingmachine.WashingMachineSetting;
 
@@ -245,7 +247,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", 0,
 						2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
-		// this.asp.setDebugLevel(99);
+		 this.asp.toggleDebugMode();
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
@@ -259,11 +261,10 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 			}
 		});
 
-		this.runTask(new AbstractComponent.AbstractTask() {
+		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-					while (true) {
 						((WashingMachine) this.getTaskOwner()).isOnSim = (((boolean) asp
 								.getModelStateValue(WashingMachineModel.URI, "isOn")));
 						((WashingMachine) this.getTaskOwner()).isWorkingSim = (((boolean) asp
@@ -272,13 +273,11 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 								.getModelStateValue(WashingMachineModel.URI, "consomation")));
 						((WashingMachine) this.getTaskOwner()).state = (((WashingMachineMode) asp
 								.getModelStateValue(WashingMachineModel.URI, "lavageMode")));
-						Thread.sleep(1000);
-					}
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-		});
+		}, 0, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

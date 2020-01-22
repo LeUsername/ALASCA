@@ -36,16 +36,18 @@ public class CVM extends AbstractCVM {
 
 		assert !this.deploymentDone();
 
-		this.controleurUri = AbstractComponent.createComponent(Controller.class.getCanonicalName(),
-				new Object[] { URIS.CONTROLLER_URI, URIS.ELECTRIC_METER_IN_URI, URIS.ELECTRIC_METER_OUT_URI,
-						URIS.FRIDGE_IN_URI, URIS.FRIDGE_OUT_URI, URIS.HAIR_DRYER_IN_URI,
-						URIS.HAIR_DRYER_OUT_URI, URIS.WIND_TURBINE_IN_URI, URIS.WIND_TURBINE_OUT_URI, URIS.WASHING_MACHINE_IN_URI,
-						URIS.WASHING_MACHINE_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI, URIS.ENGINE_GENERATOR_OUT_URI });
-		assert this.isDeployedComponent(this.controleurUri);
-
 		this.compteurUri = AbstractComponent.createComponent(ElectricMeter.class.getCanonicalName(),
-				new Object[] { URIS.ELECTRIC_METER_URI, URIS.ELECTRIC_METER_IN_URI });
+				new Object[] { URIS.ELECTRIC_METER_URI, URIS.ELECTRIC_METER_IN_URI, URIS.FRIDGE_OUT_URI + "1",
+						URIS.HAIR_DRYER_OUT_URI + "1", URIS.WASHING_MACHINE_OUT_URI + "1" });
 		assert this.isDeployedComponent(this.compteurUri);
+
+		this.controleurUri = AbstractComponent.createComponent(Controller.class.getCanonicalName(),
+				new Object[] { URIS.CONTROLLER_URI, /*URIS.ELECTRIC_METER_IN_URI,*/ URIS.ELECTRIC_METER_OUT_URI,
+						URIS.FRIDGE_IN_URI, URIS.FRIDGE_OUT_URI, URIS.HAIR_DRYER_IN_URI, URIS.HAIR_DRYER_OUT_URI,
+						URIS.WIND_TURBINE_IN_URI, URIS.WIND_TURBINE_OUT_URI, URIS.WASHING_MACHINE_IN_URI,
+						URIS.WASHING_MACHINE_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI, URIS.ENGINE_GENERATOR_OUT_URI });
+
+		assert this.isDeployedComponent(this.controleurUri);
 
 		this.refriUri = AbstractComponent.createComponent(Fridge.class.getCanonicalName(),
 				new Object[] { URIS.FRIDGE_URI, URIS.FRIDGE_IN_URI });
@@ -106,6 +108,15 @@ public class CVM extends AbstractCVM {
 		this.doPortConnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI,
 				EngineGeneratorConnector.class.getCanonicalName());
 
+		this.doPortConnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1", URIS.FRIDGE_IN_URI,
+				FridgeConnector.class.getCanonicalName());
+
+		this.doPortConnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1", URIS.HAIR_DRYER_IN_URI,
+				HairDryerConnector.class.getCanonicalName());
+
+		this.doPortConnection(this.compteurUri, URIS.WASHING_MACHINE_OUT_URI + "1", URIS.WASHING_MACHINE_IN_URI,
+				WashingMachineConnector.class.getCanonicalName());
+
 		super.deploy();
 		assert this.deploymentDone();
 	}
@@ -118,6 +129,10 @@ public class CVM extends AbstractCVM {
 		this.doPortDisconnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI);
+
+		this.doPortDisconnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1");
+		this.doPortDisconnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1");
+		this.doPortDisconnection(this.compteurUri, URIS.WASHING_MACHINE_OUT_URI + "1");
 		super.finalise();
 	}
 

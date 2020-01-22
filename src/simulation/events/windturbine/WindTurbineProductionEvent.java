@@ -3,7 +3,6 @@ package simulation.events.windturbine;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import simulation.models.electricmeter.ElectricMeterModel;
 
 public class WindTurbineProductionEvent extends AbstractEolienneEvent {
 
@@ -48,9 +47,9 @@ public class WindTurbineProductionEvent extends AbstractEolienneEvent {
 	@Override
 	public void	executeOn(AtomicModel model)
 	{
-		assert	model instanceof ElectricMeterModel ;
-
-		ElectricMeterModel m = (ElectricMeterModel)model ;
-		m.setProduction(((Reading)this.getEventInformation()).value);
+//		assert	model instanceof ElectricMeterModel ;
+//
+//		ElectricMeterModel m = (ElectricMeterModel)model ;
+//		m.setProduction(((Reading)this.getEventInformation()).value);
 	}
 }

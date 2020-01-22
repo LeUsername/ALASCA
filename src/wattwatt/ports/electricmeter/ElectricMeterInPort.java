@@ -18,7 +18,7 @@ public class ElectricMeterInPort extends AbstractInboundPort implements IElectri
 	}
 
 	@Override
-	public int getAllConso() throws Exception {
+	public double getAllConso() throws Exception {
 		return this.getOwner().handleRequestSync(owner ->((ElectricMeter)owner).giveConso());
 	}
 

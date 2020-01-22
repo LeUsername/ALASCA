@@ -17,9 +17,9 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.hairdryer.AbstractHairDryerEvent;
 import simulation.events.hairdryer.DecreasePowerEvent;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
@@ -36,7 +36,7 @@ import wattwatt.tools.hairdryer.HairDryerSetting;
 								  IncreasePowerEvent.class, 
 								  DecreasePowerEvent.class,
 								  TicEvent.class}, 
-					 exported = { ConsumptionEvent.class })
+					 exported = { HairDryerConsumptionEvent.class })
 public class HairDryerModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
@@ -144,9 +144,20 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-		this.mode = HairDryerMode.COLD_AIR;
-		this.powerLvl = HairDryerPowerLevel.MEDIUM;
-		this.state = HairDryerState.OFF;
+		if(componentRef == null) {
+			this.mode = HairDryerMode.COLD_AIR;
+			this.powerLvl = HairDryerPowerLevel.MEDIUM;
+			this.state = HairDryerState.OFF;
+		} else {
+			try {
+				this.mode = (HairDryerMode)this.componentRef.getEmbeddingComponentStateValue("mode");
+				this.powerLvl = (HairDryerPowerLevel)this.componentRef.getEmbeddingComponentStateValue("powerLevel");
+				this.state = (HairDryerState)this.componentRef.getEmbeddingComponentStateValue("isOn");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		this.triggerReading = false;
 
@@ -169,8 +180,8 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	protected void initialiseVariables(Time startTime) {
-		// as the hair dryer starts in mode OFF, its power consumption is 0
-		this.currentIntensity = 0.0;
+		// as the hair dryer starts in mode OFF, its power consumption should be 0
+		this.updateIntensity();
 
 		// first data in the plotter to start the plot.
 		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getIntensity());
@@ -184,11 +195,11 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	@Override
 	public Vector<EventI> output() {
 		if (this.triggerReading) {
-			double reading = this.currentIntensity * TENSION / 1000; // kW
+			double reading = this.currentIntensity; // Watt
 
 			Vector<EventI> ret = new Vector<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
-			ConsumptionEvent consommation = new ConsumptionEvent(currentTime, reading);
+			HairDryerConsumptionEvent consommation = new HairDryerConsumptionEvent(currentTime, reading);
 			ret.add(consommation);
 
 			this.triggerReading = false;
@@ -203,11 +214,12 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Duration timeAdvance() {
-//		if (!this.triggerReading) {
-		if (this.componentRef == null) {
+		
+		if (!this.triggerReading) {
 			return Duration.INFINITY;
 		} else {
-			return new Duration(10.0, TimeUnit.SECONDS) ;
+			return Duration.zero(this.getSimulatedTimeUnit());
+//			return new Duration(10.0, TimeUnit.SECONDS) ;
 		}
 	}
 
@@ -216,12 +228,12 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(1)) {
-			this.logMessage("SecheCheveuxModel#userDefinedInternalTransition "
-							+ elapsedTime) ;
-		}
+//		if (this.hasDebugLevel(1)) {
+//			this.logMessage("SecheCheveuxModel#userDefinedInternalTransition "
+//							+ elapsedTime) ;
+//		}
 		
-		if (this.componentRef != null) {
+		if(this.componentRef != null) {
 			// This is an example showing how to access the component state
 			// from a simulation model; this must be done with care and here
 			// we are not synchronising with other potential component threads
@@ -231,49 +243,12 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 					SERIES,
 					this.getCurrentStateTime().getSimulatedTime(),
 					this.currentIntensity);
-			try {
-				this.currentIntensity = (double)componentRef.getEmbeddingComponentStateValue("intensity");
-				
-				this.logMessage("component state = " +
-						this.currentIntensity) ;
-				
-			} catch (Exception e) {
-				throw new RuntimeException(e) ;
-			}
+			updateIntensity();
 			this.intensityPlotter.addData(
 					SERIES,
 					this.getCurrentStateTime().getSimulatedTime(),
 					this.currentIntensity);
-
 		}
-		
-//		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-//			super.userDefinedInternalTransition(elapsedTime) ;
-//
-//
-//		if (this.intensityPlotter != null) {
-//			this.intensityPlotter.addData(
-//				SERIES,
-//				this.getCurrentStateTime().getSimulatedTime(), 
-//				this.currentIntensity) ;
-//		}
-//		this.logMessage(this.getCurrentStateTime() +
-//				"|internal|temperature = " + this.currentIntensity + " C") ;
-//		}
-//		
-//		if (this.componentRef != null) {
-//			// This is an example showing how to access the component state
-//			// from a simulation model; this must be done with care and here
-//			// we are not synchronising with other potential component threads
-//			// that may access the state of the component object at the same
-//			// time.
-//			try {
-//				this.logMessage("component state = " +
-//						componentRef.getEmbeddingComponentStateValue("intensity")) ;
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
 	}
 
 	/**
@@ -281,52 +256,72 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 1");
-		}
-
-		// get the vector of current external events
-		Vector<EventI> currentEvents = this.getStoredEventAndReset();
-		boolean ticReceived = false;
-		// when this method is called, there is at least one external event
-		assert currentEvents != null;
-
-		Event ce = (Event) currentEvents.get(0);
-		
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
-		}
-
-		// the plot is piecewise constant; this data will close the currently
-		// open piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
-
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 3 " + this.getMode());
-		}
-
-		// execute the current external event on this model, changing its state
-		// and intensity level except if it's a tic
-		if (ce instanceof TicEvent) {
-			ticReceived = true;
+		if(this.componentRef == null) {
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("HairDryerModel::userDefinedExternalTransition 1");
+//			}
+	
+			// get the vector of current external events
+			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			boolean ticReceived = false;
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+			
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("HairDryerModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
+//			}
+	
+			// the plot is piecewise constant; this data will close the currently
+			// open piece
+			this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
+	
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("HairDryerModel::userDefinedExternalTransition 3 " + this.getMode());
+//			}
+	
+			// execute the current external event on this model, changing its state
+			// and intensity level except if it's a tic
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				assert ce instanceof AbstractHairDryerEvent;
+				ce.executeOn(this);
+			}
+			if (ticReceived) {
+				this.triggerReading = true;
+				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+//			if (this.hasDebugLevel(1)) {
+//				this.logMessage("HairDryerModel::userDefinedExternalTransition 4 ");
+//			}
+	
+			// add a new data on the plotter; this data will open a new piece
+			this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
+	
+			super.userDefinedExternalTransition(elapsedTime);
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("HairDryerModel::userDefinedExternalTransition 5");
+//			}
 		} else {
-			assert ce instanceof AbstractHairDryerEvent;
-			ce.executeOn(this);
-		}
-		if (ticReceived) {
+			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+			
+			assert ce instanceof TicEvent;
 			this.triggerReading = true;
-			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-		}
-		if (this.hasDebugLevel(1)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 4 ");
-		}
-
-		// add a new data on the plotter; this data will open a new piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
-
-		super.userDefinedExternalTransition(elapsedTime);
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("HairDryerModel::userDefinedExternalTransition 5");
+			
+			try {
+				this.state = (HairDryerState) this.componentRef.getEmbeddingComponentStateValue("isOn");
+				this.mode = (HairDryerMode)this.componentRef.getEmbeddingComponentStateValue("mode");
+				this.powerLvl = (HairDryerPowerLevel)this.componentRef.getEmbeddingComponentStateValue("powerLevel");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -361,8 +356,12 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		this.currentIntensity = 0.0;
 	}
 
-	public void setMode(HairDryerMode mode) {
-		this.mode = mode;
+	public void switchMode() {
+		if (this.mode == HairDryerMode.COLD_AIR) {
+			this.mode = HairDryerMode.HOT_AIR;
+		} else {
+			this.mode =HairDryerMode.COLD_AIR;
+		}
 		updateIntensity();
 	}
 
@@ -402,14 +401,18 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	}
 
 	public void updateIntensity() {
-		switch (this.getMode()) {
-		case HOT_AIR:
-			this.currentIntensity = HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue() / TENSION;
-			break;
-		case COLD_AIR:
-			this.currentIntensity = HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue() / TENSION;
-			break;
-
+		if(this.state == HairDryerState.ON) {
+			switch (this.getMode()) {
+			case HOT_AIR:
+				this.currentIntensity = HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue() / TENSION;
+				break;
+			case COLD_AIR:
+				this.currentIntensity = HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue() / TENSION;
+				break;
+	
+			}
+		} else {
+			this.currentIntensity = 0.0;
 		}
 	}
 

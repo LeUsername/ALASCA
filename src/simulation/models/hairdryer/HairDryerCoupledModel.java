@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
@@ -26,6 +28,7 @@ import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.hairdryer.DecreasePowerEvent;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
@@ -92,12 +95,21 @@ public class HairDryerCoupledModel extends CoupledModel {
 				HairDryerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 		atomicModelDescriptors.put(HairDryerUserModel.URI, AtomicModelDescriptor.create(HairDryerUserModel.class,
 				HairDryerUserModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(
+				TicModel.URI + "-1",
+				AtomicModelDescriptor.create(
+						TicModel.class,
+						TicModel.URI + "-1",
+						TimeUnit.SECONDS,
+						null,
+						SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(HairDryerModel.URI);
 		submodels.add(HairDryerUserModel.URI);
+		submodels.add(TicModel.URI + "-1");
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 		EventSource from1 = new EventSource(HairDryerUserModel.URI, SwitchOnEvent.class);
@@ -115,10 +127,21 @@ public class HairDryerCoupledModel extends CoupledModel {
 		EventSource from5 = new EventSource(HairDryerUserModel.URI, DecreasePowerEvent.class);
 		EventSink[] to5 = new EventSink[] { new EventSink(HairDryerModel.URI, DecreasePowerEvent.class) };
 		connections.put(from5, to5);
-
+		
+		EventSource from6 = new EventSource(TicModel.URI + "-1", TicEvent.class);
+		EventSink[] to6 = new EventSink[] { new EventSink(HairDryerModel.URI, TicEvent.class) };
+		connections.put(from6, to6);
+		
+		Map<Class<? extends EventI>,ReexportedEvent> reexported =
+				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+		reexported.put(
+				HairDryerConsumptionEvent.class,
+				new ReexportedEvent(HairDryerModel.URI,
+						HairDryerConsumptionEvent.class)) ;
+		
 		coupledModelDescriptors.put(HairDryerCoupledModel.URI,
 				new CoupledHIOA_Descriptor(HairDryerCoupledModel.class, HairDryerCoupledModel.URI, submodels,
-						null, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+						null, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 						null));
 
 		return new Architecture(HairDryerCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,
