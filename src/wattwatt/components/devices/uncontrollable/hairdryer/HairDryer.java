@@ -1,9 +1,7 @@
 package wattwatt.components.devices.uncontrollable.hairdryer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
@@ -13,12 +11,9 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
-import fr.sorbonne_u.devs_simulation.models.events.CallableEventAtomicSink;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
-import simulation.events.hairdryer.HairDryerConsumptionEvent;
-import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
 import simulation.models.hairdryer.HairDryerUserModel;
@@ -262,8 +257,6 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	 */
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		System.out.println("ICI + " + name);
-		
 		if (name.equals("mode")) {
 			return this.mode;
 		} else if (name.equals("isOn")) {
@@ -272,7 +265,6 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 			return this.powerLvl;
 		} else if (name.equals("switchOn")) {
 			this.on();
-			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
 			return null;
 		} else if (name.equals("switchOff")) {
 			this.off();

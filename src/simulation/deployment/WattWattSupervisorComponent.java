@@ -21,10 +21,11 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.events.electricmeter.ConsumptionEvent;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.wattwatt.WattWattModel;
+import simulation.tools.TimeScale;
 
 public class WattWattSupervisorComponent extends AbstractComponent {
 	// -------------------------------------------------------------------------
@@ -44,7 +45,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a supervisor component for the Molene example from the given map
+	 * create a supervisor component for WattWatt from the given map
 	 * describing the deployment of models on components.
 	 * 
 	 * <p>
@@ -68,7 +69,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 	}
 
 	/**
-	 * create a supervisor component for the Molene example with the given
+	 * create a supervisor component for the WattWatt example with the given
 	 * reflection inbound port URI and from the given map describing the deployment
 	 * of models on components.
 	 * 
@@ -96,7 +97,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 	}
 
 	/**
-	 * initialise the simulation architecture for the Molene example from the given
+	 * initialise the simulation architecture for the WattWatt example from the given
 	 * map describing the deployment of models on components.
 	 * 
 	 * <p>
@@ -138,7 +139,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 							}*/null,
 						(Class<? extends EventI>[])
 							new Class<?>[]{
-								ConsumptionEvent.class
+							HairDryerConsumptionEvent.class
 							},
 						TimeUnit.SECONDS,
 						modelURIs2componentURIs.get(HairDryerCoupledModel.URI))) ;
@@ -152,7 +153,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						ElectricMeterModel.URI,
 						(Class<? extends EventI>[])
 						new Class<?>[]{
-							ConsumptionEvent.class
+							HairDryerConsumptionEvent.class
 						},
 						null,
 						TimeUnit.SECONDS,
@@ -171,12 +172,12 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		EventSource from1 =
 				new EventSource(
 						HairDryerCoupledModel.URI,
-						ConsumptionEvent.class) ;
+						HairDryerConsumptionEvent.class) ;
 		EventSink[] to1=
 				new EventSink[] {
 						new EventSink(
 								ElectricMeterModel.URI,
-								ConsumptionEvent.class)} ;
+								HairDryerConsumptionEvent.class)} ;
 		connections.put(from1, to1) ;
 		
 		
@@ -221,7 +222,6 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 
 		sp.createSimulator();
 
-		Thread.sleep(1000L);
 		this.logMessage("SupervisorComponent#execute 1");
 
 		Map<String, Object> simParams = new HashMap<String, Object>();
@@ -249,7 +249,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 
 		this.logMessage("supervisor component begins simulation.");
 		long start = System.currentTimeMillis();
-		sp.doStandAloneSimulation(0, 5000L);
+		sp.doStandAloneSimulation(0, TimeScale.WEEK);
 		long end = System.currentTimeMillis();
 		this.logMessage("supervisor component ends simulation. " + (end - start));
 	}

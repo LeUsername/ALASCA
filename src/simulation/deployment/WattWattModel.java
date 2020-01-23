@@ -1,4 +1,4 @@
-package simulation.models.wattwatt;
+package simulation.deployment;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -11,7 +11,9 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 
-public class WattWattModel extends CoupledModel {
+public class WattWattModel
+extends		CoupledModel
+{
 	private static final long serialVersionUID = 1L;
 	public static final String	URI = "WattWattModel" ;
 
@@ -27,6 +29,6 @@ public class WattWattModel extends CoupledModel {
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
 			  imported, reexported, connections);
-		System.out.println("salut jacques <3");
 	}
 }
+// -----------------------------------------------------------------------------
