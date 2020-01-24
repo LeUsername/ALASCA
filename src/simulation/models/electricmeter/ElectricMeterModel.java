@@ -1,10 +1,10 @@
 package simulation.models.electricmeter;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -72,7 +72,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -121,7 +121,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 		this.consumptionPlotter.createSeries(SERIES);
 
 		// The reference to the embedding component
-		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get(URIS.ELECTRIC_METER_URI);
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.ELECTRIC_METER_URI);
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		// the model does not export any event.
 		return null;
 	}
@@ -216,7 +216,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
 		if (this.componentRef == null) {
-			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
 			assert currentEvents != null && currentEvents.size() == 1;
 
@@ -234,7 +234,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			super.userDefinedExternalTransition(elapsedTime);
 
 		} else {
-			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
 			assert currentEvents != null && currentEvents.size() == 1;
 

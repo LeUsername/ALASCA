@@ -193,16 +193,16 @@ public class WattWattSupervisorPlugin
 			return this.getRootSmop().getSimulationEndTime() ;
 		}
 
-		/**
-		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#readyForSimulation()
-		 */
-		@Override
-		public boolean		readyForSimulation() throws Exception
-		{
-			return this.getRootSmop() != null &&
-						this.getRootSmop().connected() &&
-										this.getRootSmop().readyForSimulation() ;
-		}
+//		/**
+//		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#readyForSimulation()
+//		 */
+//		@Override
+//		public boolean		readyForSimulation() throws Exception
+//		{
+//			return this.getRootSmop() != null &&
+//						this.getRootSmop().connected() &&
+//										this.getRootSmop().readyForSimulation() ;
+//		}
 
 		/**
 		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#setSimulationRunParameters(java.util.Map)
@@ -230,18 +230,18 @@ public class WattWattSupervisorPlugin
 												startTime, simulationDuration) ;
 		}
 
-		/**
-		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#startCollaborativeSimulation(double, double)
-		 */
-		@Override
-		public void			startCollaborativeSimulation(
-			double startTime,
-			double simulationDuration
-			) throws Exception
-		{
-			this.getRootSmop().startCollaborativeSimulation(
-											startTime, simulationDuration) ;
-		}
+//		/**
+//		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#startCollaborativeSimulation(double, double)
+//		 */
+//		@Override
+//		public void			startCollaborativeSimulation(
+//			double startTime,
+//			double simulationDuration
+//			) throws Exception
+//		{
+//			this.getRootSmop().startCollaborativeSimulation(
+//											startTime, simulationDuration) ;
+//		}
 
 		/**
 		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#isSimulationRunning()
@@ -310,6 +310,24 @@ public class WattWattSupervisorPlugin
 			// memorise the notified report.
 			this.report = report ;
 			this.logMessage("" + report) ;
+		}
+
+		@Override
+		public void startRealTimeSimulation(double startTime, double simulationDuration) throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void finaliseSimulation() throws Exception {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void resetArchitecture(ComponentModelArchitectureI architecture) throws Exception {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	// -----------------------------------------------------------------------------

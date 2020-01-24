@@ -1,8 +1,8 @@
 package simulation.models.washingmachine;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -155,9 +155,9 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	}
 
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		assert !this.eventList.isEmpty();
-		Vector<EventI> ret = super.output();
+		ArrayList<EventI> ret = super.output();
 		assert ret.size() == 1;
 
 		

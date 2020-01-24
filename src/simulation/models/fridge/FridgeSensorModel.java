@@ -1,5 +1,6 @@
 package simulation.models.fridge;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -201,7 +202,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI>	output()
+	public ArrayList<EventI>	output()
 	{
 		if (this.triggerReading) {
 			if (this.plotter != null) {
@@ -218,7 +219,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 			this.lastReadingTime =
 					this.getCurrentStateTime().getSimulatedTime() ;
 
-			Vector<EventI> ret = new Vector<EventI>(1) ;
+			ArrayList<EventI> ret = new ArrayList<EventI>(1) ;
 			Time currentTime = 
 					this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
 			TemperatureReadingEvent temp =
@@ -280,7 +281,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 	{
 		super.userDefinedExternalTransition(elapsedTime) ;
 
-		Vector<EventI> current = this.getStoredEventAndReset() ;
+		ArrayList<EventI> current = this.getStoredEventAndReset() ;
 		boolean	ticReceived = false ;
 		for (int i = 0 ; !ticReceived && i < current.size() ; i++) {
 			if (current.get(i) instanceof TicEvent) {

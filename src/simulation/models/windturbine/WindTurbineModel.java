@@ -1,10 +1,10 @@
 package simulation.models.windturbine;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -86,7 +86,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -159,11 +159,11 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
 			double reading = this.production; // kW
 
-			Vector<EventI> ret = new Vector<EventI>(1);
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			WindTurbineProductionEvent production = new WindTurbineProductionEvent(currentTime, reading);
 			ret.add(production);
@@ -219,7 +219,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
-		Vector<EventI> currentEvents = this.getStoredEventAndReset();
+		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
 		assert currentEvents != null && currentEvents.size() == 1;
 

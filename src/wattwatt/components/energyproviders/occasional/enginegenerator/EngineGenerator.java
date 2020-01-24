@@ -7,7 +7,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -28,7 +28,7 @@ import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
 @OfferedInterfaces(offered = IEngineGenerator.class)
 @RequiredInterfaces(required = IController.class)
-public class EngineGenerator  extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+public class EngineGenerator  extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
 	protected EngineGeneratorInPort groupein;
 
@@ -240,6 +240,12 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
 		return null;
+	}
+	
+	@Override
+	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
+		// TODO Auto-generated method stub
+		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 
 	@Override

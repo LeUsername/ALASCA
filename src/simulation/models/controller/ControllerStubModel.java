@@ -1,7 +1,7 @@
 package simulation.models.controller;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -122,10 +122,10 @@ public class ControllerStubModel extends AtomicES_Model {
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 
 		assert !this.eventList.isEmpty();
-		Vector<EventI> ret = super.output();
+		ArrayList<EventI> ret = super.output();
 		assert ret.size() == 1;
 
 		this.nextEvent = ret.get(0).getClass();

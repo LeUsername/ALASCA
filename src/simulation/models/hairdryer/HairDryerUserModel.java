@@ -1,12 +1,12 @@
 package simulation.models.hairdryer;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -85,7 +85,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -150,7 +150,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 		this.meanTimeAtLow = (double) simParams.get(vname);
 
 		// The reference to the embedding component
-		this.componentRef = (EmbeddingComponentStateAccessI) simParams.get(URIS.HAIR_DRYER_URI);
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.HAIR_DRYER_URI);
 
 	}
 
@@ -202,7 +202,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		if (componentRef != null) {
 			this.nextEvent = super.output().get(0).getClass();
 			return null;
@@ -216,7 +216,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 			// be sent to other models when they are external events.
 			assert !this.eventList.isEmpty();
 			// produce the set of such events by calling the super method
-			Vector<EventI> ret = super.output();
+			ArrayList<EventI> ret = super.output();
 			// by construction, there will be only one such event
 			assert ret.size() == 1;
 

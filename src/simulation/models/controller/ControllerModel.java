@@ -1,11 +1,12 @@
 package simulation.models.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -109,7 +110,7 @@ public class ControllerModel extends AtomicModel {
 	protected XYPlotter productionPlotter;
 	protected final Map<String, XYPlotter> modelsPlotter;
 
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 	
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -239,7 +240,7 @@ public class ControllerModel extends AtomicModel {
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI>	output()
+	public ArrayList<EventI>	output()
 	{
 		if (this.hasDebugLevel(1)) {
 			this.logMessage("output|"
@@ -247,8 +248,8 @@ public class ControllerModel extends AtomicModel {
 							+ this.triggeredDecisionEngineGenerator) ;
 		}
 		
-		Vector<EventI> ret = null ;
-		ret = new Vector<EventI>(1) ;
+		ArrayList<EventI> ret = null ;
+		ret = new ArrayList<EventI>(1) ;
 		
 		assert ret != null;
 		
@@ -295,7 +296,7 @@ public class ControllerModel extends AtomicModel {
 								+ this.EGState + ">>>>>>>>>>>>>>>") ;
 		}
 		
-		Vector<EventI> current = this.getStoredEventAndReset() ;
+		ArrayList<EventI> current = this.getStoredEventAndReset() ;
 		for (int i = 0 ; i < current.size() ; i++) {
 			if (current.get(i) instanceof EngineGeneratorProductionEvent) {
 				this.productionEngineGenerator =

@@ -10,7 +10,6 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cyphy.plugins.devs.SupervisorPlugin;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentAtomicModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentCoupledModelDescriptor;
-import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentModelArchitecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
@@ -194,14 +193,14 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						SimulationEngineCreationMode.COORDINATION_ENGINE,
 						modelURIs2componentURIs.get(WattWattModel.URI))) ;
 
-		ComponentModelArchitecture architecture =
-				new ComponentModelArchitecture(
-						WattWattModel.URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						TimeUnit.SECONDS) ;
-
-		this.sp = new SupervisorPlugin(architecture) ;
+//		ComponentModelArchitecture architecture =
+//				new ComponentModelArchitecture(
+//						WattWattModel.URI,
+//						atomicModelDescriptors,
+//						coupledModelDescriptors,
+//						TimeUnit.SECONDS) ;
+//
+//		this.sp = new SupervisorPlugin(architecture) ;
 		sp.setPluginURI("supervisor") ;
 		this.installPlugin(this.sp) ;
 		this.logMessage("Supervisor plug-in installed...") ;

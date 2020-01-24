@@ -8,7 +8,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -31,7 +31,7 @@ import wattwatt.tools.washingmachine.WashingMachineSetting;
 
 @OfferedInterfaces(offered = IWashingMachine.class)
 @RequiredInterfaces(required = IController.class)
-public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
 	protected WashingMachineInPort lavein;
 
@@ -306,6 +306,12 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 			assert name.equals("isOn");
 			return new Boolean(this.isOn);
 		}
+	}
+	
+	@Override
+	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
+		// TODO Auto-generated method stub
+		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 
 	@Override

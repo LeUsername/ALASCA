@@ -1,10 +1,10 @@
 package simulation.models.enginegenerator;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -80,7 +80,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 
 	protected double production;
 	protected double fuelCapacity;
@@ -148,12 +148,12 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	}
 
 	@Override
-	public Vector<EventI>	output()
+	public ArrayList<EventI>	output()
 	{
 		if(this.triggerReading) {
 			double reading = this.production ; // Watt
 
-			Vector<EventI> ret = new Vector<EventI>(1);
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			EngineGeneratorProductionEvent production = new EngineGeneratorProductionEvent(currentTime, reading);
 			ret.add(production);
@@ -210,7 +210,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		}
 
 		// get the vector of current external events
-		Vector<EventI> currentEvents = this.getStoredEventAndReset();
+		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		boolean ticReceived = false;
 		// when this method is called, there is at least one external event
 		assert currentEvents != null;

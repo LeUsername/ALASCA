@@ -1,12 +1,13 @@
 package simulation.models.fridge;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.utils.DoublePiece;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithDE;
@@ -171,7 +172,7 @@ extends AtomicHIOAwithDE
 	protected XYPlotter					intensityPlotter ;
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
-	protected EmbeddingComponentStateAccessI componentRef ;
+	protected EmbeddingComponentAccessI componentRef ;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -277,7 +278,7 @@ extends AtomicHIOAwithDE
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(URIS.FRIDGE_URI) ;
+			(EmbeddingComponentAccessI) simParams.get(URIS.FRIDGE_URI) ;
 	}
 
 	/**
@@ -511,7 +512,7 @@ extends AtomicHIOAwithDE
 			this.logMessage("WiFiBandwithModel#userDefinedExternalTransition "
 							+ elapsedTime) ;
 		}
-		Vector<EventI> currentEvents = this.getStoredEventAndReset() ;
+		ArrayList<EventI> currentEvents = this.getStoredEventAndReset() ;
 		assert	currentEvents != null && currentEvents.size() == 1 ;
 
 		// visualisation and simulation report.
@@ -602,7 +603,7 @@ extends AtomicHIOAwithDE
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI>	output()
+	public ArrayList<EventI>	output()
 	{
 		return null ;
 	}

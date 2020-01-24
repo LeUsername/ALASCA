@@ -9,9 +9,9 @@
 	<classpathentry exported="true" kind="lib" path="jars/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/jfreechart-1.6.0-snapshot.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/jing.jar"/>
-	<classpathentry kind="lib" path="jars/BCM-CyPhy-Components-26112019.jar"/>
-	<classpathentry kind="lib" path="jars/Simulation-26112019.jar"/>
 	<classpathentry kind="lib" path="jars/commons-math3-3.5.jar"/>
 	<classpathentry kind="lib" path="jars/BCM-03122019.jar"/>
+	<classpathentry kind="lib" path="jars/BCM-CyPhy-Components-23012020.jar"/>
+	<classpathentry kind="lib" path="jars/Simulation-23012020.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

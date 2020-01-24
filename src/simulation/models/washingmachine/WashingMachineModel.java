@@ -1,10 +1,10 @@
 package simulation.models.washingmachine;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -87,7 +87,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 
 	/** Etat dans lequel se trouve le seche cheveux */
 	protected WashingMachineState state;
@@ -134,7 +134,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(URIS.WASHING_MACHINE_URI) ;
+			(EmbeddingComponentAccessI) simParams.get(URIS.WASHING_MACHINE_URI) ;
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	}
 
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		return null;
 	}
 
@@ -231,7 +231,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		}
 
 		// get the vector of current external events
-		Vector<EventI> currentEvents = this.getStoredEventAndReset();
+		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		boolean ticReceived = false;
 		// when this method is called, there is at least one external event
 		assert currentEvents != null;

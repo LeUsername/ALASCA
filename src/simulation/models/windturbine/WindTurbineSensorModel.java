@@ -1,7 +1,7 @@
 package simulation.models.windturbine;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -152,7 +152,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		// output is called just before executing an internal transition
 		// in ES models, this corresponds to having at least one event in
 		// the event list which time of occurrence corresponds to the current
@@ -162,7 +162,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 		// be sent to other models when they are external events.
 		assert !this.eventList.isEmpty();
 		// produce the set of such events by calling the super method
-		Vector<EventI> ret = super.output();
+		ArrayList<EventI> ret = super.output();
 		// by construction, there will be only one such event
 		assert ret.size() == 1;
 

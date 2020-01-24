@@ -7,7 +7,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -31,7 +31,7 @@ import wattwatt.tools.hairdryer.HairDryerSetting;
 
 @OfferedInterfaces(offered = IHairDryer.class)
 @RequiredInterfaces(required = IController.class)
-public class HairDryer extends AbstractCyPhyComponent implements EmbeddingComponentStateAccessI {
+public class HairDryer extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 	protected HairDryerMode mode;
 	protected HairDryerPowerLevel powerLvl;
 
@@ -281,5 +281,11 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		} else {
 			return new Double(this.conso);
 		}
+	}
+	
+	@Override
+	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
+		// TODO Auto-generated method stub
+		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 }

@@ -1,10 +1,10 @@
 package simulation.models.hairdryer;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentStateAccessI;
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
@@ -86,7 +86,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
-	protected EmbeddingComponentStateAccessI componentRef;
+	protected EmbeddingComponentAccessI componentRef;
 	
 	/** current intensity in Amperes; intensity is power/tension. */
 	//@ExportedVariable(type = Double.class)
@@ -136,7 +136,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		
 		// The reference to the embedding component
 		this.componentRef =
-			(EmbeddingComponentStateAccessI) simParams.get(URIS.HAIR_DRYER_URI) ;
+			(EmbeddingComponentAccessI) simParams.get(URIS.HAIR_DRYER_URI) ;
 	}
 
 	/**
@@ -193,11 +193,11 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public Vector<EventI> output() {
+	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
 			double reading = this.currentIntensity; // Watt
 
-			Vector<EventI> ret = new Vector<EventI>(1);
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			HairDryerConsumptionEvent consommation = new HairDryerConsumptionEvent(currentTime, reading);
 			ret.add(consommation);
@@ -262,7 +262,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 //			}
 	
 			// get the vector of current external events
-			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 			boolean ticReceived = false;
 			// when this method is called, there is at least one external event
 			assert currentEvents != null;
@@ -305,7 +305,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 //				this.logMessage("HairDryerModel::userDefinedExternalTransition 5");
 //			}
 		} else {
-			Vector<EventI> currentEvents = this.getStoredEventAndReset();
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 			// when this method is called, there is at least one external event
 			assert currentEvents != null;
 	

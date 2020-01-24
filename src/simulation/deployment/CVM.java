@@ -4,27 +4,12 @@ import java.util.HashMap;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
-import simulation.models.controller.ControllerModel;
 import simulation.models.electricmeter.ElectricMeterModel;
-import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
-import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
-import simulation.models.washingmachine.WashingMachineCoupledModel;
-import simulation.models.windturbine.WindTurbineCoupledModel;
 import simulation.tools.TimeScale;
-import wattwatt.components.Controller;
 import wattwatt.components.ElectricMeter;
-import wattwatt.components.devices.schedulable.washingmachine.WashingMachine;
-import wattwatt.components.devices.suspendable.fridge.Fridge;
 import wattwatt.components.devices.uncontrollable.hairdryer.HairDryer;
-import wattwatt.components.energyproviders.occasional.enginegenerator.EngineGenerator;
-import wattwatt.components.energyproviders.random.windturbine.WindTurbine;
-import wattwatt.connectors.ElectricMeterConnector;
-import wattwatt.connectors.devices.schedulable.washingmachine.WashingMachineConnector;
-import wattwatt.connectors.devices.suspendables.fridge.FridgeConnector;
 import wattwatt.connectors.devices.uncontrollable.hairdryer.HairDryerConnector;
-import wattwatt.connectors.energyproviders.occasional.enginegenerator.EngineGeneratorConnector;
-import wattwatt.connectors.energyproviders.random.windturbine.WindTurbineConnector;
 import wattwatt.tools.URIS;
 
 public class CVM 
