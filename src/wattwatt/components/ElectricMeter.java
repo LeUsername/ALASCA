@@ -17,11 +17,13 @@ import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
+import fr.sorbonne_u.devs_simulation.models.events.EventI;
+import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
+import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.plugins.ElectricMeterSimulatorPlugin;
-import simulation.tools.TimeScale;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
@@ -146,7 +148,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -237,11 +239,20 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
+		Map<Class<? extends EventI>,EventSink[]> imported =
+				new HashMap<Class<? extends EventI>,EventSink[]>() ;
+		imported.put(
+				HairDryerConsumptionEvent.class, 
+				new EventSink[] {
+						new EventSink(ElectricMeterModel.URI, HairDryerConsumptionEvent.class)
+				}) ;
+		
 		atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
+		
 		return new Architecture(ElectricMeterModel.URI, atomicModelDescriptors, coupledModelDescriptors,
 				TimeUnit.SECONDS);
 	}

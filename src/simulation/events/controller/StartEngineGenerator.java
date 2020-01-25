@@ -39,7 +39,7 @@ public class StartEngineGenerator extends AbstractControllerEvent {
 	@Override
 	public void executeOn(AtomicModel model) {
 		assert model instanceof EngineGeneratorModel;
-
+System.out.println("decision start");
 		EngineGeneratorModel m = (EngineGeneratorModel) model;
 		m.start();
 	}

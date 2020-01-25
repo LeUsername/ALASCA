@@ -18,12 +18,13 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.electricmeter.ConsumptionEvent;
+import simulation.events.fridge.FridgeConsumptionEvent;
 import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
-import simulation.tools.fridge.FridgeConsumption;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(imported = { HairDryerConsumptionEvent.class, TicEvent.class }, exported = { ConsumptionEvent.class })
+@ModelExternalEvents(imported = { HairDryerConsumptionEvent.class, WashingMachineConsumptionEvent.class,
+		FridgeConsumptionEvent.class, TicEvent.class }, exported = { ConsumptionEvent.class })
 public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -64,6 +65,8 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	protected double hairDryerConsumption;
 	protected double fridgeConsumption;
 	protected double washingMachineConsumption;
+
+	protected boolean triggerReading;
 
 	/** plotter for the consumption level over time. */
 	protected XYPlotter consumptionPlotter;
@@ -154,6 +157,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 		// first data in the plotter to start the plot.
 		this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getConsumption());
 
+		this.triggerReading = false;
 		super.initialiseVariables(startTime);
 	}
 
@@ -162,8 +166,17 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public ArrayList<EventI> output() {
-		// the model does not export any event.
-		return null;
+		if (this.triggerReading) {
+			double reading = this.getConsumption(); // Watt
+
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
+			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
+			ConsumptionEvent consumption = new ConsumptionEvent(currentTime, reading);
+			ret.add(consumption);
+			return ret;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -205,6 +218,9 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			}
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
+			if (this.triggerReading) {
+				this.triggerReading = false;
+			}
 		} else {
 			// TODO
 		}
@@ -225,7 +241,11 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
 
-			ce.executeOn(this);
+			if (ce instanceof TicEvent) {
+				this.triggerReading = true;
+			} else {
+				ce.executeOn(this);
+			}
 			// add a new data on the plotter; this data will open a new piece
 
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
@@ -244,11 +264,11 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 					this.getConsumption());
 			try {
 				ce.executeOn(this);
-				if (ce.equals(FridgeConsumption.class)) {
+				if (ce instanceof FridgeConsumptionEvent) {
 					componentRef.getEmbeddingComponentStateValue("setFridgeConsumption");
-				} else if (ce.equals(HairDryerConsumptionEvent.class)) {
+				} else if (ce instanceof HairDryerConsumptionEvent) {
 					componentRef.getEmbeddingComponentStateValue("setHairDryerConsumption");
-				} else if (ce.equals(WashingMachineConsumptionEvent.class)) {
+				} else if (ce instanceof WashingMachineConsumptionEvent) {
 					componentRef.getEmbeddingComponentStateValue("setWashingMachineConsumption");
 				}
 			} catch (Exception e) {
@@ -302,7 +322,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	public void setFridgeConsumption(double p) {
 		this.fridgeConsumption = p;
 	}
-	
+
 	public double getHairDryerConsumption() {
 		return this.hairDryerConsumption;
 	}

@@ -2,7 +2,6 @@ package simulation.models.fridge;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
@@ -20,7 +19,6 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
-import simulation.events.fridge.TemperatureReadingEvent;
 
 @ModelExternalEvents(imported = { TicEvent.class }, 
 					 exported = { ResumeEvent.class,
@@ -48,37 +46,21 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 * @version	$Name$ -- $Revision$ -- $Date$
 	 */
-	public static class	RefrigerateurSensorModelReport
+	public static class	FridgeSensorModelReport
 	extends		AbstractSimulationReport
 	{
-		private static final long 					serialVersionUID = 1L ;
-		public final Vector<TemperatureReadingEvent>	readings ;
+		private static final long serialVersionUID = 1L;
 
-		public			RefrigerateurSensorModelReport(
-			String modelURI,
-			Vector<TemperatureReadingEvent> readings
-			)
-		{
-			super(modelURI) ;
-			this.readings = readings ;
+		public FridgeSensorModelReport(String modelURI) {
+			super(modelURI);
 		}
 
 		/**
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
-		public String	toString()
-		{
-			String ret = "\n-----------------------------------------\n" ;
-			ret += "RefrigerateurSensorModelReport\n" ;
-			ret += "-----------------------------------------\n" ;
-			ret += "number of readings = " + this.readings.size() + "\n" ;
-			ret += "Readings:\n" ;
-			for (int i = 0 ; i < this.readings.size() ; i++) {
-				ret += "    " + this.readings.get(i).eventAsString() + "\n" ;
-			}
-			ret += "-----------------------------------------\n" ;
-			return ret ;
+		public String toString() {
+			return "FridgeSensorModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -107,8 +89,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 	protected double								lastReading ;
 	/** the simulation time at the last reading.							*/
 	protected double								lastReadingTime ;
-	/** history of readings, for the simulation report.						*/
-	protected final Vector<TemperatureReadingEvent>	readings ;
+
 
 	/** frame used to plot the bandwidth readings during the simulation.	*/
 	protected XYPlotter				plotter ;
@@ -135,7 +116,6 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 
 		this.lastReading = -1.0 ;
 
-		this.readings = new Vector<TemperatureReadingEvent>() ;
 	}
 
 	// -------------------------------------------------------------------------
@@ -176,7 +156,6 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 		this.triggerReading = false ;
 
 		this.lastReadingTime = initialTime.getSimulatedTime() ;
-		this.readings.clear() ;
 		if (this.plotter != null) {
 			this.plotter.initialise() ;
 			this.plotter.showPlotter() ;
@@ -222,10 +201,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 			ArrayList<EventI> ret = new ArrayList<EventI>(1) ;
 			Time currentTime = 
 					this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
-			TemperatureReadingEvent temp =
-					new TemperatureReadingEvent(currentTime, this.temperature.v) ;
-//			ret.add(temp) ;
-			this.readings.addElement(temp) ;
+			
 //			this.logMessage(this.getCurrentStateTime() +
 //					"|output|temperature reading " +
 //					this.readings.size() + " with value = " +
@@ -316,7 +292,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 	@Override
 	public SimulationReportI		getFinalReport() throws Exception
 	{
-		return new RefrigerateurSensorModelReport(this.getURI(), this.readings) ;
+		return new FridgeSensorModelReport(this.getURI()) ;
 	}
 }
 // -----------------------------------------------------------------------------

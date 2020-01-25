@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
+import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
@@ -27,10 +28,10 @@ import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 								  PremiumModeEvent.class})
 public class WashingMachineUserModel extends AtomicES_Model {
 
-	public static class LaveLingeUserModelReport extends AbstractSimulationReport {
+	public static class WashingMachineUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public LaveLingeUserModelReport(String modelURI) {
+		public WashingMachineUserModelReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -258,6 +259,12 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		super.endSimulation(endTime);
 	}
 
-	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
+	 */
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new WashingMachineUserModelReport(this.getURI());
+	}
 
 }

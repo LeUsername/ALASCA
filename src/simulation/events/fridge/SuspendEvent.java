@@ -1,7 +1,9 @@
 package simulation.events.fridge;
 
+import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
+import simulation.models.fridge.FridgeModel;
 
 public class SuspendEvent
 extends AbstractFridgeEvent
@@ -55,6 +57,17 @@ extends AbstractFridgeEvent
 	public String		eventAsString()
 	{
 		return "SuspendEvent(" + this.eventContentAsString() + ")" ;
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#executeOn(fr.sorbonne_u.devs_simulation.models.AtomicModel)
+	 */
+	@Override
+	public void executeOn(AtomicModel model) {
+		assert model instanceof FridgeModel;
+
+		FridgeModel m = (FridgeModel) model;
+		m.suspend();
 	}
 }
 // -----------------------------------------------------------------------------

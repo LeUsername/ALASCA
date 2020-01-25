@@ -11,6 +11,7 @@ import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.fridge.FridgeModel;
 import simulation.models.fridge.FridgeSensorModel;
 import simulation.models.fridge.FridgeUserModel;
+import simulation.tools.TimeScale;
 
 public class MIL_Fridge {
 	public static void	main(String[] args)
@@ -39,10 +40,7 @@ public class MIL_Fridge {
 					FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
 			simParams.put(
 					FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-			simParams.put(FridgeModel.URI + ":" + FridgeModel.BAAR, 1.75) ;
-			simParams.put(FridgeModel.URI + ":" + FridgeModel.BBAR, 1.75) ;
-			simParams.put(FridgeModel.URI + ":" + FridgeModel.BMASSF, 1.0/11.0) ;
-			simParams.put(FridgeModel.URI + ":" + FridgeModel.BIS, 0.5) ;
+			simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
 			simParams.put(
 					FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
@@ -86,7 +84,7 @@ public class MIL_Fridge {
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			se.doStandAloneSimulation(0.0, 1000) ;
+			se.doStandAloneSimulation(0.0, TimeScale.DAY) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

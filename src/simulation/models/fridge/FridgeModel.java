@@ -8,12 +8,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.examples.molene.utils.DoublePiece;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
-import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithDE;
+import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithEquations;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.Value;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
+import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -21,8 +23,9 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.events.electricmeter.ConsumptionEvent;
+import simulation.events.fridge.AbstractFridgeEvent;
 import simulation.events.fridge.CloseEvent;
+import simulation.events.fridge.FridgeConsumptionEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
@@ -35,10 +38,11 @@ import wattwatt.tools.fridge.FridgeSetting;
 @ModelExternalEvents(imported = { CloseEvent.class, 
 								  OpenEvent.class, 
 								  ResumeEvent.class, 
-								  SuspendEvent.class },
-					exported = { ConsumptionEvent.class})
+								  SuspendEvent.class,
+								  TicEvent.class},
+					exported = { FridgeConsumptionEvent.class})
 public class FridgeModel
-extends AtomicHIOAwithDE
+extends AtomicHIOAwithEquations
 {
 	// ------------------------------------------------------------------------
 	// Inner classes
@@ -101,47 +105,21 @@ extends AtomicHIOAwithDE
 	public static final String	TEMPERATURE = "temperature" ;
 	/** name of the plotter that displays the intensity.					*/
 	public static final String	INTENSITY = "intensity" ;
-	/** name of the run parameter defining the alpha parameter of the gamma
-	 *  probability distribution giving the bandwidth at resumption.		*/
-	public static final String	BAAR = "bandwidth-alpha-at-resumption" ;
-	/** name of the run parameter defining the beta parameter of the gamma
-	 *  probability distribution giving the bandwidth at resumption.		*/
-	public static final String	BBAR = "bandwidth-beta-at-resumption" ;
-	/** name of the run parameter defining the mean slope of the bandwidth
-	 *  i.e., the mean parameter of the exponential distribution.			*/
-	public static final String	BMASSF = "bandwidth-mean-absolute-slope-scale-factor" ;
-	/** name of the run parameter defining the integration step for the
-	 *  brownian motion followed by the bandwidth.						*/
-	public static final String	BIS = "bandwidth-integration-step" ;
 
+	public static final String	INITIAL_TEMP = "inital-temp" ;
 	// Model implementation variables
 	/** the maximum temperature												*/
 	protected double					maxTemperature ;
 	/** the minimum temperature												*/
 	protected double					minTemperature ;
-	/** the alpha parameter of the gamma probability distribution giving
-	 *  the bandwidth at resumption.										*/
-	protected double					bandwidthAlphaAtResumption ;
-	/** the beta parameter of the gamma probability distribution giving
-	 *  the bandwidth at resumption.										*/
-	protected double					bandwidthBetaAtResumption ;
-	/** the mean slope of the bandwidth i.e., the mean parameter of the
-	 *  exponential distribution.											*/
-	protected double					bandwidthMeanAbsoluteSlopeScaleFactor ;
-	/** the predefined integration step for the brownian motion followed
-	 *  by the bandwidth, which can be punctually updated at run time
-	 *  when necessary.														*/
-	protected double					bandwidthIntegrationStep ;
+	
+	protected double initialTemp;
+
 
 	/**	Random number generator for the bandwidth after resumption;
 	 *  the bandwidth after resumption follows a beta distribution.			*/
 	protected final RandomDataGenerator	genTemperature ;
 
-	/** Random number generator for the bandwidth continuous evolution;
-	 * 	the bandwidth brownian motion uses an exponential and a
-	 *  uniform distribution.												*/
-	protected final RandomDataGenerator	rgBrownianMotion1 ;
-	protected final RandomDataGenerator	rgBrownianMotion2 ;
 
 	/** the value of the temperature at the next internal transition time.	*/
 	protected double					nextTemperature ;
@@ -154,7 +132,7 @@ extends AtomicHIOAwithDE
 	/** current state of the door.											*/
 	protected FridgeDoor		currentDoorState ;
 	/** current state of the consumption.									*/
-	protected FridgeConsumption	currentConsumption ;
+	protected FridgeConsumption	currentState ;
 
 	// Bandwidth function and statistics for the report
 	/** average temperature during the simulation run.						*/
@@ -173,6 +151,8 @@ extends AtomicHIOAwithDE
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
 	protected EmbeddingComponentAccessI componentRef ;
+	
+	protected boolean triggerReading;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -203,8 +183,7 @@ extends AtomicHIOAwithDE
 
 		// Create the random number generators
 		this.genTemperature = new RandomDataGenerator() ;
-		this.rgBrownianMotion1 = new RandomDataGenerator() ;
-		this.rgBrownianMotion2 = new RandomDataGenerator() ;
+
 		// Create the representation of the temperature function for the report
 		this.temperatureFunction = new Vector<DoublePiece>() ;
 		// Create the representation of the intensity function for the report
@@ -217,30 +196,7 @@ extends AtomicHIOAwithDE
 	// Simulation protocol and related methods
 	// ------------------------------------------------------------------------
 
-	/**
-	 * generate a new bandwidth using a beta distribution.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	{@code ret >= 0.0 && ret <= this.maxBandwidth}
-	 * </pre>
-	 *
-	 * @return	a randomly generated bandwidth
-	 */
-	protected double	generateBandwidthAtResumption()
-	{
-		// Generate a random temperature value at resumption using the Beta
-		// distribution 
-		double newTemperature =
-			(this.maxTemperature - this.minTemperature) *
-						this.genTemperature.nextBeta(
-										this.bandwidthAlphaAtResumption,
-										this.bandwidthBetaAtResumption) + this.minTemperature ;
-		assert	newTemperature >= this.minTemperature && newTemperature <= this.maxTemperature ;
-		return newTemperature ;
-	}
+
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -256,16 +212,10 @@ extends AtomicHIOAwithDE
 		this.maxTemperature = (double) simParams.get(vname) ;
 		vname = this.getURI() + ":" + FridgeModel.MIN_TEMPERATURE ;
 		this.minTemperature = (double) simParams.get(vname) ;
-		vname = this.getURI() + ":" + FridgeModel.BAAR ;
-		this.bandwidthAlphaAtResumption = (double) simParams.get(vname) ;
-		vname = this.getURI() + ":" + FridgeModel.BBAR ;
-		this.bandwidthBetaAtResumption = (double) simParams.get(vname) ;
-		vname = this.getURI() + ":" + FridgeModel.BMASSF ;
-		this.bandwidthMeanAbsoluteSlopeScaleFactor =
-										(double) simParams.get(vname) ;		
-		vname = this.getURI() + ":" + FridgeModel.BIS ;
-		this.bandwidthIntegrationStep = (double) simParams.get(vname) ;
 
+		vname = this.getURI() + ":" + FridgeModel.INITIAL_TEMP ;
+		this.initialTemp = (double) simParams.get(vname) ;
+		
 		// Initialise the look of the plotter
 		vname = this.getURI() + ":" + FridgeModel.TEMPERATURE + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
@@ -289,8 +239,6 @@ extends AtomicHIOAwithDE
 	{
 		// initialisation of the random number generators
 		this.genTemperature.reSeedSecure() ;
-		this.rgBrownianMotion1.reSeedSecure() ;
-		this.rgBrownianMotion2.reSeedSecure() ;
 
 		// the model starts with a closed door 
 		this.timeOfLastOpening = initialTime ;
@@ -298,10 +246,12 @@ extends AtomicHIOAwithDE
 		
 		// the model starts in the suspended
 		this.timeOfLastSuspending = initialTime ;
-		this.currentConsumption = FridgeConsumption.SUSPENDED ;
+		this.currentState = FridgeConsumption.SUSPENDED ;
 
 		// initialisation of the temperature function for the report
 		this.temperatureFunction.clear() ;
+		
+		this.triggerReading = false;
 		// initialisation of the temperature function plotter on the screen
 		if (this.temperaturePlotter != null) {
 			this.temperaturePlotter.initialise() ;
@@ -329,23 +279,13 @@ extends AtomicHIOAwithDE
 
 		// Initialise the model variables, part of the initialisation protocol
 		// of HIOA
-		double newTemperature = this.generateBandwidthAtResumption() ;
+		double newTemperature = this.initialTemp ;
 		this.temperature.v = newTemperature ;
 		// The consumption is initialized at 0 because the door is closed and the fridge is
 		// in Suspended mode
 		this.intensity = 0.0;
 	}
 
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithDE#initialiseDerivatives()
-	 */
-	@Override
-	protected void		initialiseDerivatives()
-	{
-		// Initialise the derivatives of the model variables, part of the
-		// initialisation protocol of HIOA with differential equations
-		this.computeDerivatives() ;
-	}
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
@@ -353,103 +293,15 @@ extends AtomicHIOAwithDE
 	@Override
 	public Duration		timeAdvance()
 	{
-		if (this.currentDoorState == FridgeDoor.CLOSED) {
-			return new Duration(this.nextDelay, this.getSimulatedTimeUnit()) ;
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
 		} else {
-			assert	this.currentDoorState == FridgeDoor.OPENED ;
-			// the model will resume its internal transitions when it will
-			// receive the corresponding triggering external event.
-			return Duration.INFINITY ;
-		}
-		
-	}
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOAwithDE#computeDerivatives()
-	 */
-	@Override
-	protected void		computeDerivatives()
-	{
-		// For stochastic differential equations, the method compute the
-		// next value from a stochastic quantum rather than derivatives.
-		// Here, because the bandwidth must remain between 0 and maxBandwidth,
-		// the quantum may be limited, hence changing the delay until the limit
-		// is reached. This delay becomes the next time advance of the model.
-
-		if (this.currentDoorState == FridgeDoor.CLOSED) {
-			double delta_t = this.bandwidthIntegrationStep ;
-			double uniform1 = this.rgBrownianMotion1.nextUniform(0.0, 1.0) ;
-			// To generate a random number following an exponential distribution,
-			// the inverse method says to generate a uniform random number u
-			// following U[0,1] and then compute x = -1/M * ln(1 - u) follows
-			// an exponential distribution with mean M.
-			// Here M = result of the integration step * scale factor
-			double quantum = -Math.log(1 - uniform1) / delta_t ;
-			quantum = quantum * this.bandwidthMeanAbsoluteSlopeScaleFactor ;
-			double uniform2 = this.rgBrownianMotion2.nextUniform(0.0, 1.0) ;
-			double threshold =
-					(this.maxTemperature - this.temperature.v)/this.maxTemperature ;
-			if (Math.abs(uniform2 - threshold) < 0.000001) {
-				// the slope is fixed at 0 to cope for the limit cases
-				this.nextTemperature = this.temperature.v ;
-				this.nextDelay = delta_t ;
-			} else if (uniform2 < threshold) {
-				// the quantum will be positive i.e., the bandwidth increases
-				double limit = this.maxTemperature - this.temperature.v ;
-				if (quantum > limit) {
-					// the bandwidth cannot go over the maximum
-					this.nextTemperature = this.maxTemperature ;
-					this.nextDelay = -Math.log(1 - uniform1) / quantum ;
-				} else {
-					this.nextTemperature = this.temperature.v + quantum ;
-					this.nextDelay = delta_t ;
-				}
-			} else {
-				// the quantum will be negative i.e., the bandwidth decreases
-				assert	uniform2 > threshold ;
-				double limit = this.temperature.v ;
-				if (quantum > limit) {
-					// the bandwidth cannot go under 0
-					this.nextTemperature = this.minTemperature ;
-					this.nextDelay = -Math.log(1 - uniform1) / quantum ;
-				} else {
-					this.nextTemperature = this.temperature.v - quantum ;
-					this.nextDelay = delta_t ;
-				}
-			}
-		} else {
-			assert	this.currentDoorState == FridgeDoor.OPENED ;
-			
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
+
 	
-	protected void		computeNextState()
-	{
-		if(this.currentConsumption == FridgeConsumption.RESUMED) {
-			this.intensity = FridgeModel.TENSION * FridgeSetting.ACTIVE_CONSUMPTION;
-			if (this.currentDoorState == FridgeDoor.OPENED) {
-				this.intensity += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
-				this.temperature.v = this.temperature.v + 0.1 * FridgeModel.CHANGEMENT_TEMPERATURE;
-			} else {
-				assert	this.currentDoorState == FridgeDoor.CLOSED ;
-				this.temperature.v = this.temperature.v - FridgeModel.CHANGEMENT_TEMPERATURE;
-				if(this.temperature.v <= this.minTemperature) {
-					this.temperature.v = this.minTemperature;
-				}
-			}
-		} else {
-			assert	this.currentConsumption == FridgeConsumption.SUSPENDED ;
-			this.intensity = FridgeModel.TENSION * FridgeSetting.PASSIVE_CONSUMPTION;
-			if (this.currentDoorState == FridgeDoor.OPENED) {
-				this.intensity += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
-				this.temperature.v = this.temperature.v + 0.5 * FridgeModel.CHANGEMENT_TEMPERATURE;
-			} else {
-				assert	this.currentDoorState == FridgeDoor.CLOSED ;
-				this.temperature.v = this.temperature.v + 0.25*FridgeModel.CHANGEMENT_TEMPERATURE;
-				
-			}
-		}
-	}
+	
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
@@ -461,45 +313,38 @@ extends AtomicHIOAwithDE
 			this.logMessage("RefrigerateurModel#userDefinedInternalTransition "
 							+ elapsedTime) ;
 		}
-		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-			super.userDefinedInternalTransition(elapsedTime) ;
+		if (this.triggerReading) {
+			this.triggerReading = false;
+		}
+		this.computeNextState();
+		this.temperature.time = this.getCurrentStateTime() ;
 
-//			if (this.currentDoorState == Door.CLOSED) {
-//				// the value of the bandwidth at the next internal transition
-//				// is computed in the timeAdvance function when computing
-//				// the delay until the next internal transition.
-//				this.temperature.v = this.nextTemperature ;
-//			}
-			this.computeNextState();
-			this.temperature.time = this.getCurrentStateTime() ;
-
-			// visualisation and simulation report.
-			this.temperatureFunction.add(
-				new DoublePiece(this.temperature.time.getSimulatedTime(),
-								0,
-								this.getCurrentStateTime().getSimulatedTime(),
-								this.temperature.v)) ;
-			if (this.temperaturePlotter != null) {
-				this.temperaturePlotter.addData(
-						TEMPERATURE_SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						this.temperature.v) ;
-			}
-			this.intensityFunction.add(
-					new DoublePiece(
-							this.getCurrentStateTime().getSimulatedTime(),
+		// visualisation and simulation report.
+		this.temperatureFunction.add(
+			new DoublePiece(this.temperature.time.getSimulatedTime(),
 							0,
 							this.getCurrentStateTime().getSimulatedTime(),
-							this.intensity)) ;
-				if (this.intensityPlotter != null) {
-					this.intensityPlotter.addData(
-						INTENSITY_SERIES,
-						this.getCurrentStateTime().getSimulatedTime(), 
-						this.intensity) ;
-				}
-			this.logMessage(this.getCurrentStateTime() +
-					"|internal|temperature = " + this.temperature.v + " �C") ;
+							this.temperature.v)) ;
+		if (this.temperaturePlotter != null) {
+			this.temperaturePlotter.addData(
+					TEMPERATURE_SERIES,
+					this.getCurrentStateTime().getSimulatedTime(),
+					this.temperature.v) ;
 		}
+		this.intensityFunction.add(
+				new DoublePiece(
+						this.getCurrentStateTime().getSimulatedTime(),
+						0,
+						this.getCurrentStateTime().getSimulatedTime(),
+						this.intensity)) ;
+			if (this.intensityPlotter != null) {
+				this.intensityPlotter.addData(
+					INTENSITY_SERIES,
+					this.getCurrentStateTime().getSimulatedTime(), 
+					this.intensity) ;
+			}
+		this.logMessage(this.getCurrentStateTime() +
+				"|internal|temperature = " + this.temperature.v + " �C") ;
 	}
 
 	/**
@@ -552,27 +397,12 @@ extends AtomicHIOAwithDE
 		this.temperature.time = this.getCurrentStateTime() ;
 		this.timeOfLastOpening = this.getCurrentStateTime() ;
 		this.timeOfLastSuspending = this.getCurrentStateTime();
-//		this.temperature.v = this.generateBandwidthAtResumption() ;
-		
-		if (currentEvents.get(0) instanceof CloseEvent) {
-			this.currentDoorState = FridgeDoor.CLOSED ;
-			this.logMessage(this.getCurrentStateTime() +
-					"|external|Closed.") ;
-		} else if(currentEvents.get(0) instanceof OpenEvent) {
-			this.currentDoorState = FridgeDoor.OPENED ;
-			this.logMessage(this.getCurrentStateTime() +
-					"|external|Opened.") ;
-		} else if (currentEvents.get(0) instanceof ResumeEvent) {
-			this.currentConsumption = FridgeConsumption.RESUMED ;
-			this.logMessage(this.getCurrentStateTime() +
-					"|external|Resumed.") ;
+		Event ce =(Event) currentEvents.get(0);
+		if (ce instanceof AbstractFridgeEvent) {
+			ce.executeOn(this);
 		} else {
-			assert	currentEvents.get(0) instanceof SuspendEvent ;
-			this.currentConsumption = FridgeConsumption.SUSPENDED ;
-			this.logMessage(this.getCurrentStateTime() +
-					"|external|Suspended.") ;
+			triggerReading = true;
 		}
-//		this.computeDerivatives() ;
 		this.computeNextState();
 
 		// visualisation and simulation report.
@@ -581,20 +411,12 @@ extends AtomicHIOAwithDE
 					TEMPERATURE_SERIES,
 					this.getCurrentStateTime().getSimulatedTime(),
 					this.temperature.v) ;
-			this.temperaturePlotter.addData(
-					TEMPERATURE_SERIES,
-					this.getCurrentStateTime().getSimulatedTime(),
-					this.nextTemperature) ;
 		}
 		if (this.intensityPlotter != null) {
 			this.intensityPlotter.addData(
 				INTENSITY_SERIES,
 				this.getCurrentStateTime().getSimulatedTime(), 
 				this.intensity) ;
-			this.intensityPlotter.addData(
-					INTENSITY_SERIES,
-					this.getCurrentStateTime().getSimulatedTime(), 
-					this.intensity) ;
 		}
 	}
 	
@@ -605,7 +427,17 @@ extends AtomicHIOAwithDE
 	@Override
 	public ArrayList<EventI>	output()
 	{
-		return null ;
+		if (this.triggerReading) {
+			double reading = this.temperature.v; // Watt
+
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
+			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
+			FridgeConsumptionEvent consommation = new FridgeConsumptionEvent(currentTime, reading);
+			ret.add(consommation);
+			return ret;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -636,12 +468,56 @@ extends AtomicHIOAwithDE
 	// Model-specific methods
 	// ------------------------------------------------------------------------
 
+	protected void		computeNextState()
+	{
+		if(this.currentState == FridgeConsumption.RESUMED) {
+			this.intensity = FridgeModel.TENSION * FridgeSetting.ACTIVE_CONSUMPTION;
+			if (this.currentDoorState == FridgeDoor.OPENED) {
+				this.intensity += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
+				this.temperature.v = this.temperature.v + 0.8 * FridgeModel.CHANGEMENT_TEMPERATURE;
+			} else {
+				assert	this.currentDoorState == FridgeDoor.CLOSED ;
+				this.temperature.v = this.temperature.v - FridgeModel.CHANGEMENT_TEMPERATURE;
+				if(this.temperature.v <= this.minTemperature) {
+					this.temperature.v = this.minTemperature;
+				}
+			}
+		} else {
+			assert	this.currentState == FridgeConsumption.SUSPENDED ;
+			this.intensity = FridgeModel.TENSION * FridgeSetting.PASSIVE_CONSUMPTION;
+			if (this.currentDoorState == FridgeDoor.OPENED) {
+				this.intensity += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
+				this.temperature.v = this.temperature.v + 0.5 * FridgeModel.CHANGEMENT_TEMPERATURE;
+			} else {
+				assert	this.currentDoorState == FridgeDoor.CLOSED ;
+				this.temperature.v = this.temperature.v + 0.25*FridgeModel.CHANGEMENT_TEMPERATURE;
+				
+			}
+		}
+	}
+	
 	public FridgeDoor getDoorState() {
 		return this.currentDoorState;
 	}
 	
-	public FridgeConsumption getConsumptionState() {
-		return this.currentConsumption;
+	public void closeDoor() {
+		this.currentDoorState = FridgeDoor.CLOSED;
+	}
+	
+	public void openDoor() {
+		this.currentDoorState = FridgeDoor.OPENED;
+	}
+	
+	public void resume() {
+		this.currentState = FridgeConsumption.RESUMED;
+	}
+	
+	public void suspend() {
+		this.currentState = FridgeConsumption.SUSPENDED;
+	}
+	
+	public FridgeConsumption getState() {
+		return this.currentState;
 	}
 	
 	public double getTemperature() {

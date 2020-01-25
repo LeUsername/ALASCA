@@ -25,7 +25,7 @@ public class FridgeSimulatorPlugin extends AtomicSimulatorPlugin {
 		if (name.equals("door")) {
 			return ((FridgeModel) m).getDoorState();
 		} else if (name.equals("consumption")) {
-			return ((FridgeModel) m).getConsumptionState();
+			return ((FridgeModel) m).getState();
 		} else if (name.equals("temperature")) {
 			return ((FridgeModel) m).getTemperature();
 		}else {

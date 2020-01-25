@@ -18,7 +18,6 @@ import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
 import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.plugins.HairDryerSimulatorPlugin;
-import simulation.tools.TimeScale;
 import simulation.tools.hairdryer.HairDryerPowerLevel;
 import simulation.tools.hairdryer.HairDryerState;
 import simulation.tools.hairdryer.HairDryerUserBehaviour;
@@ -216,7 +215,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 			@Override
 			public void run() {
 				try {
-					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}

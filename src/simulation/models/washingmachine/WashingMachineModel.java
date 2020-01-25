@@ -21,6 +21,7 @@ import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.tools.URIS;
 import wattwatt.tools.washingmachine.WashingMachineMode;
@@ -29,17 +30,18 @@ import wattwatt.tools.washingmachine.WashingMachineSetting;
 @ModelExternalEvents(imported = { EcoModeEvent.class, 
 								  PremiumModeEvent.class, 
 								  StartAtEvent.class, 
-								  TicEvent.class})
+								  TicEvent.class},
+exported = { WashingMachineConsumptionEvent.class})
 public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	public static class LaveLingeReport extends AbstractSimulationReport {
+	public static class WashingMachineReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
-		public LaveLingeReport(String modelURI) {
+		public WashingMachineReport(String modelURI) {
 			super(modelURI);
 		}
 
@@ -179,7 +181,17 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	@Override
 	public ArrayList<EventI> output() {
-		return null;
+		if (this.triggerReading) {
+			double reading = this.currentIntensity; // Watt
+
+			ArrayList<EventI> ret = new ArrayList<EventI>(1);
+			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
+			WashingMachineConsumptionEvent consommation = new WashingMachineConsumptionEvent(currentTime, reading);
+			ret.add(consommation);
+			return ret;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -282,13 +294,14 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.currentIntensity);
 		super.endSimulation(endTime);
 	}
+	
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
 	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
-		return new LaveLingeReport(this.getURI());
+		return new WashingMachineReport(this.getURI());
 	}
 	
 	public double getIntensity() {

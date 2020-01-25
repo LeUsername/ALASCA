@@ -27,6 +27,5 @@ public class WattWattModel extends CoupledModel {
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
 			  imported, reexported, connections);
-		System.out.println("salut jacques <3");
 	}
 }

@@ -91,8 +91,7 @@ extends		AbstractCVM
 //		this.toggleTracing(this.groupeUri);
 
 
-		this.doPortConnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1", URIS.HAIR_DRYER_IN_URI,
-				HairDryerConnector.class.getCanonicalName());
+		this.doPortConnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1", URIS.HAIR_DRYER_IN_URI, HairDryerConnector.class.getCanonicalName());
 
 
 		super.deploy();

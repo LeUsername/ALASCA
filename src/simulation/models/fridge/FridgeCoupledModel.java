@@ -110,11 +110,6 @@ public class FridgeCoupledModel extends CoupledModel {
 
 		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
 
-		Map<Class<? extends EventI>, ReexportedEvent> reexported = new HashMap<Class<? extends EventI>, ReexportedEvent>();
-		reexported.put(OpenEvent.class, new ReexportedEvent(FridgeUserModel.URI, OpenEvent.class));
-		reexported.put(CloseEvent.class, new ReexportedEvent(FridgeUserModel.URI, CloseEvent.class));
-		reexported.put(ResumeEvent.class, new ReexportedEvent(FridgeSensorModel.URI, ResumeEvent.class));
-		reexported.put(SuspendEvent.class, new ReexportedEvent(FridgeSensorModel.URI, SuspendEvent.class));
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 		EventSource from1 = new EventSource(FridgeUserModel.URI, OpenEvent.class);
@@ -141,7 +136,7 @@ public class FridgeCoupledModel extends CoupledModel {
 
 		coupledModelDescriptors.put(FridgeCoupledModel.URI,
 				new CoupledHIOA_Descriptor(FridgeCoupledModel.class, FridgeCoupledModel.URI, submodels,
-						imported, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null,
+						imported, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null,
 						null, bindings));
 
 		return new Architecture(FridgeCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

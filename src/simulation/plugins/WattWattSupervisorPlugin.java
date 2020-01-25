@@ -13,7 +13,9 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.interfaces.SupervisorPluginMa
 import fr.sorbonne_u.components.cyphy.plugins.devs.ports.SimulatorPluginManagementOutboundPort;
 import fr.sorbonne_u.components.cyphy.plugins.devs.ports.SupervisorNotificationInboundPort;
 import fr.sorbonne_u.components.cyphy.plugins.devs.ports.SupervisorPluginManagementInboundPort;
+import fr.sorbonne_u.components.reflection.connectors.ReflectionConnector;
 import fr.sorbonne_u.components.reflection.interfaces.ReflectionI;
+import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 
@@ -315,19 +317,40 @@ public class WattWattSupervisorPlugin
 		@Override
 		public void startRealTimeSimulation(double startTime, double simulationDuration) throws Exception {
 			// TODO Auto-generated method stub
-			
+			this.getRootSmop().startRealTimeSimulation(
+					startTime, simulationDuration) ;
 		}
 
 		@Override
 		public void finaliseSimulation() throws Exception {
 			// TODO Auto-generated method stub
-			
+			this.getRootSmop().finaliseSimulation() ;
 		}
 
 		@Override
 		public void resetArchitecture(ComponentModelArchitectureI architecture) throws Exception {
 			// TODO Auto-generated method stub
+			assert	architecture != null ;
 			
+			this.rootModelSmop.reinitialise() ;
+			this.owner.doPortDisconnection(this.rootModelSmop.getPortURI()) ;
+			this.rootModelSmop.unpublishPort() ;
+			this.rootModelSmop.destroyPort() ;
+			this.rootModelSmop = null ;
+			ReflectionOutboundPort rop = new ReflectionOutboundPort(this.owner) ;
+			rop.publishPort() ;
+			this.owner.doPortConnection(
+					rop.getPortURI(),
+					this.architecture.getReflectionInboundPortURI(
+											this.architecture.getRootModelURI()),
+					ReflectionConnector.class.getCanonicalName()) ;
+			rop.uninstallPlugin(this.architecture.getRootModelURI()) ;
+			this.owner.doPortDisconnection(rop.getPortURI()) ;
+			rop.unpublishPort() ;
+			rop.destroyPort() ;
+			rop = null ;
+			this.architecture = architecture ;
+			this.createSimulator() ;
 		}
 	}
 	// -----------------------------------------------------------------------------

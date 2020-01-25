@@ -236,6 +236,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			ticReceived = true;
 		} else {
 			assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
+			System.out.println(ce.getClass());
 			ce.executeOn(this);
 		}
 		if (ticReceived) {

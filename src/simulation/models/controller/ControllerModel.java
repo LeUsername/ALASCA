@@ -27,7 +27,9 @@ import simulation.tools.enginegenerator.EngineGeneratorState;
 
 @ModelExternalEvents(imported = { ConsumptionEvent.class, 
 								  EngineGeneratorProductionEvent.class, 
-								  WindTurbineProductionEvent.class})
+								  WindTurbineProductionEvent.class},
+					 exported = { StartEngineGenerator.class, 
+								  StopEngineGenerator.class})
 public class ControllerModel extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -268,7 +270,6 @@ public class ControllerModel extends AtomicModel {
 		this.lastDecisionTimeEngineGenerator =
 							this.getCurrentStateTime().getSimulatedTime() ;
 		this.mustTransmitDecision = false ;
-		System.out.println(consumption);
 		return ret ;
 	}
 
@@ -349,7 +350,7 @@ public class ControllerModel extends AtomicModel {
 			}
 		} else{
 			assert	this.EGState == EngineGeneratorState.OFF;
-			if (production <= this.consumption) {
+			if (production <= this.consumption*1200) {
 				// on l'allume
 				this.triggeredDecisionEngineGenerator = Decision.START_ENGINE;
 				this.EGState = EngineGeneratorState.ON ;

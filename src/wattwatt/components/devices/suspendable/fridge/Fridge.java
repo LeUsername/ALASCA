@@ -227,10 +227,7 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
 		simParams.put(
 				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.BAAR, 1.75) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.BBAR, 1.75) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.BMASSF, 1.0/11.0) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.BIS, 0.5) ;
+		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
 		simParams.put(
 				FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
