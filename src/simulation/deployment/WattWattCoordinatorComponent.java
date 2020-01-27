@@ -1,9 +1,9 @@
 package simulation.deployment;
 
-import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 
 public class WattWattCoordinatorComponent
-extends AbstractComponent
+extends AbstractCyPhyComponent
 {
 	// -------------------------------------------------------------------------
 	// Constructors

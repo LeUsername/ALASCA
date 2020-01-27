@@ -68,7 +68,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 * URI used to create instances of the model; assumes a singleton, otherwise a
 	 * different URI must be given to each instance.
 	 */
-	public static final String URI = "HairDryerModel";
+	public static final String URI = URIS.HAIR_DRYER_MODEL_URI;
 
 	private static final String SERIES = "intensity";
 	public static final String INTENSITY_SERIES = "intensity-series";

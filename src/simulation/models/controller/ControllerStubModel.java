@@ -17,6 +17,7 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class })
 public class ControllerStubModel extends AtomicES_Model {
@@ -43,7 +44,7 @@ public class ControllerStubModel extends AtomicES_Model {
 	}
 
 	/** URI to be used when creating the model. */
-	public static final String URI = "ControllerStubModel";
+	public static final String URI = URIS.CONTROLLER_STUB_MODEL_URI;
 
 	// Model simulation implementation variables
 	/** initial delay before sending the first switch on event. */

@@ -6,6 +6,16 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwatt.components.devices.schedulable.washingmachine.WashingMachine;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 
+/**
+ * The class <code>WashingMachineInPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The InBound port of the electric meter component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class WashingMachineInPort extends AbstractInboundPort implements IWashingMachine {
 
 	/**
@@ -130,7 +140,7 @@ public class WashingMachineInPort extends AbstractInboundPort implements IWashin
 	}
 
 	@Override
-	public void ecoLavage() throws Exception {
+	public void ecoWashing() throws Exception {
 		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {
@@ -142,7 +152,7 @@ public class WashingMachineInPort extends AbstractInboundPort implements IWashin
 	}
 
 	@Override
-	public void premiumLavage() throws Exception {
+	public void premiumWashing() throws Exception {
 		this.owner.handleRequestAsync(new AbstractComponent.AbstractService<Void>() {
 			@Override
 			public Void call() throws Exception {

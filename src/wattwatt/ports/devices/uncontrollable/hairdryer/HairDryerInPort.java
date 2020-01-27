@@ -6,6 +6,16 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwatt.components.devices.uncontrollable.hairdryer.HairDryer;
 import wattwatt.interfaces.devices.uncontrollable.hairdryer.IHairDryer;
 
+/**
+ * The class <code>HairDryerInPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The InBound port of the hair dryer component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class HairDryerInPort extends AbstractInboundPort implements IHairDryer {
 
 	/**

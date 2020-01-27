@@ -19,6 +19,7 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { TicEvent.class }, 
 					 exported = { ResumeEvent.class,
@@ -70,7 +71,7 @@ public class FridgeSensorModel extends		AtomicHIOAwithEquations
 
 	private static final long		serialVersionUID = 1L ;
 	private static final String		SERIES = "Temperature" ;
-	public static final String		URI = "FridgeSensorModel" ;
+	public static final String		URI = URIS.FRIDGE_SENSOR_MODEL_URI ;
 
 	// Run parameter names to be used when initialising them before each run
 	/** name of the run parameter defining the maximum temperature.			*/

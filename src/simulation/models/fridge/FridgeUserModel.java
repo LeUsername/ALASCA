@@ -19,6 +19,7 @@ import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.tools.fridge.FridgeDoor;
+import wattwatt.tools.URIS;
 
 //-----------------------------------------------------------------------------
 @ModelExternalEvents(exported = { CloseEvent.class, 
@@ -82,7 +83,7 @@ extends		AtomicES_Model
 	/** name of the series used in the plotting.							*/
 	private static final String	SERIES = "Refrigerateur's door opened/closed" ;
 	/** URI to be used when creating the model.								*/
-	public static final String	URI = "FridgeUserModel" ;
+	public static final String	URI = URIS.FRIDGE_USER_MODEL_URI ;
 	/** name of the run parameter defining the mean time between
 	 *  interruptions.														*/
 	public static final String	MTBI = "mtbi" ;

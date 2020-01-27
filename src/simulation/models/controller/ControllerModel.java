@@ -24,6 +24,7 @@ import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.controller.Decision;
 import simulation.tools.enginegenerator.EngineGeneratorState;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { ConsumptionEvent.class, 
 								  EngineGeneratorProductionEvent.class, 
@@ -88,7 +89,7 @@ public class ControllerModel extends AtomicModel {
 	 * URI used to create instances of the model; assumes a singleton, otherwise a
 	 * different URI must be given to each instance.
 	 */
-	public static final String URI = "ControllerModel";
+	public static final String URI = URIS.CONTROLLER_MODEL_URI;
 	
 	private static final String PRODUCTION = "production";
 	public static final String PRODUCTION_SERIES = "production-series";

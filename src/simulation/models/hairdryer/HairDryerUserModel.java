@@ -49,7 +49,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String URI = "HairDryerUserModel";
+	public static final String URI = URIS.HAIR_DRYER_USER_MODEL_URI;
 
 	public static final String INITIAL_DELAY = "initial-delay";
 	public static final String INTERDAY_DELAY = "interday-delay";

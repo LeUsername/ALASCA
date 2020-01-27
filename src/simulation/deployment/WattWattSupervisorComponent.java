@@ -220,9 +220,11 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		super.execute();
 
 		this.logMessage("supervisor component begins execution.");
-
-		sp.createSimulator();
-
+		try {
+			sp.createSimulator();
+		} catch (Exception e) {
+			System.out.println(e.getCause());
+		}
 		this.logMessage("SupervisorComponent#execute 1");
 
 		Map<String, Object> simParams = new HashMap<String, Object>();

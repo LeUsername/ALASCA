@@ -55,7 +55,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 * URI used to create instances of the model; assumes a singleton, otherwise a
 	 * different URI must be given to each instance.
 	 */
-	public static final String URI = "ElectricMeterModel";
+	public static final String URI = URIS.ELECTRIC_METER_MODEL_URI;
 
 	private static final String SERIES = "consumption";
 	public static final String CONSUMPTION_SERIES = "consumption-series";

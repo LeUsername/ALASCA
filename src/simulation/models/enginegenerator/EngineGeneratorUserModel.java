@@ -20,6 +20,7 @@ import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
 import simulation.events.enginegenerator.StopEvent;
 import simulation.tools.enginegenerator.EngineGeneratorUserAction;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { StartEvent.class, RefillEvent.class,
 		 StopEvent.class})
@@ -49,7 +50,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	public static final String ACTION = "START/STOP/REFILL";
 	
 	/** URI to be used when creating the model. */
-	public static final String URI = "EngineGeneratorUserModel";
+	public static final String URI = URIS.ENGINE_GENERATOR_USER_MODEL_URI;
 	/**
 	 * name of the run parameter defining the intial delay.
 	 */

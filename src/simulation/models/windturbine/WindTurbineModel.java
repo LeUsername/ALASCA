@@ -23,6 +23,7 @@ import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
 import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.windturbine.WindTurbineState;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { WindReadingEvent.class, 
 								  SwitchOffEvent.class, 
@@ -59,7 +60,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 * URI used to create instances of the model; assumes a singleton, otherwise a
 	 * different URI must be given to each instance.
 	 */
-	public static final String URI = "WindTurbineModel";
+	public static final String URI = URIS.WIND_TURBINE_MODEL_URI;
 	
 	private static final String PRODUCTION = "production";
 	public static final String PRODUCTION_SERIES = "production-series";

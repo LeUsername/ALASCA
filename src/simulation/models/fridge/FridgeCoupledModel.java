@@ -31,6 +31,7 @@ import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
+import wattwatt.tools.URIS;
 
 public class FridgeCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -39,7 +40,7 @@ public class FridgeCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "FridgeCoupledModel";
+	public static final String URI = URIS.FRIDGE_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

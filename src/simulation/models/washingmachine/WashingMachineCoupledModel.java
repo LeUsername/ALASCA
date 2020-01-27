@@ -30,6 +30,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
+import wattwatt.tools.URIS;
 
 public class WashingMachineCoupledModel extends CoupledModel {
 
@@ -39,7 +40,7 @@ public class WashingMachineCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "WashingMachineCoupledModel";
+	public static final String URI = URIS.WASHING_MACHINE_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

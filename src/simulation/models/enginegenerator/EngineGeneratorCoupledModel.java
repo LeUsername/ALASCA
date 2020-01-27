@@ -30,6 +30,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
 import simulation.events.enginegenerator.StopEvent;
+import wattwatt.tools.URIS;
 
 public class EngineGeneratorCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -38,7 +39,7 @@ public class EngineGeneratorCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "EngineGeneratorCoupledModel";
+	public static final String URI = URIS.ENGINE_GENERATOR_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

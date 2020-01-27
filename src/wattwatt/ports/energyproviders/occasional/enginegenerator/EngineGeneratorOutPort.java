@@ -4,6 +4,16 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 
+/**
+ * The class <code>EngineGeneratorOutPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The OutBound port of the engine generator component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class EngineGeneratorOutPort extends AbstractOutboundPort implements IEngineGenerator {
 
 	/**

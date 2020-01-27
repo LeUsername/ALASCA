@@ -22,6 +22,7 @@ import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
 import simulation.tools.washingmachine.WashingMachineUserBehaviour;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { StartAtEvent.class, 
 								  EcoModeEvent.class, 
@@ -52,7 +53,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	
 	public static final String ACTION = "START_AT/ECO/PREMIUM";
 	/** URI to be used when creating the model. */
-	public static final String URI = "WashingMachineUserModel";
+	public static final String URI = URIS.WASHING_MACHINE_USER_MODEL_URI;
 	/**
 	 * name of the run parameter defining the mean time between interruptions.
 	 */

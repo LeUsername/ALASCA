@@ -13,6 +13,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.electricmeter.ConsumptionEvent;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { ConsumptionEvent.class })
 public class ElectricMeterStubModel extends AtomicES_Model {
@@ -22,7 +23,7 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "ElectricMeterSensorModel";
+	public static final String URI = URIS.ELECTRIC_METER_STUB_MODEL_URI;
 
 	protected double initialDelay;
 	protected double interdayDelay;

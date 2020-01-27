@@ -3,6 +3,21 @@ package wattwatt.connectors.energyproviders.occasional.enginegenerator;
 import wattwatt.connectors.energyproviders.EnergyProviderConnector;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 
+
+/**
+ * The class <code>EngineGeneratorConnector</code> implements a connector between
+ * the <code>IController</code> and the <code>IEngineGenerator</code> interfaces.
+ *
+ * <p><strong>Description</strong></p>
+ * 
+ * It implements the required interface <code>IController</code> and in the
+ * methods it calls the corresponding offered method
+ * <code>IEngineGenerator</code>.
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class EngineGeneratorConnector extends EnergyProviderConnector implements IEngineGenerator {
 
 	@Override

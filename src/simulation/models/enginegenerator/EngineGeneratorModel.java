@@ -26,6 +26,7 @@ import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
 import simulation.events.enginegenerator.StopEvent;
 import simulation.tools.enginegenerator.EngineGeneratorState;
+import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
 @ModelExternalEvents(imported = { RefillEvent.class, 
@@ -59,7 +60,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 * URI used to create instances of the model; assumes a singleton, otherwise a
 	 * different URI must be given to each instance.
 	 */
-	public static final String URI = "EngineGeneratorModel";
+	public static final String URI = URIS.ENGINE_GENERATOR_MODEL_URI;
 
 	private static final String PRODUCTION = "production";
 	public static final String PRODUCTION_SERIES = "production-series";

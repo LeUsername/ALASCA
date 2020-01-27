@@ -36,41 +36,89 @@ import wattwatt.ports.electricmeter.ElectricMeterInPort;
 import wattwatt.tools.URIS;
 import wattwatt.tools.electricmeter.ElectricMeterSetting;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ElectricMeter</code> 
+*
+* <p><strong>Description</strong></p>
+* 
+³ This class implements the electric meter component that give the overall energy consumption
+* of all the components in our system.
+* The controller is connected to all device that consume energy so he require all their interfaces
+* 
+* 
+* <p>Created on : 2020-01-27</p>
+* 
+* @author	<p>Bah Thierno, Zheng Pascal</p>
+*/
+//The next annotation requires that the referenced interface is added to
+//the required interfaces of the component.
 @OfferedInterfaces(offered = IElectricMeter.class)
 @RequiredInterfaces(required = { IController.class, IFridge.class, IHairDryer.class, IWashingMachine.class })
 public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
-	protected ElectricMeterInPort cptin;
-
-	protected FridgeOutPort refriout;
-	protected HairDryerOutPort sechout;
-	protected WashingMachineOutPort laveout;
-
-	protected double consomation;
-	protected double fridgeConsumption;
-	protected double hairDryerConsumption;
-	protected double washingMachineConsumption;
-
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-	protected double consumptionSim;
+	
+	/** The inbound port of the electric meter*/
+	protected ElectricMeterInPort cptin;
 
+	/**	the outbound port used to call the fridge services.	*/
+	protected FridgeOutPort refriout;
+	/**	the outbound port used to call the hair dryer services.	*/
+	protected HairDryerOutPort sechout;
+	/**	the outbound port used to call the washing machine services	*/
+	protected WashingMachineOutPort laveout;
+
+	/**	the overall energy consumption*/
+	protected double consomation;
+	
+	/**	the fridge energy consumption*/
+	protected double fridgeConsumption;
+	/**	the hair dryer energy consumption*/
+	protected double hairDryerConsumption;
+	/**	the washing machine energy consumption*/
+	protected double washingMachineConsumption;
+
+	/** the simulation plug-in holding the simulation models. */
 	protected ElectricMeterSimulatorPlugin asp;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Create an electric meter.
+	 * This constructor is used in the CVM.
+	 * 
+	 *
+	 * @param uri				URI of the component.
+	 * @param compteurIn		inbound port URI of the electric meter.
+	 * @throws Exception		<i>todo.</i>
+	 */
 	protected ElectricMeter(String uri, String compteurIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
+		
 		this.cptin = new ElectricMeterInPort(compteurIn, this);
 		this.cptin.publishPort();
-
 		this.tracer.setRelativePosition(0, 1);
 	}
+	
 
+	/**
+	 * Create an electric meter.
+	 * This constructor is used in the Distributed CVM.
+	 * 
+	 *
+	 * @param uri				URI of the component.
+	 * @param compteurIn		inbound port URI of the electric meter.
+	 * @param refriOut		outbound port URI of the fridge.
+	 * @param sechOut		outbound port URI of the hair dryer.
+	 * @param laveOut		outbound port URI of the washing machine.
+	 * @throws Exception		<i>todo.</i>
+	 */
 	protected ElectricMeter(String uri, String compteurIn, String refriOut, String sechOut, String laveOut)
 			throws Exception {
 		super(uri, 2, 3);
@@ -89,6 +137,11 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 		this.tracer.setRelativePosition(0, 1);
 	}
+
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+
 
 	protected void initialise() throws Exception {
 		// The coupled model has been made able to create the simulation

@@ -20,6 +20,7 @@ import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
 import simulation.tools.windturbine.WindTurbineState;
+import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { TicEvent.class }, exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class WindTurbineSensorModel extends AtomicES_Model {
@@ -50,7 +51,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String URI = "WindTurbineSensorModel";
+	public static final String URI = URIS.WIND_TURBINE_SENSOR_MODEL_URI;
 	
 	public static final String INITIAL_DELAY = "initial-delay";
 	public static final String INTERDAY_DELAY = "interday-delay";

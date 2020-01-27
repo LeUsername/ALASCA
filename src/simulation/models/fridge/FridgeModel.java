@@ -91,7 +91,7 @@ extends AtomicHIOAwithEquations
 	private static final long	serialVersionUID = 1L ;
 	private static final String	TEMPERATURE_SERIES = "refrigerateur temperature" ;
 	private static final String	INTENSITY_SERIES = "refrigerateur intensity" ;
-	public static final String	URI = "FridgeModel" ;
+	public static final String	URI = URIS.FRIDGE_MODEL_URI ;
 	/** nominal tension (in Volts) of the fridge. */
 	protected static final double TENSION = 220.0; // Volts
 	protected static final double CHANGEMENT_TEMPERATURE = 0.05; // �C

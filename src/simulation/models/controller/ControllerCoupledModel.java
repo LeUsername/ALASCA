@@ -26,6 +26,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
+import wattwatt.tools.URIS;
 
 // TODO
 public class ControllerCoupledModel extends		CoupledModel{
@@ -35,7 +36,7 @@ public class ControllerCoupledModel extends		CoupledModel{
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "ControllerCoupledModel";
+	public static final String URI = URIS.CONTROLLER_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

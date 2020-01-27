@@ -33,6 +33,7 @@ import simulation.events.hairdryer.IncreasePowerEvent;
 import simulation.events.hairdryer.SwitchModeEvent;
 import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
+import wattwatt.tools.URIS;
 
 public class HairDryerCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -41,7 +42,7 @@ public class HairDryerCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "HairDryerCoupledModel";
+	public static final String URI = URIS.HAIR_DRYER_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

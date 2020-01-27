@@ -5,6 +5,16 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwatt.components.ElectricMeter;
 import wattwatt.interfaces.electricmeter.IElectricMeter;
 
+/**
+ * The class <code>ElectricMeterInPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The InBound port of the electric meter component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class ElectricMeterInPort extends AbstractInboundPort implements IElectricMeter{
 
 	/**

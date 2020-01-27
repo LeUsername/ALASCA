@@ -28,6 +28,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
+import wattwatt.tools.URIS;
 
 public class WindTurbineCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -36,7 +37,7 @@ public class WindTurbineCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "WindTurbineCoupledModel";
+	public static final String URI = URIS.WIND_TURBINE_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors

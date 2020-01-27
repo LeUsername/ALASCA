@@ -4,6 +4,16 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 
+/**
+ * The class <code>WashingMachineOutPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The OutBound port of the washing machine component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class WashingMachineOutPort extends AbstractOutboundPort implements IWashingMachine {
 
 	/**
@@ -91,14 +101,14 @@ public class WashingMachineOutPort extends AbstractOutboundPort implements IWash
 	}
 
 	@Override
-	public void ecoLavage() throws Exception {
-		((IWashingMachine) this.connector).ecoLavage();
+	public void ecoWashing() throws Exception {
+		((IWashingMachine) this.connector).ecoWashing();
 
 	}
 
 	@Override
-	public void premiumLavage() throws Exception {
-		((IWashingMachine) this.connector).premiumLavage();
+	public void premiumWashing() throws Exception {
+		((IWashingMachine) this.connector).premiumWashing();
 
 	}
 

@@ -6,6 +6,16 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwatt.components.energyproviders.occasional.enginegenerator.EngineGenerator;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 
+/**
+ * The class <code>EngineGeneratorInPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The InBound port of the engine generator component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class EngineGeneratorInPort extends AbstractInboundPort implements IEngineGenerator {
 
 	/**

@@ -4,6 +4,16 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import wattwatt.interfaces.energyproviders.random.windturbine.IWindTurbine;
 
+/**
+ * The class <code>WindTurbineOutPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The OutBound port of the wind turbine component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class WindTurbineOutPort extends AbstractOutboundPort implements IWindTurbine{
 
 	/**

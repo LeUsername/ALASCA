@@ -6,6 +6,16 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import wattwatt.components.devices.suspendable.fridge.Fridge;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
 
+/**
+ * The class <code>FridgeInPort</code>
+ *
+ * <p><strong>Description</strong></p>
+ *  The InBound port of the fridge component
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class FridgeInPort extends AbstractInboundPort implements IFridge {
 
 	/**

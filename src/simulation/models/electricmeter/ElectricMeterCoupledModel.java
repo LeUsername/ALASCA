@@ -26,6 +26,7 @@ import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.electricmeter.ConsumptionEvent;
+import wattwatt.tools.URIS;
 
 public class ElectricMeterCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
@@ -34,7 +35,7 @@ public class ElectricMeterCoupledModel extends CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI of the unique instance of this class (in this example). */
-	public static final String URI = "ElectricMeterCoupledModel";
+	public static final String URI = URIS.ELECTRIC_METER_COUPLED_MODEL_URI;
 
 	// -------------------------------------------------------------------------
 	// Constructors
