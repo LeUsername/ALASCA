@@ -172,6 +172,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	@Override
 	public Duration timeAdvance() {
+		
 		if (!this.triggerReading) {
 			return Duration.INFINITY;
 		} else {

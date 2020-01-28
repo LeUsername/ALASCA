@@ -48,6 +48,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 
 		public HairDryerModelReport(String modelURI) {
 			super(modelURI);
+			
 		}
 
 		/**
@@ -137,6 +138,7 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		// The reference to the embedding component
 		this.componentRef =
 			(EmbeddingComponentAccessI) simParams.get(URIS.HAIR_DRYER_URI) ;
+		System.out.println(componentRef);
 	}
 
 	/**

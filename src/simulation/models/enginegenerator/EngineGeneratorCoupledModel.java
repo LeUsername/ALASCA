@@ -27,6 +27,9 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
+import simulation.events.controller.StartEngineGenerator;
+import simulation.events.controller.StopEngineGenerator;
+import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
 import simulation.events.enginegenerator.StopEvent;
@@ -111,10 +114,31 @@ public class EngineGeneratorCoupledModel extends CoupledModel {
 		VariableSink[] sinks = new VariableSink[] {
 				new VariableSink("fuelCapacity", Double.class, GroupeElectrogeneUserModel.URI) };
 		bindings.put(source, sinks);*/
+		
+		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
+		imported.put(
+				StartEngineGenerator.class,
+				new EventSink[] {
+						new EventSink(EngineGeneratorModel.URI,
+								StartEngineGenerator.class)
+				}) ;
+			imported.put(
+					StopEngineGenerator.class,
+					new EventSink[] {
+							new EventSink(EngineGeneratorModel.URI,
+									StopEngineGenerator.class)
+					}) ;
+			
+		Map<Class<? extends EventI>,ReexportedEvent> reexported =
+				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+		reexported.put(
+				EngineGeneratorProductionEvent.class,
+				new ReexportedEvent(EngineGeneratorModel.URI,
+						EngineGeneratorProductionEvent.class)) ;
 
 		coupledModelDescriptors.put(EngineGeneratorCoupledModel.URI,
 				new CoupledHIOA_Descriptor(EngineGeneratorCoupledModel.class, EngineGeneratorCoupledModel.URI, submodels,
-						null, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+						imported, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 						null));
 
 		return new Architecture(EngineGeneratorCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

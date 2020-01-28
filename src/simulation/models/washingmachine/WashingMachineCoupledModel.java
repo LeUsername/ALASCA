@@ -30,6 +30,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import wattwatt.tools.URIS;
 
 public class WashingMachineCoupledModel extends CoupledModel {
@@ -104,6 +105,13 @@ public class WashingMachineCoupledModel extends CoupledModel {
 		EventSink[] to5 = new EventSink[] { new EventSink(WashingMachineModel.URI, TicEvent.class) };
 		connections.put(from5, to5);
 		
+		Map<Class<? extends EventI>,ReexportedEvent> reexported =
+				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+		reexported.put(
+				WashingMachineConsumptionEvent.class,
+				new ReexportedEvent(WashingMachineModel.URI,
+						WashingMachineConsumptionEvent.class)) ;
+		
 		/*Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
 		VariableSource source = new VariableSource("fuelCapacity", Double.class, GroupeElectrogeneModel.URI);
 		VariableSink[] sinks = new VariableSink[] {
@@ -112,7 +120,7 @@ public class WashingMachineCoupledModel extends CoupledModel {
 
 		coupledModelDescriptors.put(WashingMachineCoupledModel.URI,
 				new CoupledHIOA_Descriptor(WashingMachineCoupledModel.class, WashingMachineCoupledModel.URI, submodels,
-						null, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+						null, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 						null));
 
 		return new Architecture(WashingMachineCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

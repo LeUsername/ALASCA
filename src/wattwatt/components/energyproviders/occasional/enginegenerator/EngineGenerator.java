@@ -1,9 +1,5 @@
 package wattwatt.components.energyproviders.occasional.enginegenerator;
 
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -11,19 +7,12 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
-import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.deployment.WattWattMain;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
 import simulation.models.enginegenerator.EngineGeneratorModel;
-import simulation.models.enginegenerator.EngineGeneratorUserModel;
 import simulation.plugins.EngineGeneratorSimulatorPlugin;
-import simulation.tools.TimeScale;
-import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 import wattwatt.ports.energyproviders.occasional.enginegenerator.EngineGeneratorInPort;
-import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
 //-----------------------------------------------------------------------------
@@ -146,66 +135,66 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
-		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put(URIS.ENGINE_GENERATOR_URI, this);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
-				EngineGeneratorUserBehaviour.INITIAL_DELAY);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
-				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
-				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
-				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
-				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
-		simParams.put(
-				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "Start / Stop / Refill",
-						2*WattWattMain.getPlotterWidth(),
-						0, WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
-
-		simParams.put(
-				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
-		simParams.put(
-				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
-						2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
-		this.asp.setSimulationRunParameters(simParams);
-		// Start the simulation.
-		this.runTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-						((EngineGenerator) this.getTaskOwner()).isOnSim = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isOn"));
-						((EngineGenerator) this.getTaskOwner()).isEmpty = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isEmpty"));
-						((EngineGenerator) this.getTaskOwner()).isFull = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isFull"));
-						((EngineGenerator) this.getTaskOwner()).fuelQuantitySim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "capacity"));
-						((EngineGenerator) this.getTaskOwner()).productionSim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "production"));
-						
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 0, 1000, TimeUnit.MILLISECONDS);
+//		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+//		HashMap<String, Object> simParams = new HashMap<String, Object>();
+//		simParams.put(URIS.ENGINE_GENERATOR_URI, this);
+//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
+//				EngineGeneratorUserBehaviour.INITIAL_DELAY);
+//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
+//				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
+//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
+//				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
+//				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
+//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
+//				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
+//		simParams.put(
+//				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
+//						+ PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "Start / Stop / Refill",
+//						2*WattWattMain.getPlotterWidth(),
+//						0, WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight()));
+//
+//		simParams.put(
+//				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
+//						+ PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight()));
+//		simParams.put(
+//				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
+//						+ PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
+//						2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight()));
+//		this.asp.setSimulationRunParameters(simParams);
+//		// Start the simulation.
+//		this.runTask(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		});
+//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//						((EngineGenerator) this.getTaskOwner()).isOnSim = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isOn"));
+//						((EngineGenerator) this.getTaskOwner()).isEmpty = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isEmpty"));
+//						((EngineGenerator) this.getTaskOwner()).isFull = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isFull"));
+//						((EngineGenerator) this.getTaskOwner()).fuelQuantitySim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "capacity"));
+//						((EngineGenerator) this.getTaskOwner()).productionSim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "production"));
+//						
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 0, 1000, TimeUnit.MILLISECONDS);
 		/*
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override

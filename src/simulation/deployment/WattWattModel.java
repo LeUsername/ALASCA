@@ -10,12 +10,13 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
+import wattwatt.tools.URIS;
 
 public class WattWattModel
 extends		CoupledModel
 {
 	private static final long serialVersionUID = 1L;
-	public static final String	URI = "WattWattModel" ;
+	public static final String	URI = URIS.WATTWATT_MODEL_URI ;
 
 	public				WattWattModel(
 		String uri,
@@ -30,5 +31,6 @@ extends		CoupledModel
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
 			  imported, reexported, connections);
 	}
+	
 }
 // -----------------------------------------------------------------------------

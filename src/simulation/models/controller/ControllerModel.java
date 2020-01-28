@@ -160,6 +160,9 @@ public class ControllerModel extends AtomicModel {
 			this.modelsPlotter.put(ControllerModel.ENGINE_GENERATOR, new XYPlotter(pd2));
 			this.modelsPlotter.get(ControllerModel.ENGINE_GENERATOR).createSeries(ControllerModel.ENGINE_GENERATOR);
 		}
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.CONTROLLER_URI);
 	}
 
 	/**

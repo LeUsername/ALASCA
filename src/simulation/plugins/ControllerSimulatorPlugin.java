@@ -1,8 +1,11 @@
 package simulation.plugins;
 
+import java.util.Map;
+
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.controller.ControllerModel;
+import wattwatt.tools.URIS;
 
 //------------------------------------------------------------------------------
 /**
@@ -22,6 +25,29 @@ import simulation.models.controller.ControllerModel;
 public class ControllerSimulatorPlugin extends AtomicSimulatorPlugin {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * @see fr.sorbonne_u.components.cyphy.plugins.devs.AbstractSimulatorPlugin#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void			setSimulationRunParameters(
+		Map<String, Object> simParams
+		) throws Exception
+	{
+		// Here, we are at a good place to capture the reference to the owner
+		// component and pass it to the simulation model.
+		simParams.put(URIS.CONTROLLER_URI,
+					  this.owner) ;
+
+		
+		super.setSimulationRunParameters(simParams) ;
+		
+		// It is a good idea to remove the binding to avoid other components
+		// to get a reference on this owner component i.e., have a reference
+		// leak outside the component.
+		simParams.remove(URIS.CONTROLLER_URI) ;
+	}
+	
 
 	public Object getModelStateValue(String modelURI, String name) throws Exception {
 

@@ -307,6 +307,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	// ------------------------------------------------------------------------
 
 	public double getConsumption() {
+
 		this.totalConsumption = this.fridgeConsumption + this.hairDryerConsumption + this.washingMachineConsumption;
 		return this.totalConsumption;
 	}

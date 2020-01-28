@@ -571,19 +571,8 @@ public class WattWattMain {
 			simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD,
 					10.0);
 			
-			
 			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
 			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
-			simParams.put(
-					FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription(
-							"RefrigerateurUserModel",
-							"Time (min)",
-							"Opened / Closed",
-							WattWattMain.ORIGIN_X,
-							WattWattMain.ORIGIN_Y,
-							WattWattMain.getPlotterWidth(),
-							WattWattMain.getPlotterHeight())) ;
 			
 			
 			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;

@@ -12,7 +12,6 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentAtomic
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentCoupledModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentModelArchitecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
-import fr.sorbonne_u.devs_simulation.examples.molene.SimulationMain;
 import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
@@ -21,9 +20,22 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.events.controller.StartEngineGenerator;
+import simulation.events.controller.StopEngineGenerator;
+import simulation.events.electricmeter.ConsumptionEvent;
+import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.hairdryer.HairDryerConsumptionEvent;
+import simulation.events.washingmachine.WashingMachineConsumptionEvent;
+import simulation.models.controller.ControllerModel;
 import simulation.models.electricmeter.ElectricMeterModel;
+import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
+import simulation.models.enginegenerator.EngineGeneratorModel;
+import simulation.models.enginegenerator.EngineGeneratorUserModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
+import simulation.models.hairdryer.HairDryerModel;
+import simulation.models.washingmachine.WashingMachineCoupledModel;
+import simulation.models.washingmachine.WashingMachineModel;
+import simulation.models.washingmachine.WashingMachineUserModel;
 import simulation.models.wattwatt.WattWattModel;
 import simulation.tools.TimeScale;
 
@@ -31,7 +43,8 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
+	
+	public static final String		ARCHITECTURE_URI = "WattWattSimArchitecture" ;
 	/** the supervisor plug-in attached to the component. */
 	protected SupervisorPlugin sp;
 	/**
@@ -155,9 +168,70 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						new Class<?>[]{
 							HairDryerConsumptionEvent.class
 						},
-						null,
+						(Class<? extends EventI>[])
+						new Class<?>[]{
+						ConsumptionEvent.class
+						},
 						TimeUnit.SECONDS,
 						modelURIs2componentURIs.get(ElectricMeterModel.URI))) ;
+		
+		// ----------------------------------------------------------------
+		// Controller
+		// ----------------------------------------------------------------
+		atomicModelDescriptors.put(
+				ControllerModel.URI,
+				ComponentAtomicModelDescriptor.create(
+						ControllerModel.URI,
+						(Class<? extends EventI>[])
+						new Class<?>[]{
+							ConsumptionEvent.class
+						},
+						(Class<? extends EventI>[])
+						new Class<?>[]{
+							StartEngineGenerator.class,
+							StopEngineGenerator.class
+						},
+						TimeUnit.SECONDS,
+						modelURIs2componentURIs.get(ControllerModel.URI))) ;
+		
+		// ----------------------------------------------------------------
+		// Engine Generator
+		// ----------------------------------------------------------------
+		atomicModelDescriptors.put(
+				EngineGeneratorCoupledModel.URI,
+				ComponentAtomicModelDescriptor.create(
+						EngineGeneratorCoupledModel.URI,
+						(Class<? extends EventI>[])
+							new Class<?>[]{
+								StartEngineGenerator.class,
+								StopEngineGenerator.class
+							},
+						(Class<? extends EventI>[])
+							new Class<?>[]{
+							EngineGeneratorProductionEvent.class
+							},
+						TimeUnit.SECONDS,
+						modelURIs2componentURIs.get(EngineGeneratorCoupledModel.URI))) ;
+		
+		// ----------------------------------------------------------------
+		// Washing Machine
+		// ----------------------------------------------------------------
+		atomicModelDescriptors.put(
+				WashingMachineCoupledModel.URI,
+				ComponentAtomicModelDescriptor.create(
+						WashingMachineCoupledModel.URI,
+						null,
+						(Class<? extends EventI>[])
+							new Class<?>[]{
+							WashingMachineConsumptionEvent.class
+							},
+						TimeUnit.SECONDS,
+						modelURIs2componentURIs.get(WashingMachineCoupledModel.URI))) ;
+		
+		
+		// ----------------------------------------------------------------
+		// Full architecture
+		// ----------------------------------------------------------------
 		
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 				new HashMap<>() ;
@@ -165,6 +239,9 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		Set<String> submodels = new HashSet<String>() ;
 		submodels.add(HairDryerCoupledModel.URI) ;
 		submodels.add(ElectricMeterModel.URI) ;
+		submodels.add(ControllerModel.URI) ;
+		submodels.add(EngineGeneratorCoupledModel.URI) ;
+		submodels.add(WashingMachineCoupledModel.URI) ;
 		
 		Map<EventSource,EventSink[]> connections =
 				new HashMap<EventSource,EventSink[]>() ;
@@ -179,6 +256,60 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 								ElectricMeterModel.URI,
 								HairDryerConsumptionEvent.class)} ;
 		connections.put(from1, to1) ;
+		
+		EventSource from2 =
+				new EventSource(
+						ElectricMeterModel.URI,
+						ConsumptionEvent.class) ;
+		EventSink[] to2 =
+				new EventSink[] {
+						new EventSink(
+								ControllerModel.URI,
+								ConsumptionEvent.class)} ;
+		connections.put(from2, to2) ;
+		
+		EventSource from3 =
+				new EventSource(
+						EngineGeneratorCoupledModel.URI,
+						EngineGeneratorProductionEvent.class) ;
+		EventSink[] to3 =
+				new EventSink[] {
+						new EventSink(
+								ControllerModel.URI,
+								EngineGeneratorProductionEvent.class)} ;
+		connections.put(from3, to3) ;
+		
+		EventSource from4 =
+				new EventSource(
+						ControllerModel.URI,
+						StartEngineGenerator.class) ;
+		EventSink[] to4 =
+				new EventSink[] {
+						new EventSink(
+								EngineGeneratorCoupledModel.URI,
+								StartEngineGenerator.class)} ;
+		connections.put(from4, to4) ;
+		EventSource from5 =
+				new EventSource(
+						ControllerModel.URI,
+						StopEngineGenerator.class) ;
+		EventSink[] to5 =
+				new EventSink[] {
+						new EventSink(
+								EngineGeneratorCoupledModel.URI,
+								StopEngineGenerator.class)} ;
+		connections.put(from5, to5) ;
+		
+		EventSource from6 =
+				new EventSource(
+						WashingMachineCoupledModel.URI,
+						WashingMachineConsumptionEvent.class) ;
+		EventSink[] to6 =
+				new EventSink[] {
+						new EventSink(
+								ElectricMeterModel.URI,
+								WashingMachineConsumptionEvent.class)} ;
+		connections.put(from6, to6) ;
 		
 		
 		coupledModelDescriptors.put(
@@ -196,7 +327,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 
 		ComponentModelArchitecture architecture =
 				new ComponentModelArchitecture(
-						"SIL simulation architecture",
+						ARCHITECTURE_URI,
 						WattWattModel.URI,
 						atomicModelDescriptors,
 						coupledModelDescriptors,
@@ -220,29 +351,91 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		super.execute();
 
 		this.logMessage("supervisor component begins execution.");
-		try {
+		try{
 			sp.createSimulator();
-		} catch (Exception e) {
-			System.out.println(e.getCause());
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
+		Thread.sleep(1000L) ;
+		
 		this.logMessage("SupervisorComponent#execute 1");
 
 		Map<String, Object> simParams = new HashMap<String, Object>();
 
-		String modelURI = TicModel.URI + "-1";
+		String modelURI = TicModel.URI + "-10";
 		simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME, new Duration(10.0, TimeUnit.SECONDS));
+		
+		
+		simParams.put(
+				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"Hair dryer model",
+						"Time (min)",
+						"Intensity (Watt)",
+						WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y,
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		
+		simParams.put(
+				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
+						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		simParams.put(
+				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Power (Watt)", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		simParams.put(
+				WashingMachineUserModel.URI + ":" + WashingMachineUserModel.ACTION + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
+						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y+4*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
 
-		modelURI = HairDryerCoupledModel.URI;
-		simParams.put(modelURI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("SecheCheveuxCoupledModel", "Time (sec)", "Bandwidth (Mbps)",
-						SimulationMain.ORIGIN_X, SimulationMain.ORIGIN_Y + SimulationMain.getPlotterHeight(),
-						SimulationMain.getPlotterWidth(), SimulationMain.getPlotterHeight()));
+		simParams.put(
+				WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("LaveLingeModel", "Time (min)", "Consumption (W)", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		simParams.put(
+				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Volume (Liters)", WattWattMain.ORIGIN_X,
+						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
 
-		modelURI = ElectricMeterModel.URI;
-		simParams.put(modelURI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("CompteurModel", "Time (sec)", "Bandwidth (Mbps)", SimulationMain.ORIGIN_X,
-						SimulationMain.ORIGIN_Y + 2 * SimulationMain.getPlotterHeight(),
-						SimulationMain.getPlotterWidth(), SimulationMain.getPlotterHeight()));
+		simParams.put(
+				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"Electric meter model",
+						"Time (min)",
+						"Consumption (Watt)",
+						2 * WattWattMain.getPlotterWidth(), 
+						3 * WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		simParams.put(					
+				ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		simParams.put(
+				ControllerModel.URI + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		
 
 		this.logMessage("SupervisorComponent#execute 2");
 
