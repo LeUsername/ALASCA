@@ -13,6 +13,29 @@ import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.tools.TimeScale;
 import simulation.tools.hairdryer.HairDryerUserBehaviour;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>MIL_HairDryer</code> simply tests the simulation architecture
+* defined by <code>HairDryerCoupledModel</code> before attaching it to a
+* component.
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class MIL_HairDryer {
 	public static void	main(String[] args)
 	{

@@ -1,5 +1,16 @@
 package simulation.tools.washingmachine;
 
+/**
+ * The class <code>HairDryerUserBehaviour</code> 
+ *
+ * <p><strong>Description</strong></p>
+ * 
+ * Define somme variable used to set up the washing machine user in the simulation.
+ * 
+ * <p>Created on : 2020-01-27</p>
+ * 
+ * @author	<p>Bah Thierno, Zheng Pascal</p>
+ */
 public class WashingMachineUserBehaviour {
 
 	public static final double INITIAL_DELAY = 10.0;

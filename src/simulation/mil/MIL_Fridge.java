@@ -13,6 +13,29 @@ import simulation.models.fridge.FridgeSensorModel;
 import simulation.models.fridge.FridgeUserModel;
 import simulation.tools.TimeScale;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>MIL_Fridge</code> simply tests the simulation architecture
+* defined by <code>FridgeCoupledModel</code> before attaching it to a
+* component.
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class MIL_Fridge {
 	public static void	main(String[] args)
 	{

@@ -10,6 +10,29 @@ import simulation.deployment.WattWattMain;
 import simulation.models.controller.ControllerCoupledModel;
 import simulation.models.controller.ControllerModel;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>MIL_Controller</code> simply tests the simulation architecture
+* defined by <code>ControllerCoupledModel</code> before attaching it to a
+* component.
+* The Coupled model use a Stub to represent the devices that should interact with the controller.
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class MIL_Controller {
 	public static void	main(String[] args)
 	{
@@ -33,7 +56,6 @@ public class MIL_Controller {
 			
 			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0) ;
-			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			se.doStandAloneSimulation(0.0, 500.0) ;
 		} catch (Exception e) {

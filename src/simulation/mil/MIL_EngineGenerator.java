@@ -13,6 +13,29 @@ import simulation.models.enginegenerator.EngineGeneratorUserModel;
 import simulation.tools.TimeScale;
 import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>MIL_EngineGenerator</code> simply tests the simulation architecture
+* defined by <code>EngineGeneratorCoupledModel</code> before attaching it to a
+* component.
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class MIL_EngineGenerator {
 	public static void main(String[] args) {
 		SimulationEngine se;
@@ -54,7 +77,6 @@ public class MIL_EngineGenerator {
 
 			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0);
-			System.out.println(se.simulatorAsString());
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			se.doStandAloneSimulation(0.0, TimeScale.WEEK);
 		} catch (Exception e) {

@@ -20,8 +20,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.events.controller.StartEngineGenerator;
-import simulation.events.controller.StopEngineGenerator;
+import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.hairdryer.HairDryerConsumptionEvent;
@@ -188,8 +188,8 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						},
 						(Class<? extends EventI>[])
 						new Class<?>[]{
-							StartEngineGenerator.class,
-							StopEngineGenerator.class
+							StartEngineGeneratorEvent.class,
+							StopEngineGeneratorEvent.class
 						},
 						TimeUnit.SECONDS,
 						modelURIs2componentURIs.get(ControllerModel.URI))) ;
@@ -203,8 +203,8 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						EngineGeneratorCoupledModel.URI,
 						(Class<? extends EventI>[])
 							new Class<?>[]{
-								StartEngineGenerator.class,
-								StopEngineGenerator.class
+								StartEngineGeneratorEvent.class,
+								StopEngineGeneratorEvent.class
 							},
 						(Class<? extends EventI>[])
 							new Class<?>[]{
@@ -282,22 +282,22 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		EventSource from4 =
 				new EventSource(
 						ControllerModel.URI,
-						StartEngineGenerator.class) ;
+						StartEngineGeneratorEvent.class) ;
 		EventSink[] to4 =
 				new EventSink[] {
 						new EventSink(
 								EngineGeneratorCoupledModel.URI,
-								StartEngineGenerator.class)} ;
+								StartEngineGeneratorEvent.class)} ;
 		connections.put(from4, to4) ;
 		EventSource from5 =
 				new EventSource(
 						ControllerModel.URI,
-						StopEngineGenerator.class) ;
+						StopEngineGeneratorEvent.class) ;
 		EventSink[] to5 =
 				new EventSink[] {
 						new EventSink(
 								EngineGeneratorCoupledModel.URI,
-								StopEngineGenerator.class)} ;
+								StopEngineGeneratorEvent.class)} ;
 		connections.put(from5, to5) ;
 		
 		EventSource from6 =

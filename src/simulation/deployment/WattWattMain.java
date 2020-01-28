@@ -28,8 +28,8 @@ import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.events.controller.StartEngineGenerator;
-import simulation.events.controller.StopEngineGenerator;
+import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
@@ -214,16 +214,16 @@ public class WattWattMain {
 			Map<Class<? extends EventI>,EventSink[]> imported2 =
 					new HashMap<Class<? extends EventI>,EventSink[]>() ;
 			imported2.put(
-				StartEngineGenerator.class,
+				StartEngineGeneratorEvent.class,
 				new EventSink[] {
 						new EventSink(EngineGeneratorModel.URI,
-								StartEngineGenerator.class)
+								StartEngineGeneratorEvent.class)
 				}) ;
 			imported2.put(
-					StopEngineGenerator.class,
+					StopEngineGeneratorEvent.class,
 					new EventSink[] {
 							new EventSink(EngineGeneratorModel.URI,
-									StopEngineGenerator.class)
+									StopEngineGeneratorEvent.class)
 					}) ;
 			
 			coupledModelDescriptors.put(EngineGeneratorCoupledModel.URI,
@@ -460,13 +460,13 @@ public class WattWattMain {
 			EventSink[] to4 = new EventSink[] {
 					new EventSink(ControllerModel.URI, ConsumptionEvent.class) };
 			connections.put(from4, to4);
-			EventSource from5 = new EventSource(ControllerModel.URI, StartEngineGenerator.class);
+			EventSource from5 = new EventSource(ControllerModel.URI, StartEngineGeneratorEvent.class);
 			EventSink[] to5 = new EventSink[] {
-					new EventSink(EngineGeneratorCoupledModel.URI, StartEngineGenerator.class) };
+					new EventSink(EngineGeneratorCoupledModel.URI, StartEngineGeneratorEvent.class) };
 			connections.put(from5, to5);
-			EventSource from6 = new EventSource(ControllerModel.URI, StopEngineGenerator.class);
+			EventSource from6 = new EventSource(ControllerModel.URI, StopEngineGeneratorEvent.class);
 			EventSink[] to6 = new EventSink[] {
-					new EventSink(EngineGeneratorCoupledModel.URI, StopEngineGenerator.class) };
+					new EventSink(EngineGeneratorCoupledModel.URI, StopEngineGeneratorEvent.class) };
 			connections.put(from6, to6);
 			EventSource from7 = new EventSource(WashingMachineCoupledModel.URI, WashingMachineConsumptionEvent.class);
 			EventSink[] to7 = new EventSink[] {

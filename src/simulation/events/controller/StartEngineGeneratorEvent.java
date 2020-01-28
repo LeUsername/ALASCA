@@ -7,18 +7,18 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.models.enginegenerator.EngineGeneratorModel;
 
-public class StartEngineGenerator extends AbstractControllerEvent {
+public class StartEngineGeneratorEvent extends AbstractControllerEvent {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public StartEngineGenerator(Time timeOfOccurrence, EventInformationI content) {
+	public StartEngineGeneratorEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
-	public StartEngineGenerator(Time timeOfOccurrence) {
+	public StartEngineGeneratorEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
@@ -29,7 +29,7 @@ public class StartEngineGenerator extends AbstractControllerEvent {
 
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		if (e instanceof RefillEvent || e instanceof StopEngineGenerator) {
+		if (e instanceof RefillEvent || e instanceof StopEngineGeneratorEvent) {
 			return false;
 		} else {
 			return true;

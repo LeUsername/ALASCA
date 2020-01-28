@@ -12,6 +12,29 @@ import simulation.models.windturbine.WindTurbineModel;
 import simulation.models.windturbine.WindTurbineSensorModel;
 import simulation.tools.TimeScale;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>MIL_WindTurbine</code> simply tests the simulation architecture
+* defined by <code>WindTurbineCoupledModel</code> before attaching it to a
+* component.
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class MIL_WindTurbine {
 	public static void	main(String[] args)
 	{
@@ -20,6 +43,7 @@ public class MIL_WindTurbine {
 		try {
 			Architecture localArchitecture = WindTurbineCoupledModel.build() ;
 			se = localArchitecture.constructSimulator() ;
+			
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 			
 			simParams.put(
@@ -45,6 +69,7 @@ public class MIL_WindTurbine {
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
 			se.doStandAloneSimulation(0.0, TimeScale.WEEK) ;
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

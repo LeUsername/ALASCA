@@ -27,8 +27,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
-import simulation.events.controller.StartEngineGenerator;
-import simulation.events.controller.StopEngineGenerator;
+import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
 import simulation.events.enginegenerator.StartEvent;
@@ -117,16 +117,16 @@ public class EngineGeneratorCoupledModel extends CoupledModel {
 		
 		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
 		imported.put(
-				StartEngineGenerator.class,
+				StartEngineGeneratorEvent.class,
 				new EventSink[] {
 						new EventSink(EngineGeneratorModel.URI,
-								StartEngineGenerator.class)
+								StartEngineGeneratorEvent.class)
 				}) ;
 			imported.put(
-					StopEngineGenerator.class,
+					StopEngineGeneratorEvent.class,
 					new EventSink[] {
 							new EventSink(EngineGeneratorModel.URI,
-									StopEngineGenerator.class)
+									StopEngineGeneratorEvent.class)
 					}) ;
 			
 		Map<Class<? extends EventI>,ReexportedEvent> reexported =

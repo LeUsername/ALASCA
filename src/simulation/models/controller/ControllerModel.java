@@ -17,8 +17,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.events.controller.StartEngineGenerator;
-import simulation.events.controller.StopEngineGenerator;
+import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.windturbine.WindTurbineProductionEvent;
@@ -29,8 +29,8 @@ import wattwatt.tools.URIS;
 @ModelExternalEvents(imported = { ConsumptionEvent.class, 
 								  EngineGeneratorProductionEvent.class, 
 								  WindTurbineProductionEvent.class},
-					 exported = { StartEngineGenerator.class, 
-								  StopEngineGenerator.class})
+					 exported = { StartEngineGeneratorEvent.class, 
+								  StopEngineGeneratorEvent.class})
 public class ControllerModel extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Inner classes
@@ -260,9 +260,9 @@ public class ControllerModel extends AtomicModel {
 		assert ret != null;
 		
 		if (this.triggeredDecisionEngineGenerator == Decision.START_ENGINE) {
-			ret.add(new StartEngineGenerator(this.getCurrentStateTime())) ;
+			ret.add(new StartEngineGeneratorEvent(this.getCurrentStateTime())) ;
 		} else if (this.triggeredDecisionEngineGenerator == Decision.STOP_ENGINE) {
-			ret.add(new StopEngineGenerator(this.getCurrentStateTime())) ;
+			ret.add(new StopEngineGeneratorEvent(this.getCurrentStateTime())) ;
 		}
 	
 		this.decisionFunctionEngineGenerator.add(
