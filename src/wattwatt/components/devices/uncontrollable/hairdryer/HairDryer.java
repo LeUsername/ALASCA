@@ -28,26 +28,66 @@ import wattwatt.tools.URIS;
 import wattwatt.tools.hairdryer.HairDryerMode;
 import wattwatt.tools.hairdryer.HairDryerSetting;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>HairDryer</code>
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* This class implements the hair dryer component. The hair dryer 
+* requires the controller interface because he have to be
+* connected to the controller to receive order from him.
+* 
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//The next annotation requires that the referenced interface is added to
+//the required interfaces of the component.
 @OfferedInterfaces(offered = IHairDryer.class)
 @RequiredInterfaces(required = IController.class)
 public class HairDryer extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
-	protected HairDryerMode mode;
-	protected HairDryerPowerLevel powerLvl;
-
-	protected HairDryerState isOn;
-	protected int conso;
-
+	
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
+	/** The inbound port of the hair dryer */
 	protected HairDryerInPort sechin;
+	
+	/** The mode of the hair dryer */
+	protected HairDryerMode mode;
+	/** The power level of the hair dryer */
+	protected HairDryerPowerLevel powerLvl;
+
+	/** The state of the hair dryer */
+	protected HairDryerState isOn;
+	
+	/** The energy consumption of the hair dryer */
+	protected double conso;
+
+	/** the simulation plug-in holding the simulation models. */
 	protected HairDryerSimulatorPlugin asp;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Create a hair dryer.
+	 * 
+	 *
+	 * @param uri        URI of the component.
+	 * @param sechin 	inbound port URI of the hair dryer.
+	 * @throws Exception <i>todo.</i>
+	 */
 	protected HairDryer(String uri, String sechin) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
@@ -90,56 +130,10 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		this.toggleLogging();
 	}
 
-	public void on() {
-		this.isOn = HairDryerState.ON;
-	}
-
-	public void off() {
-		this.isOn = HairDryerState.OFF;
-	}
-
-	public int giveConso() {
-		return conso;
-	}
-
-	public boolean isOn() {
-		return this.isOn == HairDryerState.ON;
-	}
-
-	public void switchMode() {
-		if (this.mode == HairDryerMode.COLD_AIR) {
-			this.mode = HairDryerMode.HOT_AIR;
-		} else {
-			this.mode = HairDryerMode.COLD_AIR;
-		}
-	}
-
-	protected void setMode(HairDryerMode mode) {
-		this.mode = mode;
-	}
-
-	public void increasePower() {
-		if (this.powerLvl == HairDryerPowerLevel.LOW) {
-			this.powerLvl = HairDryerPowerLevel.MEDIUM;
-		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
-			this.powerLvl = HairDryerPowerLevel.HIGH;
-		}
-
-	}
-
-	public void decreasePower() {
-		if (this.powerLvl == HairDryerPowerLevel.HIGH) {
-			this.powerLvl = HairDryerPowerLevel.MEDIUM;
-		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
-			this.powerLvl = HairDryerPowerLevel.LOW;
-		}
-	}
-
-	protected void setPowerLevel(HairDryerPowerLevel powerLeveLValue) {
-		this.powerLvl = powerLeveLValue;
-
-	}
-
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+	
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -151,37 +145,6 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 		}
 	}
 
-	public void behave(Random rand) {
-		if (this.isOn == HairDryerState.ON) {
-			if (rand.nextBoolean()) {
-				this.switchMode();
-				if (rand.nextBoolean()) {
-					this.increasePower();
-				} else {
-					this.decreasePower();
-				}
-			}
-			if (this.mode == HairDryerMode.COLD_AIR) {
-				this.conso += HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue();
-			} else {
-				this.conso += HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue();
-			}
-		} else {
-			if (this.mode == HairDryerMode.COLD_AIR) {
-				if (this.conso - HairDryerSetting.CONSO_COLD_MODE <= 0) {
-					this.conso = 0;
-				} else {
-					this.conso -= HairDryerSetting.CONSO_COLD_MODE;
-				}
-			} else {
-				if (this.conso - HairDryerSetting.CONSO_HOT_MODE <= 0) {
-					this.conso = 0;
-				} else {
-					this.conso -= HairDryerSetting.CONSO_HOT_MODE;
-				}
-			}
-		}
-	}
 
 	@Override
 	public void execute() throws Exception {
@@ -208,7 +171,7 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription("Hair dryer model", "Time (min)", "Intensity (Watt)", 0, 0,
 						WattWattMain.getPlotterWidth(), WattWattMain.getPlotterHeight()));
-		this.asp.setDebugLevel(0);
+		
 		this.asp.setSimulationRunParameters(simParams);
 		// Start the simulation.
 		this.runTask(new AbstractComponent.AbstractTask() {
@@ -284,7 +247,88 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		// TODO Auto-generated method stub
 		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+	}
+	
+	public void behave(Random rand) {
+		if (this.isOn == HairDryerState.ON) {
+			if (rand.nextBoolean()) {
+				this.switchMode();
+				if (rand.nextBoolean()) {
+					this.increasePower();
+				} else {
+					this.decreasePower();
+				}
+			}
+			if (this.mode == HairDryerMode.COLD_AIR) {
+				this.conso += HairDryerSetting.CONSO_COLD_MODE * this.powerLvl.getValue();
+			} else {
+				this.conso += HairDryerSetting.CONSO_HOT_MODE * this.powerLvl.getValue();
+			}
+		} else {
+			if (this.mode == HairDryerMode.COLD_AIR) {
+				if (this.conso - HairDryerSetting.CONSO_COLD_MODE <= 0) {
+					this.conso = 0;
+				} else {
+					this.conso -= HairDryerSetting.CONSO_COLD_MODE;
+				}
+			} else {
+				if (this.conso - HairDryerSetting.CONSO_HOT_MODE <= 0) {
+					this.conso = 0;
+				} else {
+					this.conso -= HairDryerSetting.CONSO_HOT_MODE;
+				}
+			}
+		}
+	}
+	
+	public void on() {
+		this.isOn = HairDryerState.ON;
+	}
+
+	public void off() {
+		this.isOn = HairDryerState.OFF;
+	}
+
+	public double giveConso() {
+		return conso;
+	}
+
+	public boolean isOn() {
+		return this.isOn == HairDryerState.ON;
+	}
+
+	public void switchMode() {
+		if (this.mode == HairDryerMode.COLD_AIR) {
+			this.mode = HairDryerMode.HOT_AIR;
+		} else {
+			this.mode = HairDryerMode.COLD_AIR;
+		}
+	}
+
+	protected void setMode(HairDryerMode mode) {
+		this.mode = mode;
+	}
+
+	public void increasePower() {
+		if (this.powerLvl == HairDryerPowerLevel.LOW) {
+			this.powerLvl = HairDryerPowerLevel.MEDIUM;
+		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
+			this.powerLvl = HairDryerPowerLevel.HIGH;
+		}
+
+	}
+
+	public void decreasePower() {
+		if (this.powerLvl == HairDryerPowerLevel.HIGH) {
+			this.powerLvl = HairDryerPowerLevel.MEDIUM;
+		} else if (this.powerLvl == HairDryerPowerLevel.MEDIUM) {
+			this.powerLvl = HairDryerPowerLevel.LOW;
+		}
+	}
+
+	protected void setPowerLevel(HairDryerPowerLevel powerLeveLValue) {
+		this.powerLvl = powerLeveLValue;
+
 	}
 }

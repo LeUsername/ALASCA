@@ -38,19 +38,27 @@ import wattwatt.tools.electricmeter.ElectricMeterSetting;
 
 //-----------------------------------------------------------------------------
 /**
-* The class <code>ElectricMeter</code> 
-*
-* <p><strong>Description</strong></p>
-* 
-³ This class implements the electric meter component that give the overall energy consumption
-* of all the components in our system.
-* The controller is connected to all device that consume energy so he require all their interfaces
-* 
-* 
-* <p>Created on : 2020-01-27</p>
-* 
-* @author	<p>Bah Thierno, Zheng Pascal</p>
-*/
+ * The class <code>ElectricMeter</code>
+ *
+ * <p>
+ * <strong>Description</strong>
+ * </p>
+ * 
+ * ³ This class implements the electric meter component that give the overall
+ * energy consumption of all the components in our system. The electric meter is
+ * connected to all device that consume energy so he require all their
+ * interfaces
+ * 
+ * 
+ * <p>
+ * Created on : 2020-01-27
+ * </p>
+ * 
+ * @author
+ *         <p>
+ *         Bah Thierno, Zheng Pascal
+ *         </p>
+ */
 //The next annotation requires that the referenced interface is added to
 //the required interfaces of the component.
 @OfferedInterfaces(offered = IElectricMeter.class)
@@ -60,25 +68,25 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-	
-	/** The inbound port of the electric meter*/
+
+	/** The inbound port of the electric meter */
 	protected ElectricMeterInPort cptin;
 
-	/**	the outbound port used to call the fridge services.	*/
+	/** the outbound port used to call the fridge services. */
 	protected FridgeOutPort refriout;
-	/**	the outbound port used to call the hair dryer services.	*/
+	/** the outbound port used to call the hair dryer services. */
 	protected HairDryerOutPort sechout;
-	/**	the outbound port used to call the washing machine services	*/
+	/** the outbound port used to call the washing machine services */
 	protected WashingMachineOutPort laveout;
 
-	/**	the overall energy consumption*/
+	/** the overall energy consumption */
 	protected double consomation;
-	
-	/**	the fridge energy consumption*/
+
+	/** the fridge energy consumption */
 	protected double fridgeConsumption;
-	/**	the hair dryer energy consumption*/
+	/** the hair dryer energy consumption */
 	protected double hairDryerConsumption;
-	/**	the washing machine energy consumption*/
+	/** the washing machine energy consumption */
 	protected double washingMachineConsumption;
 
 	/** the simulation plug-in holding the simulation models. */
@@ -89,35 +97,32 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Create an electric meter.
-	 * This constructor is used in the CVM.
+	 * Create an electric meter. This constructor is used in the CVM.
 	 * 
 	 *
-	 * @param uri				URI of the component.
-	 * @param compteurIn		inbound port URI of the electric meter.
-	 * @throws Exception		<i>todo.</i>
+	 * @param uri        URI of the component.
+	 * @param compteurIn inbound port URI of the electric meter.
+	 * @throws Exception <i>todo.</i>
 	 */
 	protected ElectricMeter(String uri, String compteurIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
-		
+
 		this.cptin = new ElectricMeterInPort(compteurIn, this);
 		this.cptin.publishPort();
 		this.tracer.setRelativePosition(0, 1);
 	}
-	
 
 	/**
-	 * Create an electric meter.
-	 * This constructor is used in the Distributed CVM.
+	 * Create an electric meter. This constructor is used in the Distributed CVM.
 	 * 
 	 *
-	 * @param uri				URI of the component.
-	 * @param compteurIn		inbound port URI of the electric meter.
-	 * @param refriOut		outbound port URI of the fridge.
-	 * @param sechOut		outbound port URI of the hair dryer.
-	 * @param laveOut		outbound port URI of the washing machine.
-	 * @throws Exception		<i>todo.</i>
+	 * @param uri        URI of the component.
+	 * @param compteurIn inbound port URI of the electric meter.
+	 * @param refriOut   outbound port URI of the fridge.
+	 * @param sechOut    outbound port URI of the hair dryer.
+	 * @param laveOut    outbound port URI of the washing machine.
+	 * @throws Exception <i>todo.</i>
 	 */
 	protected ElectricMeter(String uri, String compteurIn, String refriOut, String sechOut, String laveOut)
 			throws Exception {
@@ -138,14 +143,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		this.tracer.setRelativePosition(0, 1);
 	}
 
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
-
-
 	protected void initialise() throws Exception {
-		// The coupled model has been made able to create the simulation
-		// architecture description.
 		Architecture localArchitecture = this.createLocalArchitecture(null);
 		// Create the appropriate DEVS simulation plug-in.
 		this.asp = new ElectricMeterSimulatorPlugin();
@@ -161,15 +159,9 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		this.toggleLogging();
 	}
 
-	public double giveConso() throws Exception {
-		return consomation;
-	}
-
-	public void majConso() {
-		Random rand = new Random();
-		this.consomation = ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION + rand.nextInt(
-				ElectricMeterSetting.MAX_THR_HOUSE_CONSUMPTION - ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION);
-	}
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
 
 	@Override
 	public void start() throws ComponentStartException {
@@ -187,6 +179,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		super.execute();
 
 		HashMap<String, Object> simParams = new HashMap<String, Object>();
+
 		simParams.put(URIS.ELECTRIC_METER_URI, this);
 		simParams.put(
 				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":"
@@ -201,40 +194,28 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 			@Override
 			public void run() {
 				try {
-//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+					// asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
 		});
 
-		// this.runTask(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// while (true) {
-		// ((ElectricMeter) this.getTaskOwner()).consumptionSim =
-		// (((double) asp.getModelStateValue(ElectricMeterModel.URI, "consumption")));
-		// Thread.sleep(1000);
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// });
-		// this.scheduleTask(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// while (true) {
-		// ((ElectricMeter) this.getTaskOwner()).majConso();
-		// Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 100, TimeUnit.MILLISECONDS);
+		// When there is no simulation
+		
+//		this.scheduleTask(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//					while (true) {
+//						((ElectricMeter) this.getTaskOwner()).majConso();
+//						Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
+//					}
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -281,33 +262,48 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 			return null;
 		}
 	}
-	
+
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		// TODO Auto-generated method stub
 		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
-
-		Map<Class<? extends EventI>,EventSink[]> imported =
-				new HashMap<Class<? extends EventI>,EventSink[]>() ;
-		imported.put(
-				HairDryerConsumptionEvent.class, 
-				new EventSink[] {
-						new EventSink(ElectricMeterModel.URI, HairDryerConsumptionEvent.class)
-				}) ;
 		
+		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
+		
+		imported.put(HairDryerConsumptionEvent.class,
+				new EventSink[] { new EventSink(ElectricMeterModel.URI, HairDryerConsumptionEvent.class) });
+
 		atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
-		
 		return new Architecture(ElectricMeterModel.URI, atomicModelDescriptors, coupledModelDescriptors,
 				TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Get the overall energy consumption
+	 * @return	the overall energy consumption
+	 * @throws Exception<i>todo.</i>
+	 */
+	public double giveConso() throws Exception {
+		return consomation;
+	}
+
+	/**
+	 * Update the overall energy consumption randomly
+	 * @return	void
+	 * @throws Exception<i>todo.</i>
+	 */
+	public void majConso() {
+		Random rand = new Random();
+		this.consomation = ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION + rand.nextInt(
+				ElectricMeterSetting.MAX_THR_HOUSE_CONSUMPTION - ElectricMeterSetting.MIN_THR_HOUSE_CONSUMPTION);
 	}
 
 }

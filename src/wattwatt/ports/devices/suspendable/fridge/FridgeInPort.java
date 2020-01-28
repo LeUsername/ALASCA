@@ -76,7 +76,7 @@ public class FridgeInPort extends AbstractInboundPort implements IFridge {
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return this.getOwner().handleRequestSync(owner ->((Fridge)owner).giveConso());
 	}
 

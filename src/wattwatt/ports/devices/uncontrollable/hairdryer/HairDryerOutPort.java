@@ -39,7 +39,7 @@ public class HairDryerOutPort extends AbstractOutboundPort implements IHairDryer
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return ((IHairDryer)this.connector).getConso();
 	}
 

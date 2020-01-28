@@ -4,6 +4,21 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.hairdryer.HairDryerModel;
 
+//------------------------------------------------------------------------------
+/**
+* The class <code>HairDryerSimulatorPlugin</code> implements the simulation
+* plug-in for the component <code>HairDryer</code>.
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class HairDryerSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;
 

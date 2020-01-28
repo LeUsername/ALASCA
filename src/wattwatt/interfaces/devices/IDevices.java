@@ -35,7 +35,7 @@ public interface IDevices extends OfferedI, RequiredI{
 	 * @return	the consommation
 	 * @throws Exception<i>todo.</i>
 	 */
-	public int getConso() throws Exception;
+	public double getConso() throws Exception;
 	
 	/**
 	 * Check if a device is on

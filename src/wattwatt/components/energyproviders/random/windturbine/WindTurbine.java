@@ -26,21 +26,65 @@ import wattwatt.ports.energyproviders.random.windturbine.WindTurbineInPort;
 import wattwatt.tools.URIS;
 import wattwatt.tools.windturbine.WindTurbineSetting;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WindTurbine</code>
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* This class implements the wind turbine component. The wind turbine 
+* requires the controller interface because he have to be
+* connected to the controller to receive order from him.
+* 
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//The next annotation requires that the referenced interface is added to
+//the required interfaces of the component.
 @OfferedInterfaces(offered = IWindTurbine.class)
 @RequiredInterfaces(required = IController.class)
 public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+	/** The inbound port of the wind turbine */
 	protected WindTurbineInPort eoin;
 
+	/** The state of the wind turbine */
 	protected boolean isOn;
+	/** The energy production of the wind turbine */
 	protected int production;
 	
+	/** The state of the wind turbine on simulation */
 	protected boolean isOnSim;
+	/** The energy production of the wind turbine on simulation */
 	protected double productionSim;
 	
+	/** the simulation plug-in holding the simulation models. */
 	protected WindTurbineSimulatorPlugin asp;
 	
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 
+	/**
+	 * Create a wind turbine.
+	 * 
+	 *
+	 * @param uri        URI of the component.
+	 * @param eoIn 	inbound port URI of the wind turbine.
+	 * @throws Exception <i>todo.</i>
+	 */
 	protected WindTurbine(String uri, String eoIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
@@ -72,39 +116,11 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 		this.toggleLogging();
 	}
 	
-	public void behave() {
-		// production should depend on the power of the wind
-		if (this.isOn) {
-			this.production += WindTurbineSetting.PROD_THR;
-		} else {
-
-			if (this.production - WindTurbineSetting.PROD_THR <= 0) {
-				this.production = 0;
-			} else {
-
-				this.production -= WindTurbineSetting.PROD_THR;
-			}
-
-		}
-	}
-
-	public int getEnergie() {
-		return this.production;
-	}
-
-	public void On() {
-		this.isOn = true;
-	}
-
-	public void Off() {
-		this.isOn = false;
-	}
-
-	public boolean isOn() {
-
-		return this.isOn;
-	}
-
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+	
+	
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -192,13 +208,11 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		// TODO Auto-generated method stub
 		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 
@@ -206,5 +220,39 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		return WindTurbineCoupledModel.build();
 	}
+	
+	public void behave() {
+		// production should depend on the power of the wind
+		if (this.isOn) {
+			this.production += WindTurbineSetting.PROD_THR;
+		} else {
+
+			if (this.production - WindTurbineSetting.PROD_THR <= 0) {
+				this.production = 0;
+			} else {
+
+				this.production -= WindTurbineSetting.PROD_THR;
+			}
+
+		}
+	}
+
+	public int getEnergie() {
+		return this.production;
+	}
+
+	public void On() {
+		this.isOn = true;
+	}
+
+	public void Off() {
+		this.isOn = false;
+	}
+
+	public boolean isOn() {
+
+		return this.isOn;
+	}
+
 
 }

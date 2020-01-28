@@ -26,25 +26,72 @@ import wattwatt.ports.energyproviders.occasional.enginegenerator.EngineGenerator
 import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>EngineGenerator</code>
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* This class implements the engine generator component. The engine generator 
+* requires the controller interface because he have to be
+* connected to the controller to receive order from him.
+* 
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//The next annotation requires that the referenced interface is added to
+//the required interfaces of the component.
 @OfferedInterfaces(offered = IEngineGenerator.class)
 @RequiredInterfaces(required = IController.class)
 public class EngineGenerator  extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+	/** The inbound port of the engine generator */	
 	protected EngineGeneratorInPort groupein;
 
+	/** The state of the fridge */
 	protected boolean isOn;
+	/** The energy production of the engine generator */
 	protected int production;
+	/** The fuel quantity of the engine generator */
 	protected int fuelQuantity;
 	
+	/** The state of the fridge on simulation */
 	protected boolean isOnSim;
+	/** The energy production of the engine generator on simulation*/
 	protected double productionSim;
+	/** The fuel quantity of the engine generator on simulation */
 	protected double fuelQuantitySim;
+	
 	protected boolean isFull;
 	protected boolean isEmpty;
 	
+	/** the simulation plug-in holding the simulation models. */
 	protected EngineGeneratorSimulatorPlugin asp;
 	
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 
+	/**
+	 * Create a engine generator.
+	 * 
+	 *
+	 * @param uri        URI of the component.
+	 * @param groupeIn 	inbound port URI of the engine generator.
+	 * @throws Exception <i>todo.</i>
+	 */
 	protected EngineGenerator(String uri, String groupeIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
@@ -79,58 +126,9 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		this.toggleLogging();
 	}
 
-	public int getEnergie() throws Exception {
-		return this.production;
-	}
-
-	public boolean fuelIsEmpty() throws Exception {
-		return this.fuelQuantity == 0;
-	}
-
-	public boolean fuelIsFull() throws Exception {
-		return this.fuelQuantity == EngineGeneratorSetting.FUEL_CAPACITY;
-	}
-
-	public int fuelQuantity() throws Exception {
-		return this.fuelQuantity;
-	}
-
-	public void on() throws Exception {
-		this.isOn = true;
-	}
-
-	public void off() throws Exception {
-		this.isOn = false;
-	}
-
-	public void addFuel(int quantity) throws Exception {
-		if (this.fuelQuantity + quantity >= EngineGeneratorSetting.FUEL_CAPACITY) {
-			this.fuelQuantity = EngineGeneratorSetting.FUEL_CAPACITY;
-		} else {
-			this.fuelQuantity += EngineGeneratorSetting.FUEL_CAPACITY;
-		}
-	}
-
-	public boolean isOn() {
-		return this.isOn;
-	}
-
-	public void behave() throws Exception {
-		if (this.isOn && !this.fuelIsEmpty()) {
-			this.logMessage("Groupe is producing");
-			this.production += EngineGeneratorSetting.PROD_THR;
-			if (this.fuelQuantity - EngineGeneratorSetting.PROD_THR <= 0) {
-				this.fuelQuantity = 0;
-			} else {
-				this.fuelQuantity -= EngineGeneratorSetting.PROD_THR;
-			}
-		} else {
-			if (this.fuelIsEmpty()) {
-				this.off();
-				this.logMessage("No more fuel");
-			}
-		}
-	}
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------	
 
 	@Override
 	public void start() throws ComponentStartException {
@@ -244,13 +242,65 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		// TODO Auto-generated method stub
 		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
 
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		return EngineGeneratorCoupledModel.build();
+	}
+	
+	public int getEnergie() throws Exception {
+		return this.production;
+	}
+
+	public boolean fuelIsEmpty() throws Exception {
+		return this.fuelQuantity == 0;
+	}
+
+	public boolean fuelIsFull() throws Exception {
+		return this.fuelQuantity == EngineGeneratorSetting.FUEL_CAPACITY;
+	}
+
+	public int fuelQuantity() throws Exception {
+		return this.fuelQuantity;
+	}
+
+	public void on() throws Exception {
+		this.isOn = true;
+	}
+
+	public void off() throws Exception {
+		this.isOn = false;
+	}
+
+	public void addFuel(int quantity) throws Exception {
+		if (this.fuelQuantity + quantity >= EngineGeneratorSetting.FUEL_CAPACITY) {
+			this.fuelQuantity = EngineGeneratorSetting.FUEL_CAPACITY;
+		} else {
+			this.fuelQuantity += EngineGeneratorSetting.FUEL_CAPACITY;
+		}
+	}
+
+	public boolean isOn() {
+		return this.isOn;
+	}
+
+	public void behave() throws Exception {
+		if (this.isOn && !this.fuelIsEmpty()) {
+			this.logMessage("Groupe is producing");
+			this.production += EngineGeneratorSetting.PROD_THR;
+			if (this.fuelQuantity - EngineGeneratorSetting.PROD_THR <= 0) {
+				this.fuelQuantity = 0;
+			} else {
+				this.fuelQuantity -= EngineGeneratorSetting.PROD_THR;
+			}
+		} else {
+			if (this.fuelIsEmpty()) {
+				this.off();
+				this.logMessage("No more fuel");
+			}
+		}
 	}
 
 }

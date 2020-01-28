@@ -51,7 +51,7 @@ public class HairDryerInPort extends AbstractInboundPort implements IHairDryer {
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((HairDryer) owner).giveConso());
 
 	}

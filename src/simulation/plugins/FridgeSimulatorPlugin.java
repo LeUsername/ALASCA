@@ -4,6 +4,21 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.fridge.FridgeModel;
 
+//------------------------------------------------------------------------------
+/**
+* The class <code>FridgeSimulatorPlugin</code> implements the simulation
+* plug-in for the component <code>Fridge</code>.
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class FridgeSimulatorPlugin extends AtomicSimulatorPlugin {
 	private static final long serialVersionUID = 1L;
 

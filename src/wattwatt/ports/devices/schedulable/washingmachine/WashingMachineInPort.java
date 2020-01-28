@@ -58,7 +58,7 @@ public class WashingMachineInPort extends AbstractInboundPort implements IWashin
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((WashingMachine) owner).giveConso());
 	}
 

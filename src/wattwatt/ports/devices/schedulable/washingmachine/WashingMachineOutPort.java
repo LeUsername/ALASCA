@@ -91,7 +91,7 @@ public class WashingMachineOutPort extends AbstractOutboundPort implements IWash
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return ((IWashingMachine) this.connector).getConso();
 	}
 

@@ -30,7 +30,7 @@ public abstract class DeviceConnector extends AbstractConnector implements IDevi
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return ((IDevices) this.offering).getConso();
 	}
 

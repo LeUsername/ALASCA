@@ -50,7 +50,7 @@ public class FridgeOutPort extends AbstractOutboundPort implements IFridge {
 	}
 
 	@Override
-	public int getConso() throws Exception {
+	public double getConso() throws Exception {
 		return ((IFridge)this.connector).getConso();
 	}
 

@@ -1,7 +1,7 @@
 package wattwatt.tools.hairdryer;
 
 /**
- * The enum <code>HairDryerMode</code> 
+ * The enumeration <code>HairDryerMode</code> 
  *
  * <p><strong>Description</strong></p>
  * 

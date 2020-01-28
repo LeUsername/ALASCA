@@ -30,33 +30,80 @@ import wattwatt.tools.URIS;
 import wattwatt.tools.controller.ControllerSetting;
 import wattwatt.tools.fridge.FridgeSetting;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>Fridge</code>
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* This class implements the fridge component. The fridge 
+* requires the controller interface because he have to be
+* connected to the controller to receive order from him.
+* 
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//The next annotation requires that the referenced interface is added to
+//the required interfaces of the component.
 @OfferedInterfaces(offered = IFridge.class)
 @RequiredInterfaces(required = IController.class)
 public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponentAccessI {
 
-	protected FridgeConsumption consumptionState;
-	protected FridgeDoor currentDoorState;
-	protected double intensity;
-	protected double temperature;
-
-	protected double tempH;
-	protected double tempB;
-
-	protected boolean isOn;
-	protected boolean isWorking;
-	protected int conso;
-
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
+	/** The inbound port of the fridge */
 	protected FridgeInPort refrin;
+	
+	/** The mode of the fridge, if he is suspended or not */
+	protected FridgeConsumption consumptionState;
+	
+	/** The current state of the fridge door */
+	protected FridgeDoor currentDoorState;
+	
+	protected double intensity;
+	
+	/** The temperature of the fridge used in the simulation */
+	protected double temperature;
+
+	/** The temperature of the upper compartment */
+	protected double tempH;
+	/** The temperature of the lower compartment */
+	protected double tempB;
+
+	/** The state of the fridge */
+	protected boolean isOn;
+	/** The state of the fridge */
+	protected boolean isWorking;
+	
+	/** The energy consumption of the fridge */
+	protected double conso;
+
+
+	/** the simulation plug-in holding the simulation models. */
 	protected FridgeSimulatorPlugin asp;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Create a washing machine.
+	 * 
+	 *
+	 * @param uri        URI of the component.
+	 * @param refriIn 	inbound port URI of the fridge.
+	 * @throws Exception <i>todo.</i>
+	 */
 	protected Fridge(String uri, String refriIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
@@ -91,104 +138,10 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		// Toggle logging on to get a log on the screen.
 		this.toggleLogging();
 	}
-
-	public double getTempHaut() {
-		return this.tempH;
-	}
-
-	public double getTempBas() {
-		return this.tempB;
-	}
-
-	public void suspend() {
-		this.isWorking = false;
-	}
-
-	public void resume() {
-		if (this.isOn) {
-			this.isWorking = true;
-		} else {
-			this.isWorking = false;
-		}
-
-	}
-
-	public void on() {
-		this.isOn = true;
-		this.isWorking = true;
-	}
-
-	public void off() {
-		this.isOn = false;
-		this.isWorking = false;
-	}
-
-	public boolean isWorking() {
-		return this.isWorking;
-	}
-
-	public boolean isOn() {
-		return this.isOn;
-	}
-
-	public int giveConso() {
-		return conso;
-	}
-
-	public void setDoorState(FridgeDoor door) {
-		this.currentDoorState = door;
-	}
-
-	public void setConsumptionState(FridgeConsumption consumption) {
-		this.consumptionState = consumption;
-	}
-
-	public void setIntensity(double intensity) {
-		this.intensity = intensity;
-	}
-
-	public void setTemperature(double temperature) {
-		this.temperature = temperature;
-	}
-
-	public void regule() {
-		if (this.isOn) {
-			if (this.isWorking) {
-				if (this.tempH > FridgeSetting.TEMP_H_MIN) {
-					this.tempH--;
-				}
-				if (this.tempB > FridgeSetting.TEMP_L_MIN) {
-					this.tempB--;
-				}
-				this.conso += FridgeSetting.ACTIVE_CONSUMPTION;
-			} else {
-				if (this.tempH < FridgeSetting.TEMP_H_MAX) {
-					this.tempH++;
-				}
-				if (this.tempB < FridgeSetting.TEMP_L_MAX) {
-					this.tempB++;
-				}
-				if (this.conso - FridgeSetting.PASSIVE_CONSUMPTION <= 0) {
-					this.conso = 0;
-				} else {
-					this.conso -= FridgeSetting.PASSIVE_CONSUMPTION;
-				}
-
-			}
-		} else {
-			if (this.conso - FridgeSetting.PASSIVE_CONSUMPTION <= 0) {
-				this.conso = 0;
-			} else {
-				this.conso -= FridgeSetting.PASSIVE_CONSUMPTION;
-			}
-		}
-	}
-
-	public void printState() {
-		this.logMessage(">>> isOn : [" + this.isOn + "] Working : [" + this.isWorking + "] Temp Haut : ["
-				+ this.getTempHaut() + " ] Temp Bas : [" + this.getTempBas() + " ] \n>>> Conso depuis le debut : ["
-				+ this.giveConso() + " ]\n");
-	}
+	
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
 
 	@Override
 	public void start() throws ComponentStartException {
@@ -344,4 +297,104 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		// TODO Auto-generated method stub
 		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
 	}
+	
+	public double getTempHaut() {
+		return this.tempH;
+	}
+
+	public double getTempBas() {
+		return this.tempB;
+	}
+
+	public void suspend() {
+		this.isWorking = false;
+	}
+
+	public void resume() {
+		if (this.isOn) {
+			this.isWorking = true;
+		} else {
+			this.isWorking = false;
+		}
+
+	}
+
+	public void on() {
+		this.isOn = true;
+		this.isWorking = true;
+	}
+
+	public void off() {
+		this.isOn = false;
+		this.isWorking = false;
+	}
+
+	public boolean isWorking() {
+		return this.isWorking;
+	}
+
+	public boolean isOn() {
+		return this.isOn;
+	}
+
+	public double giveConso() {
+		return conso;
+	}
+
+	public void setDoorState(FridgeDoor door) {
+		this.currentDoorState = door;
+	}
+
+	public void setConsumptionState(FridgeConsumption consumption) {
+		this.consumptionState = consumption;
+	}
+
+	public void setIntensity(double intensity) {
+		this.intensity = intensity;
+	}
+
+	public void setTemperature(double temperature) {
+		this.temperature = temperature;
+	}
+
+	public void regule() {
+		if (this.isOn) {
+			if (this.isWorking) {
+				if (this.tempH > FridgeSetting.TEMP_H_MIN) {
+					this.tempH--;
+				}
+				if (this.tempB > FridgeSetting.TEMP_L_MIN) {
+					this.tempB--;
+				}
+				this.conso += FridgeSetting.ACTIVE_CONSUMPTION;
+			} else {
+				if (this.tempH < FridgeSetting.TEMP_H_MAX) {
+					this.tempH++;
+				}
+				if (this.tempB < FridgeSetting.TEMP_L_MAX) {
+					this.tempB++;
+				}
+				if (this.conso - FridgeSetting.PASSIVE_CONSUMPTION <= 0) {
+					this.conso = 0;
+				} else {
+					this.conso -= FridgeSetting.PASSIVE_CONSUMPTION;
+				}
+
+			}
+		} else {
+			if (this.conso - FridgeSetting.PASSIVE_CONSUMPTION <= 0) {
+				this.conso = 0;
+			} else {
+				this.conso -= FridgeSetting.PASSIVE_CONSUMPTION;
+			}
+		}
+	}
+
+	public void printState() {
+		this.logMessage(">>> isOn : [" + this.isOn + "] Working : [" + this.isWorking + "] Temp Haut : ["
+				+ this.getTempHaut() + " ] Temp Bas : [" + this.getTempBas() + " ] \n>>> Conso depuis le debut : ["
+				+ this.giveConso() + " ]\n");
+	}
+
+	
 }

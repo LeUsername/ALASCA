@@ -1,7 +1,7 @@
 package wattwatt.tools.washingmachine;
 
 /**
- * The enum <code>WashingMachineMode</code> 
+ * The enumeration <code>WashingMachineMode</code> 
  *
  * <p><strong>Description</strong></p>
  * 
