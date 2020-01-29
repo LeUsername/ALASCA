@@ -684,10 +684,20 @@ public class WattWattMain {
 			simParams.put(
 					ControllerModel.URI + ":" + ControllerModel.FRIDGE_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
-					new PlotterDescription("ControllerModel", "Time (sec)", "Fridge decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
-							WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+					new PlotterDescription("ControllerModel", "Time (sec)", "Fridge decision",
+							WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(),
+							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			
+			simParams.put(
+					ControllerModel.URI + ":" + ControllerModel.WASHING_MACHINE_SERIES + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("ControllerModel", "Time (sec)", "WM decision",
+							WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight(),
+							WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
 			
 			simParams.put(
 					ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,

@@ -524,6 +524,13 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						WattWattMain.getPlotterHeight()));
 		
 		simParams.put(
+				ControllerModel.URI + ":" + ControllerModel.WASHING_MACHINE_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "WM decision", WattWattMain.ORIGIN_X ,
+						WattWattMain.ORIGIN_Y + 3 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		simParams.put(
 				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
 						"Hair dryer model",

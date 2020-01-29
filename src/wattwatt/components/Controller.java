@@ -20,6 +20,7 @@ import simulation.models.controller.ControllerModel;
 import simulation.plugins.ControllerSimulatorPlugin;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 import simulation.tools.fridge.FridgeConsumption;
+import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
@@ -376,8 +377,7 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 			return new Double(this.eoout.getEnergy());
 		} else if (name.equals("stateEG")) {
 			return this.groupeout.isOn()?EngineGeneratorState.ON : EngineGeneratorState.OFF;
-		} else {
-			assert name.equals("stateFridge");
+		} else if(name.equals("stateFridge")){
 			boolean on  = this.refriout.isOn();
 			boolean isWorking = this.refriout.isWorking();
 			
@@ -386,6 +386,21 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 			}
 			else {
 				return FridgeConsumption.SUSPENDED;
+			}
+		}else {
+			assert name.equals("stateWM");
+			boolean on  = this.laveout.isOn();
+			boolean isWorking = this.laveout.isWorking();
+			
+			if(on && isWorking) {
+				return WashingMachineState.WORKING;
+			}
+			else {
+				if(on) {
+					return WashingMachineState.ON;
+				}else {
+					return WashingMachineState.OFF;
+				}
 			}
 		}
 	}
@@ -398,9 +413,15 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 			this.groupeout.off();
 		} else if (name.equals("suspendFridge")) {
 			this.refriout.suspend();
-		} else {
-			assert name.equals("resumeFridge");
+		} else if (name.equals("resumeFridge")) {
 			this.refriout.resume();
+		} 
+		else if (name.equals("startWM")) {
+			this.laveout.On(); 
+		}
+		else {
+			assert name.equals("stopWM");
+			this.laveout.Off();
 		}
 	}
 

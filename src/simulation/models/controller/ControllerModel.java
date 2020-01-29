@@ -29,6 +29,7 @@ import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.tools.controller.Decision;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 import simulation.tools.fridge.FridgeConsumption;
+import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.tools.URIS;
 
 @ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class,
@@ -96,6 +97,9 @@ public class ControllerModel extends AtomicModel {
 
 	private static final String FRIDGE = "frigde";
 	public static final String FRIDGE_SERIES = "fridge-series";
+	
+	private static final String WASHING_MACHINE = "washing-machine";
+	public static final String WASHING_MACHINE_SERIES = "washing-machine-series";
 
 	private static final String CONTROLLER_STUB = "controller-stub";
 	public static final String CONTROLLER_STUB_SERIES = "controller-stub-series";
@@ -107,6 +111,7 @@ public class ControllerModel extends AtomicModel {
 
 	protected EngineGeneratorState EGState;
 	protected FridgeConsumption FridgeState;
+	protected WashingMachineState WMState;
 
 	protected Decision triggeredDecisionEngineGenerator;
 	protected Decision lastDecisionEngineGenerator;
@@ -117,6 +122,11 @@ public class ControllerModel extends AtomicModel {
 	protected Decision lastDecisionFridge;
 	protected double lastDecisionTimeFridge;
 	protected final Vector<DecisionPiece> decisionFunctionFridge;
+	
+	protected Decision triggeredDecisionWashingMachine;
+	protected Decision lastDecisionWashingMachine;
+	protected double lastDecisionTimeWashingMachine;
+	protected final Vector<DecisionPiece> decisionFunctionWashingMachine;
 
 	protected XYPlotter productionPlotter;
 
@@ -133,6 +143,7 @@ public class ControllerModel extends AtomicModel {
 
 		this.decisionFunctionEngineGenerator = new Vector<>();
 		this.decisionFunctionFridge = new Vector<>();
+		this.decisionFunctionWashingMachine = new Vector<>();
 		this.modelsPlotter = new HashMap<String, XYPlotter>();
 
 		// this.setLogger(new StandardLogger());
@@ -171,6 +182,11 @@ public class ControllerModel extends AtomicModel {
 			PlotterDescription pd3 = (PlotterDescription) simParams.get(vname);
 			this.modelsPlotter.put(ControllerModel.FRIDGE, new XYPlotter(pd3));
 			this.modelsPlotter.get(ControllerModel.FRIDGE).createSeries(ControllerModel.FRIDGE);
+			
+			vname = this.getURI() + ":" + ControllerModel.WASHING_MACHINE_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME;
+			PlotterDescription pd4 = (PlotterDescription) simParams.get(vname);
+			this.modelsPlotter.put(ControllerModel.WASHING_MACHINE, new XYPlotter(pd4));
+			this.modelsPlotter.get(ControllerModel.WASHING_MACHINE).createSeries(ControllerModel.WASHING_MACHINE);
 		}
 
 		// The reference to the embedding component
@@ -192,6 +208,7 @@ public class ControllerModel extends AtomicModel {
 			this.productionWindTurbine = 0.0;
 			this.EGState = EngineGeneratorState.OFF;
 			this.FridgeState = FridgeConsumption.RESUMED;
+			this.WMState = WashingMachineState.OFF;
 		} else {
 			try {
 				this.consumption = (double) this.componentRef.getEmbeddingComponentStateValue("consumption");
@@ -199,8 +216,8 @@ public class ControllerModel extends AtomicModel {
 						.getEmbeddingComponentStateValue("productionEG");
 				this.productionWindTurbine = (double) this.componentRef.getEmbeddingComponentStateValue("productionWT");
 				this.EGState = (EngineGeneratorState) this.componentRef.getEmbeddingComponentStateValue("stateEG");
-				;
 				this.FridgeState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("stateFridge");
+				this.WMState = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("stateWM");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -215,6 +232,11 @@ public class ControllerModel extends AtomicModel {
 		this.lastDecisionFridge = Decision.RESUME_FRIDGE;
 		this.lastDecisionTimeFridge = initialTime.getSimulatedTime();
 		decisionFunctionFridge.clear();
+		
+		this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
+		this.lastDecisionWashingMachine = Decision.STOP_WASHING;
+		this.lastDecisionTimeWashingMachine = initialTime.getSimulatedTime();
+		decisionFunctionWashingMachine.clear();
 
 		if (this.productionPlotter != null) {
 			this.productionPlotter.initialise();
@@ -235,7 +257,12 @@ public class ControllerModel extends AtomicModel {
 				} else if (URI == ControllerModel.FRIDGE) {
 					plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 							this.decisionToInteger(this.lastDecisionFridge));
-				} else {
+				} 
+				 else if (URI == ControllerModel.WASHING_MACHINE) {
+						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
+								this.decisionToInteger(this.lastDecisionWashingMachine));
+					}
+				else {
 					assert URI.equals(ControllerModel.CONTROLLER_STUB);
 					plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 							this.decisionToInteger(this.lastDecisionEngineGenerator));
@@ -271,7 +298,13 @@ public class ControllerModel extends AtomicModel {
 			return 1;
 		} else if (d == Decision.SUSPEND_FRIDGE) {
 			return 0;
-		} else {
+		} 
+		else if (d == Decision.START_WASHING) {
+			return 1;
+		} else if (d == Decision.STOP_WASHING) {
+			return 0;
+		}
+		else {
 			// Need to add other decisions
 			return -1;
 		}
@@ -303,18 +336,29 @@ public class ControllerModel extends AtomicModel {
 			} else if (this.triggeredDecisionFridge == Decision.RESUME_FRIDGE) {
 				ret.add(new ResumeFridgeEvent(this.getCurrentStateTime()));
 			}
+			else if (this.triggeredDecisionWashingMachine == Decision.START_WASHING) {
+				ret.add(new StartWashingMachineEvent(this.getCurrentStateTime()));
+			} else if (this.triggeredDecisionWashingMachine == Decision.STOP_WASHING) {
+				ret.add(new StopWashingMachineEvent(this.getCurrentStateTime()));
+			}
 
 			this.decisionFunctionEngineGenerator.add(new DecisionPiece(this.lastDecisionTimeEngineGenerator,
 					this.getCurrentStateTime().getSimulatedTime(), this.lastDecisionEngineGenerator));
 
 			this.decisionFunctionFridge.add(new DecisionPiece(this.lastDecisionTimeFridge,
 					this.getCurrentStateTime().getSimulatedTime(), this.lastDecisionFridge));
+			
+			this.decisionFunctionWashingMachine.add(new DecisionPiece(this.lastDecisionTimeWashingMachine,
+					this.getCurrentStateTime().getSimulatedTime(), this.lastDecisionWashingMachine));
 
 			this.lastDecisionEngineGenerator = this.triggeredDecisionEngineGenerator;
 			this.lastDecisionTimeEngineGenerator = this.getCurrentStateTime().getSimulatedTime();
 
 			this.lastDecisionFridge = this.triggeredDecisionFridge;
 			this.lastDecisionTimeFridge = this.getCurrentStateTime().getSimulatedTime();
+			
+			this.lastDecisionWashingMachine = this.triggeredDecisionWashingMachine;
+			this.lastDecisionTimeWashingMachine = this.getCurrentStateTime().getSimulatedTime();
 
 			this.mustTransmitDecision = false;
 			return ret;
@@ -337,6 +381,15 @@ public class ControllerModel extends AtomicModel {
 						this.componentRef.setEmbeddingComponentStateValue("resumeFridge", null);
 					}
 				}
+				 else if (this.triggeredDecisionWashingMachine != this.lastDecisionWashingMachine) {
+						if (this.triggeredDecisionWashingMachine == Decision.START_WASHING) {
+							System.out.println("5");
+							this.componentRef.setEmbeddingComponentStateValue("startWM", null);
+						} else if (this.triggeredDecisionWashingMachine == Decision.STOP_WASHING) {
+							System.out.println("6");
+							this.componentRef.setEmbeddingComponentStateValue("stopWM", null);
+						}
+					}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -345,12 +398,19 @@ public class ControllerModel extends AtomicModel {
 
 			this.decisionFunctionFridge.add(new DecisionPiece(this.lastDecisionTimeFridge,
 					this.getCurrentStateTime().getSimulatedTime(), this.lastDecisionFridge));
+			
+			this.decisionFunctionWashingMachine.add(new DecisionPiece(this.lastDecisionTimeWashingMachine,
+					this.getCurrentStateTime().getSimulatedTime(), this.lastDecisionWashingMachine));
 
 			this.lastDecisionEngineGenerator = this.triggeredDecisionEngineGenerator;
 			this.lastDecisionTimeEngineGenerator = this.getCurrentStateTime().getSimulatedTime();
 
 			this.lastDecisionFridge = this.triggeredDecisionFridge;
 			this.lastDecisionTimeFridge = this.getCurrentStateTime().getSimulatedTime();
+			
+			this.lastDecisionWashingMachine = this.triggeredDecisionWashingMachine;
+			this.lastDecisionTimeWashingMachine = this.getCurrentStateTime().getSimulatedTime();
+			
 			this.mustTransmitDecision = false;
 			return null;
 		}
@@ -436,6 +496,32 @@ public class ControllerModel extends AtomicModel {
 					this.mustTransmitDecision = true;
 				}
 			}
+			
+			if (this.WMState == WashingMachineState.ON) {
+				if (production <= this.consumption) {
+					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
+					this.WMState = WashingMachineState.OFF;
+
+					this.mustTransmitDecision = true;
+				}
+			} if(this.WMState == WashingMachineState.WORKING) {
+				if (production <= this.consumption) {
+					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
+					this.WMState = WashingMachineState.OFF;
+
+					this.mustTransmitDecision = true;
+				}
+			}
+			else {
+				assert this.WMState == WashingMachineState.OFF;
+				if (production > this.consumption + 20) {
+					this.triggeredDecisionWashingMachine = Decision.START_WASHING;
+					this.WMState = WashingMachineState.ON;
+
+					this.mustTransmitDecision = true;
+				}
+			}
+
 
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), production);
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), production);
@@ -450,7 +536,11 @@ public class ControllerModel extends AtomicModel {
 					} else if (URI == ControllerModel.FRIDGE) {
 						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 								this.decisionToInteger(this.lastDecisionFridge));
-					} else {
+					}else if (URI == ControllerModel.WASHING_MACHINE) {
+						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
+								this.decisionToInteger(this.lastDecisionWashingMachine));
+					}  
+					else {
 						assert URI.equals(ControllerModel.CONTROLLER_STUB);
 						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 								this.decisionToInteger(this.lastDecisionEngineGenerator));
@@ -469,10 +559,10 @@ public class ControllerModel extends AtomicModel {
 				this.productionWindTurbine = (double) this.componentRef.getEmbeddingComponentStateValue("productionWT");
 				this.EGState = (EngineGeneratorState) this.componentRef.getEmbeddingComponentStateValue("stateEG");
 				this.FridgeState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("stateFridge");
+				this.WMState = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("stateWM");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			// GroupeElectrogeneState oldState = this.EGState ;
 			double production = this.productionEngineGenerator + this.productionWindTurbine;
 
 			if (this.EGState == EngineGeneratorState.ON) {
@@ -511,6 +601,30 @@ public class ControllerModel extends AtomicModel {
 					
 				}
 			}
+			if (this.WMState == WashingMachineState.ON) {
+				if (production <= this.consumption) {
+					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
+					this.WMState = WashingMachineState.OFF;
+
+					this.mustTransmitDecision = true;
+				}
+			} if(this.WMState == WashingMachineState.WORKING) {
+				if (production <= this.consumption) {
+					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
+					this.WMState = WashingMachineState.OFF;
+
+					this.mustTransmitDecision = true;
+				}
+			}
+			else {
+				assert this.WMState == WashingMachineState.OFF;
+				if (production > this.consumption + 20) {
+					this.triggeredDecisionWashingMachine = Decision.START_WASHING;
+					this.WMState = WashingMachineState.ON;
+
+					this.mustTransmitDecision = true;
+				}
+			}
 
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), production);
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), production);
@@ -525,7 +639,11 @@ public class ControllerModel extends AtomicModel {
 					} else if (URI == ControllerModel.FRIDGE) {
 						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 								this.decisionToInteger(this.lastDecisionFridge));
-					} else {
+					}else if (URI == ControllerModel.WASHING_MACHINE) {
+						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
+								this.decisionToInteger(this.lastDecisionWashingMachine));
+					}  
+					else {
 						assert URI.equals(ControllerModel.CONTROLLER_STUB);
 						plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 								this.decisionToInteger(this.lastDecisionEngineGenerator));
@@ -556,7 +674,11 @@ public class ControllerModel extends AtomicModel {
 				} else if (URI == ControllerModel.FRIDGE) {
 					plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 							this.decisionToInteger(this.lastDecisionFridge));
-				} else {
+				}else if (URI == ControllerModel.WASHING_MACHINE) {
+					plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
+							this.decisionToInteger(this.lastDecisionWashingMachine));
+				}  
+				else {
 					assert URI.equals(ControllerModel.CONTROLLER_STUB);
 					plotter.addData(URI, this.getCurrentStateTime().getSimulatedTime(),
 							this.decisionToInteger(this.lastDecisionEngineGenerator));
