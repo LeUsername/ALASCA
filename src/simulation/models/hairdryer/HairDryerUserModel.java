@@ -286,30 +286,30 @@ public class HairDryerUserModel extends AtomicES_Model {
 			// See what is the type of event to be executed
 			try {
 				if (this.nextEvent.equals(SwitchOnEvent.class)) {
-					this.componentRef.getEmbeddingComponentStateValue("switchOn");
+					this.componentRef.setEmbeddingComponentStateValue("switchOn", null);
 
 					d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 					this.scheduleEvent(new SwitchModeEvent(this.getCurrentStateTime().add(d)));
 					
 				} else if (this.nextEvent.equals(SwitchModeEvent.class)) {
-					this.componentRef.getEmbeddingComponentStateValue("switchMode");
+					this.componentRef.setEmbeddingComponentStateValue("switchMode",null);
 					d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
 					this.scheduleEvent(new IncreasePowerEvent(this.getCurrentStateTime().add(d)));
 				} else if (this.nextEvent.equals(IncreasePowerEvent.class)) {
-					this.componentRef.getEmbeddingComponentStateValue("increasePower");
+					this.componentRef.setEmbeddingComponentStateValue("increasePower",null);
 
 					d = new Duration(2.0 * this.meanTimeAtHigh * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
 					this.scheduleEvent(new DecreasePowerEvent(this.getCurrentStateTime().add(d)));
 				} else if (this.nextEvent.equals(DecreasePowerEvent.class)) {
-					this.componentRef.getEmbeddingComponentStateValue("decreasePower");
+					this.componentRef.setEmbeddingComponentStateValue("decreasePower",null);
 
 					d = new Duration(2.0 * this.meanTimeAtLow * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
 					this.scheduleEvent(new SwitchOffEvent(this.getCurrentStateTime().add(d)));
 				} else if (this.nextEvent.equals(SwitchOffEvent.class)) {
-					this.componentRef.getEmbeddingComponentStateValue("switchOff");
+					this.componentRef.setEmbeddingComponentStateValue("switchOff",null);
 
 					d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
 					this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));

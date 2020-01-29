@@ -5,6 +5,7 @@ import java.util.Map;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.windturbine.WindTurbineModel;
+import simulation.models.windturbine.WindTurbineSensorModel;
 import wattwatt.tools.URIS;
 
 //------------------------------------------------------------------------------
@@ -39,6 +40,12 @@ public class WindTurbineSimulatorPlugin extends AtomicSimulatorPlugin {
 		simParams.put(URIS.WIND_TURBINE_URI,
 					  this.owner) ;
 
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
+				10.0) ;
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
+				100.0) ;
 		
 		super.setSimulationRunParameters(simParams) ;
 		

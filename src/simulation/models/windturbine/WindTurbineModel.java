@@ -181,14 +181,6 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Duration timeAdvance() {
-//		if (this.componentRef == null) {
-//			// the model has no internal event, however, its state will evolve
-//			// upon reception of external events.
-//			return Duration.INFINITY;
-//		} else {
-//			// This is to test the embedding component access facility.
-//			return new Duration(10.0, TimeUnit.SECONDS);
-//		}
 		if (!this.triggerReading) {
 			return Duration.INFINITY;
 		} else {
@@ -220,35 +212,72 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
-		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-
-		assert currentEvents != null && currentEvents.size() == 1;
-
-		Event ce = (Event) currentEvents.get(0);
-		boolean ticReceived = false;
-
-		if (ce instanceof TicEvent) {
-			ticReceived = true;
-		} else {
-			assert ce instanceof AbstractEolienneEvent;
-			if (ce instanceof WindReadingEvent) {
-				this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
+		if(this.componentRef == null) {
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+	
+			assert currentEvents != null && currentEvents.size() == 1;
+	
+			Event ce = (Event) currentEvents.get(0);
+			boolean ticReceived = false;
+	
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				assert ce instanceof AbstractEolienneEvent;
+				if (ce instanceof WindReadingEvent) {
+					this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
+				}
+				ce.executeOn(this);
 			}
-			ce.executeOn(this);
+			if (ticReceived) {
+				this.triggerReading = true;
+				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+			
+			// add a new data on the plotter; this data will open a new piece
+	
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
+	
+			if (ce instanceof WindReadingEvent) {
+				this.lastWindReadingTime = this.currentWindReadingTime;
+			}
+			super.userDefinedExternalTransition(elapsedTime);
+		} else {
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+			
+			assert currentEvents != null && currentEvents.size() == 1;
+	
+			Event ce = (Event) currentEvents.get(0);
+			boolean ticReceived = false;
+	
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				assert ce instanceof AbstractEolienneEvent;
+				if (ce instanceof WindReadingEvent) {
+					this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
+				}
+				ce.executeOn(this);
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("production", this.production);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (ticReceived) {
+				this.triggerReading = true;
+				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+			
+			// add a new data on the plotter; this data will open a new piece
+	
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
+	
+			if (ce instanceof WindReadingEvent) {
+				this.lastWindReadingTime = this.currentWindReadingTime;
+			}
+			super.userDefinedExternalTransition(elapsedTime);
 		}
-		if (ticReceived) {
-			this.triggerReading = true;
-			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-		}
-		
-		// add a new data on the plotter; this data will open a new piece
-
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
-
-		if (ce instanceof WindReadingEvent) {
-			this.lastWindReadingTime = this.currentWindReadingTime;
-		}
-		super.userDefinedExternalTransition(elapsedTime);
 	}
 
 	/**
@@ -284,6 +313,11 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	public void setProduction(double windSpeed) {
 		this.production = 0.5 * (BLADES_AREA
 				* windDensity(KELVIN_TEMP)) * windSpeed * windSpeed ;
+		// We tried to calculate realistic value but the production was much too
+		// high compared to the consumption thus, we choose to divide this
+		// production by 100
+		this.production /= 100.0;
+		
 	}
 
 	public void switchOn() {

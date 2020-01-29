@@ -7,17 +7,23 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
 import simulation.models.controller.ControllerModel;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
+import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.washingmachine.WashingMachineCoupledModel;
+import simulation.models.windturbine.WindTurbineCoupledModel;
 import wattwatt.components.Controller;
 import wattwatt.components.ElectricMeter;
 import wattwatt.components.devices.schedulable.washingmachine.WashingMachine;
+import wattwatt.components.devices.suspendable.fridge.Fridge;
 import wattwatt.components.devices.uncontrollable.hairdryer.HairDryer;
 import wattwatt.components.energyproviders.occasional.enginegenerator.EngineGenerator;
+import wattwatt.components.energyproviders.random.windturbine.WindTurbine;
 import wattwatt.connectors.ElectricMeterConnector;
 import wattwatt.connectors.devices.schedulable.washingmachine.WashingMachineConnector;
+import wattwatt.connectors.devices.suspendables.fridge.FridgeConnector;
 import wattwatt.connectors.devices.uncontrollable.hairdryer.HairDryerConnector;
 import wattwatt.connectors.energyproviders.occasional.enginegenerator.EngineGeneratorConnector;
+import wattwatt.connectors.energyproviders.random.windturbine.WindTurbineConnector;
 import wattwatt.tools.URIS;
 
 public class CVM 
@@ -47,6 +53,7 @@ extends		AbstractCVM
 	{
 		assert !this.deploymentDone();
 
+		
 		HashMap<String,String> hm = new HashMap<>() ;
 		
 		this.controleurUri = AbstractComponent.createComponent(Controller.class.getCanonicalName(),
@@ -82,8 +89,21 @@ extends		AbstractCVM
 		this.laveUri = AbstractComponent.createComponent(WashingMachine.class.getCanonicalName(),
 				new Object[] { URIS.WASHING_MACHINE_URI, URIS.WASHING_MACHINE_IN_URI });
 		assert this.isDeployedComponent(this.laveUri);
+		
 		hm.put(WashingMachineCoupledModel.URI, this.laveUri);
 
+		this.refriUri = AbstractComponent.createComponent(Fridge.class.getCanonicalName(),
+				new Object[] { URIS.FRIDGE_URI, URIS.FRIDGE_IN_URI });
+		assert this.isDeployedComponent(this.refriUri);
+		
+		hm.put(FridgeCoupledModel.URI, this.refriUri);
+		
+		this.eolUri = AbstractComponent.createComponent(WindTurbine.class.getCanonicalName(),
+				new Object[] { URIS.WIND_TURBINE_URI, URIS.WIND_TURBINE_IN_URI });
+		assert this.isDeployedComponent(this.eolUri);
+		
+		hm.put(WindTurbineCoupledModel.URI, this.eolUri);
+		
 		
 		String coordURI =
 				AbstractComponent.createComponent(
@@ -102,17 +122,17 @@ extends		AbstractCVM
 		this.doPortConnection(this.controleurUri, URIS.ELECTRIC_METER_OUT_URI, URIS.ELECTRIC_METER_IN_URI,
 				ElectricMeterConnector.class.getCanonicalName());
 
-//		this.doPortConnection(this.controleurUri, URIS.FRIDGE_OUT_URI, URIS.FRIDGE_IN_URI,
-//				FridgeConnector.class.getCanonicalName());
+		this.doPortConnection(this.controleurUri, URIS.FRIDGE_OUT_URI, URIS.FRIDGE_IN_URI,
+				FridgeConnector.class.getCanonicalName());
 
 		this.doPortConnection(this.controleurUri, URIS.HAIR_DRYER_OUT_URI, URIS.HAIR_DRYER_IN_URI,
 				HairDryerConnector.class.getCanonicalName());
 
-//		this.doPortConnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI, URIS.WIND_TURBINE_IN_URI,
-//				WindTurbineConnector.class.getCanonicalName());
+		this.doPortConnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI, URIS.WIND_TURBINE_IN_URI,
+				WindTurbineConnector.class.getCanonicalName());
 
-//		this.doPortConnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI, URIS.WASHING_MACHINE_IN_URI,
-//				WashingMachineConnector.class.getCanonicalName());
+		this.doPortConnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI, URIS.WASHING_MACHINE_IN_URI,
+				WashingMachineConnector.class.getCanonicalName());
 
 		this.doPortConnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI, URIS.ENGINE_GENERATOR_IN_URI,
 				EngineGeneratorConnector.class.getCanonicalName());
@@ -120,8 +140,8 @@ extends		AbstractCVM
 		
 		this.doPortConnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1", URIS.HAIR_DRYER_IN_URI, HairDryerConnector.class.getCanonicalName());
 
-//		this.doPortConnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1", URIS.FRIDGE_IN_URI,
-//				FridgeConnector.class.getCanonicalName());
+		this.doPortConnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1", URIS.FRIDGE_IN_URI,
+				FridgeConnector.class.getCanonicalName());
 
 		this.doPortConnection(this.compteurUri, URIS.WASHING_MACHINE_OUT_URI + "1", URIS.WASHING_MACHINE_IN_URI,
 				WashingMachineConnector.class.getCanonicalName());
@@ -133,13 +153,13 @@ extends		AbstractCVM
 	@Override
 	public void finalise() throws Exception {
 		this.doPortDisconnection(this.controleurUri, URIS.ELECTRIC_METER_OUT_URI);
-//		this.doPortDisconnection(this.controleurUri, URIS.FRIDGE_OUT_URI);
+		this.doPortDisconnection(this.controleurUri, URIS.FRIDGE_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.HAIR_DRYER_OUT_URI);
-//		this.doPortDisconnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI);
-//		this.doPortDisconnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI);
+		this.doPortDisconnection(this.controleurUri, URIS.WIND_TURBINE_OUT_URI);
+		this.doPortDisconnection(this.controleurUri, URIS.WASHING_MACHINE_OUT_URI);
 		this.doPortDisconnection(this.controleurUri, URIS.ENGINE_GENERATOR_OUT_URI);
 
-//		this.doPortDisconnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1");
+		this.doPortDisconnection(this.compteurUri, URIS.FRIDGE_OUT_URI + "1");
 		this.doPortDisconnection(this.compteurUri, URIS.HAIR_DRYER_OUT_URI + "1");
 		this.doPortDisconnection(this.compteurUri, URIS.WASHING_MACHINE_OUT_URI + "1");
 		super.finalise();
@@ -157,7 +177,7 @@ extends		AbstractCVM
 		try {
 			CVM vm = new CVM() ;
 			vm.startStandardLifeCycle(50000L) ;
-			Thread.sleep(30000L) ;
+
 			System.out.println("ending...") ;
 			System.exit(0) ;
 		} catch (Exception e) {

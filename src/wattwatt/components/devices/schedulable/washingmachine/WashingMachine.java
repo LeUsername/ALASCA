@@ -10,8 +10,8 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import simulation.models.washingmachine.WashingMachineCoupledModel;
-import simulation.models.washingmachine.WashingMachineModel;
 import simulation.plugins.WashingMachineSimulatorPlugin;
+import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.schedulable.washingmachine.IWashingMachine;
 import wattwatt.ports.devices.schedulable.washingmachine.WashingMachineInPort;
@@ -61,9 +61,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	protected int durationWork;
 
 	/** The state of the washing machine */
-	protected boolean isOn;
-	/** The state of the washing machine */
-	protected boolean isWorking;
+	protected WashingMachineState state;
 	
 	/** The energy consumption of the washing machine */
 	protected double conso;
@@ -72,7 +70,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	// Constants and variables used in the simulation
 	// -------------------------------------------------------------------------
 	protected boolean isOnSim;
-	protected WashingMachineMode state;
+	protected WashingMachineMode state2;
 	protected boolean isWorkingSim;
 	protected double consoSim;
 
@@ -98,13 +96,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 		this.lavein.publishPort();
 		
 		
-		// not currently using thoses ////////////////////
-		this.isOnSim = (boolean) this.asp.getModelStateValue(WashingMachineModel.URI, "isOn");
-		this.state = (WashingMachineMode) this.asp.getModelStateValue(WashingMachineModel.URI, "lavageMode");
-		this.isWorkingSim = (boolean) this.asp.getModelStateValue(WashingMachineModel.URI, "isWorking");
-		this.consoSim = (double) this.asp.getModelStateValue(WashingMachineModel.URI, "consommation");
-		/////////////////////////////////////////////////
-		
+		this.state = WashingMachineState.OFF;
 		ecoLavage();
 		this.startingTime = WashingMachineSetting.START;
 		this.tracer.setRelativePosition(1, 2);
@@ -177,7 +169,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 //						+ PlotterDescription.PLOTTING_PARAM_NAME,
 //				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", 0,
 //						2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight()));
+//						WattWattMain.getPlottstateerHeight()));
 //		
 //		this.asp.toggleDebugMode(); // Debug
 //		this.asp.setSimulationRunParameters(simParams);
@@ -233,19 +225,31 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
 		if (name.equals("consumption")) {
-			return new Double(this.consoSim);
+			return new Double(this.conso);
 		} else if (name.equals("mode")) {
 			return this.mode;
 		} else {
-			assert name.equals("isOn");
-			return new Boolean(this.isOn);
+			
+			assert name.equals("state");
+
+			return this.state;
 		}
 	}
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+		if (name.equals("startAt")) {
+			int d = Math.round((float) value);
+			
+			this.startAt(d);
+		} else if (name.equals("premiumMode")) {
+			this.premiumLavage();
+		} else {
+			assert name.equals("ecoMode");
+			this.ecoLavage();
+		}
 	}
+	
 
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
@@ -274,13 +278,12 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	}
 
 	public void endBefore(int end) {
-		assert end < WashingMachineSetting.END;
 		startingTime = end;
 	}
 
 	public void startAt(int debut) {
-		assert debut >= WashingMachineSetting.START;
 		startingTime = debut;
+		this.state = WashingMachineState.WORKING;
 	}
 
 	public void late(int delay) {
@@ -296,19 +299,19 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	}
 
 	public void On() {
-		this.isOn = true;
+		this.state = WashingMachineState.ON;
 	}
 
 	public void Off() {
-		this.isOn = false;
+		this.state = WashingMachineState.OFF;
 	}
 
 	public boolean isOn() {
-		return this.isOn;
+		return this.state == WashingMachineState.ON ||this.state == WashingMachineState.WORKING; 
 	}
 
 	public boolean isWorking() {
-		return this.isWorking;
+		return this.state == WashingMachineState.WORKING;
 	}
 
 	public double giveConso() {
@@ -322,12 +325,14 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	public void ecoLavage() {
 		mode = WashingMachineMode.ECO;
 		conso = WashingMachineSetting.CONSO_ECO_MODE;
+		this.state = WashingMachineState.OFF;
 		durationWork = WashingMachineSetting.DURATION_ECO_MODE;
 	}
 
 	public void premiumLavage() {
 		mode = WashingMachineMode.PREMIUM;
 		conso = WashingMachineSetting.CONSO_PREMIUM_MODE;
+		this.state = WashingMachineState.OFF;
 		durationWork = WashingMachineSetting.CONSO_PREMIUM_MODE;
 	}
 
@@ -336,8 +341,8 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	}
 
 	public void behave(Random rand) throws InterruptedException {
-		if (this.isOn) {
-			this.isWorking = true;
+		if (this.state == WashingMachineState.ON) {
+			this.state = WashingMachineState.WORKING;
 			if (getMode() == WashingMachineMode.ECO) {
 				this.logMessage(
 						"Washing machine starting eco mode at: " + this.startingTime + " for " + this.durationWork);
@@ -351,12 +356,12 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 				this.logMessage("Still working for " + this.durationWork / 2);
 				Thread.sleep(this.durationWork / 2);
 			}
-			this.isWorking = false;
+			this.state = WashingMachineState.OFF;
 		}
 	}
 
 	public void printState() {
-		this.logMessage(">>> isOn : [" + this.isOn + "] Mode : [" + this.getMode()
+		this.logMessage(">>> isOn : [" + this.state + "] Mode : [" + this.getMode()
 				+ " ] \n>>> Conso depuis le debut : [" + this.giveConso() + " ]\n");
 	}
 

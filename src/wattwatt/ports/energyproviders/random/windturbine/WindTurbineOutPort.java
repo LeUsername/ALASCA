@@ -26,7 +26,7 @@ public class WindTurbineOutPort extends AbstractOutboundPort implements IWindTur
 	}
 
 	@Override
-	public int getEnergy() throws Exception {
+	public double getEnergy() throws Exception {
 		return ((IWindTurbine)this.connector).getEnergy();
 	}
 

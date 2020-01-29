@@ -44,7 +44,8 @@ public class MIL_ElectricMeter {
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 			
 			simParams.put(
-					ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Electric meter model",
 							"Time (min)",

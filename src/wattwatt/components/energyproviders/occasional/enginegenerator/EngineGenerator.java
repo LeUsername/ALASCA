@@ -52,7 +52,7 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	/** The state of the fridge */
 	protected boolean isOn;
 	/** The energy production of the engine generator */
-	protected int production;
+	protected double production;
 	/** The fuel quantity of the engine generator */
 	protected int fuelQuantity;
 	
@@ -231,7 +231,9 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+		if(name.equals("production")) {
+			this.production = (double) value;
+		}
 	}
 
 	@Override
@@ -239,7 +241,7 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		return EngineGeneratorCoupledModel.build();
 	}
 	
-	public int getEnergie() throws Exception {
+	public double getEnergie() throws Exception {
 		return this.production;
 	}
 

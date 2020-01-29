@@ -1,9 +1,5 @@
 package wattwatt.components.energyproviders.random.windturbine;
 
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -11,19 +7,12 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
-import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.deployment.WattWattMain;
-import simulation.models.washingmachine.WashingMachineModel;
 import simulation.models.windturbine.WindTurbineCoupledModel;
 import simulation.models.windturbine.WindTurbineModel;
-import simulation.models.windturbine.WindTurbineSensorModel;
 import simulation.plugins.WindTurbineSimulatorPlugin;
-import simulation.tools.TimeScale;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.random.windturbine.IWindTurbine;
 import wattwatt.ports.energyproviders.random.windturbine.WindTurbineInPort;
-import wattwatt.tools.URIS;
 import wattwatt.tools.windturbine.WindTurbineSetting;
 
 //-----------------------------------------------------------------------------
@@ -63,7 +52,7 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	/** The state of the wind turbine */
 	protected boolean isOn;
 	/** The energy production of the wind turbine */
-	protected int production;
+	protected double production;
 	
 	/** The state of the wind turbine on simulation */
 	protected boolean isOnSim;
@@ -135,48 +124,48 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
-		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put(URIS.WIND_TURBINE_URI, this);
-		simParams.put(
-				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
-				10.0) ;
-		simParams.put(
-				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
-				100.0) ;
-		simParams.put(
-				WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("Production", "Time (min)", "Production (W)",
-						3 * WattWattMain.getPlotterWidth(),
-						0,
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-		
-		this.asp.setSimulationRunParameters(simParams);
-		this.runTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		
-		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-						((WindTurbine) this.getTaskOwner()).isOnSim = 
-								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isOn")));
-						((WindTurbine) this.getTaskOwner()).productionSim = 
-								(((double) asp.getModelStateValue(WashingMachineModel.URI, "production")));
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 0, 1000, TimeUnit.MILLISECONDS);
+//		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
+//		HashMap<String, Object> simParams = new HashMap<String, Object>();
+//		simParams.put(URIS.WIND_TURBINE_URI, this);
+//		simParams.put(
+//				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
+//				10.0) ;
+//		simParams.put(
+//				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
+//				100.0) ;
+//		simParams.put(
+//				WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription("Production", "Time (min)", "Production (W)",
+//						3 * WattWattMain.getPlotterWidth(),
+//						0,
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight())) ;
+//		
+//		this.asp.setSimulationRunParameters(simParams);
+//		this.runTask(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		});
+//		
+//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//						((WindTurbine) this.getTaskOwner()).isOnSim = 
+//								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isOn")));
+//						((WindTurbine) this.getTaskOwner()).productionSim = 
+//								(((double) asp.getModelStateValue(WashingMachineModel.URI, "production")));
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 0, 1000, TimeUnit.MILLISECONDS);
 		/*
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
@@ -213,7 +202,9 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+		if(name.equals("production")) {
+			this.production = (double) value;
+		}
 	}
 
 	@Override
@@ -237,7 +228,7 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 		}
 	}
 
-	public int getEnergie() {
+	public double getEnergie() {
 		return this.production;
 	}
 

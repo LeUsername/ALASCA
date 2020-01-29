@@ -138,7 +138,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		// The reference to the embedding component
 		this.componentRef =
 			(EmbeddingComponentAccessI) simParams.get(URIS.HAIR_DRYER_URI) ;
-		System.out.println(componentRef);
 	}
 
 	/**
@@ -156,7 +155,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 				this.powerLvl = (HairDryerPowerLevel)this.componentRef.getEmbeddingComponentStateValue("powerLevel");
 				this.state = (HairDryerState)this.componentRef.getEmbeddingComponentStateValue("isOn");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -190,6 +188,20 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 
 		super.initialiseVariables(startTime);
 	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
+		} else {
+			return Duration.zero(this.getSimulatedTimeUnit());
+//			return new Duration(10.0, TimeUnit.SECONDS) ;
+		}
+	}
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
@@ -212,20 +224,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	}
 
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		
-		if (!this.triggerReading) {
-			return Duration.INFINITY;
-		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
-//			return new Duration(10.0, TimeUnit.SECONDS) ;
-		}
-	}
-
-	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
 	 */
 	@Override
@@ -236,11 +234,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 //		}
 		
 		if(this.componentRef != null) {
-			// This is an example showing how to access the component state
-			// from a simulation model; this must be done with care and here
-			// we are not synchronising with other potential component threads
-			// that may access the state of the component object at the same
-			// time.
 			this.intensityPlotter.addData(
 					SERIES,
 					this.getCurrentStateTime().getSimulatedTime(),
@@ -321,7 +314,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 				this.mode = (HairDryerMode)this.componentRef.getEmbeddingComponentStateValue("mode");
 				this.powerLvl = (HairDryerPowerLevel)this.componentRef.getEmbeddingComponentStateValue("powerLevel");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

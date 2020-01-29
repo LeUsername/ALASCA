@@ -38,5 +38,6 @@ public interface IHairDryer extends IDevices {
 	 * @throws Exception<i>todo.</i>
 	 */
 	public void decreasePower() throws Exception;
+	
 
 }

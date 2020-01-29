@@ -20,23 +20,35 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.events.controller.ResumeFridgeEvent;
 import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StartWashingMachineEvent;
 import simulation.events.controller.StopEngineGeneratorEvent;
+import simulation.events.controller.StopWashingMachineEvent;
+import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
+import simulation.events.fridge.FridgeConsumptionEvent;
 import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
+import simulation.events.windturbine.WindTurbineProductionEvent;
 import simulation.models.controller.ControllerModel;
 import simulation.models.electricmeter.ElectricMeterModel;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
 import simulation.models.enginegenerator.EngineGeneratorModel;
 import simulation.models.enginegenerator.EngineGeneratorUserModel;
+import simulation.models.fridge.FridgeCoupledModel;
+import simulation.models.fridge.FridgeModel;
+import simulation.models.fridge.FridgeSensorModel;
+import simulation.models.fridge.FridgeUserModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
 import simulation.models.washingmachine.WashingMachineCoupledModel;
 import simulation.models.washingmachine.WashingMachineModel;
 import simulation.models.washingmachine.WashingMachineUserModel;
 import simulation.models.wattwatt.WattWattModel;
+import simulation.models.windturbine.WindTurbineCoupledModel;
+import simulation.models.windturbine.WindTurbineModel;
 import simulation.tools.TimeScale;
 
 public class WattWattSupervisorComponent extends AbstractComponent {
@@ -131,6 +143,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 
 		this.modelURIs2componentURIs = modelURIs2componentURIs;
 
+		
 		this.tracer.setTitle("SupervisorComponent");
 		this.tracer.setRelativePosition(0, 4);
 		this.toggleTracing();
@@ -166,7 +179,9 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						ElectricMeterModel.URI,
 						(Class<? extends EventI>[])
 						new Class<?>[]{
-							HairDryerConsumptionEvent.class
+							HairDryerConsumptionEvent.class,
+							FridgeConsumptionEvent.class,
+							WashingMachineConsumptionEvent.class
 						},
 						(Class<? extends EventI>[])
 						new Class<?>[]{
@@ -184,12 +199,18 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						ControllerModel.URI,
 						(Class<? extends EventI>[])
 						new Class<?>[]{
-							ConsumptionEvent.class
+							ConsumptionEvent.class,
+							EngineGeneratorProductionEvent.class,
+							WindTurbineProductionEvent.class
 						},
 						(Class<? extends EventI>[])
 						new Class<?>[]{
-							StartEngineGeneratorEvent.class,
-							StopEngineGeneratorEvent.class
+							StartEngineGeneratorEvent.class, 
+							StopEngineGeneratorEvent.class, 
+							SuspendFridgeEvent.class, 
+							ResumeFridgeEvent.class,
+							StartWashingMachineEvent.class,
+							StopWashingMachineEvent.class
 						},
 						TimeUnit.SECONDS,
 						modelURIs2componentURIs.get(ControllerModel.URI))) ;
@@ -220,13 +241,51 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 				WashingMachineCoupledModel.URI,
 				ComponentAtomicModelDescriptor.create(
 						WashingMachineCoupledModel.URI,
-						null,
+						(Class<? extends EventI>[])
+						new Class<?>[]{
+							StartWashingMachineEvent.class,
+							StopWashingMachineEvent.class
+						},
 						(Class<? extends EventI>[])
 							new Class<?>[]{
 							WashingMachineConsumptionEvent.class
 							},
 						TimeUnit.SECONDS,
 						modelURIs2componentURIs.get(WashingMachineCoupledModel.URI))) ;
+		
+		// ----------------------------------------------------------------
+		// Fridge
+		// ----------------------------------------------------------------
+		atomicModelDescriptors.put(
+				FridgeCoupledModel.URI,
+				ComponentAtomicModelDescriptor.create(
+						FridgeCoupledModel.URI,
+						(Class<? extends EventI>[])
+						new Class<?>[]{
+							SuspendFridgeEvent.class,
+							ResumeFridgeEvent.class
+						},
+						(Class<? extends EventI>[])
+							new Class<?>[]{
+							FridgeConsumptionEvent.class
+							},
+						TimeUnit.SECONDS,
+						modelURIs2componentURIs.get(FridgeCoupledModel.URI))) ;
+		
+		// ----------------------------------------------------------------
+		// WindTurbine
+		// ----------------------------------------------------------------
+		atomicModelDescriptors.put(
+				WindTurbineCoupledModel.URI,
+				ComponentAtomicModelDescriptor.create(
+						WindTurbineCoupledModel.URI,
+						null,
+						(Class<? extends EventI>[])
+							new Class<?>[]{
+							WindTurbineProductionEvent.class
+							},
+						TimeUnit.SECONDS,
+						modelURIs2componentURIs.get(WindTurbineCoupledModel.URI))) ;
 		
 		
 		// ----------------------------------------------------------------
@@ -242,6 +301,8 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		submodels.add(ControllerModel.URI) ;
 		submodels.add(EngineGeneratorCoupledModel.URI) ;
 		submodels.add(WashingMachineCoupledModel.URI) ;
+		submodels.add(FridgeCoupledModel.URI) ;
+		submodels.add(WindTurbineCoupledModel.URI) ;
 		
 		Map<EventSource,EventSink[]> connections =
 				new HashMap<EventSource,EventSink[]>() ;
@@ -256,6 +317,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 								ElectricMeterModel.URI,
 								HairDryerConsumptionEvent.class)} ;
 		connections.put(from1, to1) ;
+		
 		
 		EventSource from2 =
 				new EventSource(
@@ -311,6 +373,72 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 								WashingMachineConsumptionEvent.class)} ;
 		connections.put(from6, to6) ;
 		
+		EventSource from7 =
+				new EventSource(
+						FridgeCoupledModel.URI,
+						FridgeConsumptionEvent.class) ;
+		EventSink[] to7 =
+				new EventSink[] {
+						new EventSink(
+								ElectricMeterModel.URI,
+								FridgeConsumptionEvent.class)} ;
+		connections.put(from7, to7) ;
+		
+		EventSource from8 =
+				new EventSource(
+						ControllerModel.URI,
+						SuspendFridgeEvent.class) ;
+		EventSink[] to8 =
+				new EventSink[] {
+						new EventSink(
+								FridgeCoupledModel.URI,
+								SuspendFridgeEvent.class)} ;
+		connections.put(from8, to8) ;
+		EventSource from9 =
+				new EventSource(
+						ControllerModel.URI,
+						ResumeFridgeEvent.class) ;
+		EventSink[] to9 =
+				new EventSink[] {
+						new EventSink(
+								FridgeCoupledModel.URI,
+								ResumeFridgeEvent.class)} ;
+		connections.put(from9, to9) ;
+		
+		EventSource from10 =
+				new EventSource(
+						WindTurbineCoupledModel.URI,
+						WindTurbineProductionEvent.class) ;
+		EventSink[] to10 =
+				new EventSink[] {
+						new EventSink(
+								ControllerModel.URI,
+								WindTurbineProductionEvent.class)} ;
+		connections.put(from10, to10) ;
+		
+		EventSource from11 =
+				new EventSource(
+						ControllerModel.URI,
+						StartWashingMachineEvent.class) ;
+		EventSink[] to11 =
+				new EventSink[] {
+						new EventSink(
+								WashingMachineCoupledModel.URI,
+								StartWashingMachineEvent.class)} ;
+		connections.put(from11, to11) ;
+		EventSource from12 =
+				new EventSource(
+						ControllerModel.URI,
+						StopWashingMachineEvent.class) ;
+		EventSink[] to12 =
+				new EventSink[] {
+						new EventSink(
+								WashingMachineCoupledModel.URI,
+								StopWashingMachineEvent.class)} ;
+		connections.put(from12, to12) ;
+		
+
+		
 		
 		coupledModelDescriptors.put(
 				WattWattModel.URI,
@@ -365,6 +493,35 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		String modelURI = TicModel.URI + "-10";
 		simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME, new Duration(10.0, TimeUnit.SECONDS));
 		
+		simParams.put(
+				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"Electric meter model",
+						"Time (min)",
+						"Consumption (Watt)",
+						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y,
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		
+		simParams.put(					
+				ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X ,
+						WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		simParams.put(
+				ControllerModel.URI + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X ,
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
+		simParams.put(
+				ControllerModel.URI + ":" + ControllerModel.FRIDGE_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("ControllerModel", "Time (sec)", "Fridge decision", WattWattMain.ORIGIN_X ,
+						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight()));
 		
 		simParams.put(
 				HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
@@ -372,69 +529,115 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 						"Hair dryer model",
 						"Time (min)",
 						"Intensity (Watt)",
-						WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y,
+						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight())) ;
 		
+
 		simParams.put(
-				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
+				WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
-						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y, WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
-		simParams.put(
-				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Power (Watt)", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("LaveLingeModel", "Time (min)", "Consumption (W)",
+						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(),
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		
 		simParams.put(
 				WashingMachineUserModel.URI + ":" + WashingMachineUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
-						WattWattMain.ORIGIN_X, WattWattMain.ORIGIN_Y+4*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(), 
+						WattWattMain.ORIGIN_Y+ 3*WattWattMain.getPlotterHeight(), 
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
-
+		
 		simParams.put(
-				WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeModel", "Time (min)", "Consumption (W)", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
+				WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"Wind turbine model",
+						"Time (min)",
+						"Production (Watt)",
+						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y , 
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+	
 		
 		simParams.put(
 				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Volume (Liters)", WattWattMain.ORIGIN_X,
-						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Volume (Liters)", 
+						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), 
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 
+		
 		simParams.put(
-				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"Electric meter model",
-						"Time (min)",
-						"Consumption (Watt)",
-						2 * WattWattMain.getPlotterWidth(), 
-						3 * WattWattMain.getPlotterHeight(),
+				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
+						+ PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Power (Watt)", 
+						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), 
 						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		
-		simParams.put(					
-				ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
-						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
-						WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight()));
 		simParams.put(
-				ControllerModel.URI + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":"
+				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
-						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
+						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight() ,
+						WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		
+		
+		simParams.put(
+				FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurModel",
+						"Time (sec)",
+						"Temperature (Celsius)",
+						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y , 
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		simParams.put(
+				FridgeModel.URI + ":"  + FridgeModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurModel",
+						"Time (min)",
+						"Consumption (W)",
+						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), 
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+
+		simParams.put(
+				FridgeSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurSensorModel",
+						"Time (min)",
+						"Temperature (Celcius)",
+						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), 
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		
+		simParams.put(
+				FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+				new PlotterDescription(
+						"RefrigerateurUserModel",
+						"Time (min)",
+						"Opened / Closed",
+						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
+						WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight(), 
+						WattWattMain.getPlotterWidth(),
+						WattWattMain.getPlotterHeight())) ;
+		
+
 		
 
 		this.logMessage("SupervisorComponent#execute 2");

@@ -109,6 +109,9 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		PlotterDescription pdFuelQuantity = (PlotterDescription) simParams.get(vname) ;
 		this.fuelQuantityPlotter = new XYPlotter(pdFuelQuantity) ;
 		this.fuelQuantityPlotter.createSeries(QUANTITY) ;
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.ENGINE_GENERATOR_URI);
 	}
 	
 	@Override
@@ -169,36 +172,37 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(1)) {
-			this.logMessage("GroupeElectrogeneModel#userDefinedInternalTransition "
-							+ elapsedTime) ;
+//		if (this.hasDebugLevel(1)) {
+//			this.logMessage("GroupeElectrogeneModel#userDefinedInternalTransition "
+//							+ elapsedTime) ;
+//		}
+		if(this.componentRef != null) {
+			if(this.triggerReading) {
+				this.updateState();
+				this.triggerReading = false;
+			}
+			if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
+				super.userDefinedInternalTransition(elapsedTime) ;
+	
+				
+			if (this.productionPlotter != null) {
+				this.productionPlotter.addData(
+					PRODUCTION,
+					this.getCurrentStateTime().getSimulatedTime(), 
+					this.production) ;
+			}
+	//		this.logMessage(this.getCurrentStateTime() +
+	//				"|internal|production = " + this.production + " Watt") ;
+			}
+			if (this.fuelQuantityPlotter != null) {
+				this.fuelQuantityPlotter.addData(
+					QUANTITY,
+					this.getCurrentStateTime().getSimulatedTime(), 
+					this.fuelCapacity) ;
+			}
+	//		this.logMessage(this.getCurrentStateTime() +
+	//				"|internal|temperature = " + this.fuelCapacity + " L") ;
 		}
-		if(this.triggerReading) {
-			this.updateState();
-			this.triggerReading = false;
-		}
-		if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-			super.userDefinedInternalTransition(elapsedTime) ;
-
-			
-		if (this.productionPlotter != null) {
-			this.productionPlotter.addData(
-				PRODUCTION,
-				this.getCurrentStateTime().getSimulatedTime(), 
-				this.production) ;
-		}
-		this.logMessage(this.getCurrentStateTime() +
-				"|internal|production = " + this.production + " Watt") ;
-		}
-		if (this.fuelQuantityPlotter != null) {
-			this.fuelQuantityPlotter.addData(
-				QUANTITY,
-				this.getCurrentStateTime().getSimulatedTime(), 
-				this.fuelCapacity) ;
-		}
-		this.logMessage(this.getCurrentStateTime() +
-				"|internal|temperature = " + this.fuelCapacity + " L") ;
-		
 	}
 
 	/**
@@ -206,55 +210,106 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 1");
-		}
-
-		// get the vector of current external events
-		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-		boolean ticReceived = false;
-		// when this method is called, there is at least one external event
-		assert currentEvents != null;
-
-		Event ce = (Event) currentEvents.get(0);
-
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
-		}
-
-		// the plot is piecewise constant; this data will close the currently
-		// open piece
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
-		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
-
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 3 " + this.state);
-		}
-
-		// execute the current external event on this model, changing its state
-		// and intensity level
-		if (ce instanceof TicEvent) {
-			ticReceived = true;
+//		if (this.hasDebugLevel(2)) {
+//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 1");
+//		}
+		if(this.componentRef == null) {
+			// get the vector of current external events
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+			boolean ticReceived = false;
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+	
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
+	//		}
+	
+			// the plot is piecewise constant; this data will close the currently
+			// open piece
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+			this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
+	
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 3 " + this.state);
+	//		}
+	
+			// execute the current external event on this model, changing its state
+			// and intensity level
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
+				ce.executeOn(this);
+			}
+			if (ticReceived) {
+				this.triggerReading = true;
+				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+	//		 if (this.hasDebugLevel(1)) {
+	//		 this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 4 ");
+	//		 }
+	
+			// add a new data on the plotter; this data will open a new piece
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+			this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
+	
+			super.userDefinedExternalTransition(elapsedTime);
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 5");
+	//		}
 		} else {
-			assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
-			System.out.println(ce.getClass());
-			ce.executeOn(this);
-		}
-		if (ticReceived) {
-			this.triggerReading = true;
-			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-		}
-		 if (this.hasDebugLevel(1)) {
-		 this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 4 ");
-		 }
-
-		// add a new data on the plotter; this data will open a new piece
-		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
-		this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
-
-		super.userDefinedExternalTransition(elapsedTime);
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 5");
+			// get the vector of current external events
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+			boolean ticReceived = false;
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+	
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
+	//		}
+	
+			// the plot is piecewise constant; this data will close the currently
+			// open piece
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+			this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
+	
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 3 " + this.state);
+	//		}
+	
+			// execute the current external event on this model, changing its state
+			// and intensity level
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
+				ce.executeOn(this);
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("production", this.production);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (ticReceived) {
+				this.triggerReading = true;
+				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+	//		 if (this.hasDebugLevel(1)) {
+	//		 this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 4 ");
+	//		 }
+	
+			// add a new data on the plotter; this data will open a new piece
+			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
+			this.fuelQuantityPlotter.addData(QUANTITY, this.getCurrentStateTime().getSimulatedTime(), this.fuelCapacity);
+	
+			super.userDefinedExternalTransition(elapsedTime);
+	//		if (this.hasDebugLevel(2)) {
+	//			this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 5");
+	//		}			
 		}
 	}
 	

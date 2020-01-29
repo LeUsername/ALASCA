@@ -21,5 +21,5 @@ public interface IEnergyProviders extends OfferedI, RequiredI {
 	 * @return quantity of energy provided
 	 * @throws Exception<i>todo.</i>
 	 */
-	public int getEnergy() throws Exception;
+	public double getEnergy() throws Exception;
 }

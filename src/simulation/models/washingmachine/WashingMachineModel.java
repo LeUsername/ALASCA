@@ -18,6 +18,8 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.events.controller.StartWashingMachineEvent;
+import simulation.events.controller.StopWashingMachineEvent;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
@@ -30,8 +32,10 @@ import wattwatt.tools.washingmachine.WashingMachineSetting;
 @ModelExternalEvents(imported = { EcoModeEvent.class, 
 								  PremiumModeEvent.class, 
 								  StartAtEvent.class, 
-								  TicEvent.class},
-exported = { WashingMachineConsumptionEvent.class})
+								  TicEvent.class,
+								  StopWashingMachineEvent.class,
+								  StartWashingMachineEvent.class },
+					 exported = { WashingMachineConsumptionEvent.class})
 public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
@@ -129,7 +133,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		vname = this.getURI() + ":" + STD ;
 		this.startingTimeDelay = (double) simParams.get(vname) ;
 		
-		vname = this.getURI() + ":" + WashingMachineModel.SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		vname = this.getURI() + ":" + WashingMachineModel.INTENSITY_SERIES + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
 		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
 		this.intensityPlotter = new XYPlotter(pdTemperature) ;
 		this.intensityPlotter.createSeries(WashingMachineModel.SERIES) ;
@@ -144,9 +148,17 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-		this.lavage = WashingMachineMode.ECO;
-		this.state = WashingMachineState.OFF;
-
+		if(componentRef == null) {
+			this.lavage = WashingMachineMode.ECO;
+			this.state = WashingMachineState.OFF;
+		} else {
+			try {
+				this.lavage = (WashingMachineMode) this.componentRef.getEmbeddingComponentStateValue("mode");
+				this.state = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("state");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		this.triggerReading = false;
 
 		this.intensityPlotter.initialise();
@@ -184,12 +196,14 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
 			double reading = this.currentIntensity; // Watt
-
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			WashingMachineConsumptionEvent consommation = new WashingMachineConsumptionEvent(currentTime, reading);
 			ret.add(consommation);
+			
+			this.triggerReading = false;
 			return ret;
+			
 		} else {
 			return null;
 		}
@@ -200,38 +214,20 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(1)) {
-			this.logMessage("LaveLingeModel#userDefinedInternalTransition " + elapsedTime);
-		}
-		if (this.triggerReading) {
-			this.updateState();
-			this.triggerReading = false;
-		} else {
-			if (this.componentRef != null) {
-				// This is an example showing how to access the component state
-				// from a simulation model; this must be done with care and here
-				// we are not synchronising with other potential component threads
-				// that may access the state of the component object at the same
-				// time.
-				try {
-					this.currentIntensity = (double)componentRef.getEmbeddingComponentStateValue("consumption");
-//					this.logMessage("component state = " + this.currentIntensity);
-					this.lavage = (WashingMachineMode)componentRef.getEmbeddingComponentStateValue("mode");
-//					this.logMessage("component state = " + this.lavage);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-			if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
-				super.userDefinedInternalTransition(elapsedTime);
+//		if (this.hasDebugLevel(1)) {
+//			this.logMessage("LaveLingeModel#userDefinedInternalTransition " + elapsedTime);
+//		}
 	
-				if (this.intensityPlotter != null) {
-					this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
-							this.currentIntensity);
-				}
-				this.logMessage(this.getCurrentStateTime() + "|internal|intensity = " + this.currentIntensity + " Amp");
+			if (this.componentRef != null) {
+				this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
+						this.currentIntensity);
+				this.updateState();
+				this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
+						this.currentIntensity);
+				
 			}
-		}
+//			this.logMessage(this.getCurrentStateTime() + "|internal|intensity = " + this.currentIntensity + " Amp");
+		
 	}
 
 	/**
@@ -239,51 +235,69 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("LaveLingeModel::userDefinedExternalTransition 1");
-		}
-
-		// get the vector of current external events
-		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-		boolean ticReceived = false;
-		// when this method is called, there is at least one external event
-		assert currentEvents != null;
-
-		Event ce = (Event) currentEvents.get(0);
-
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("LaveLingeModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
-		}
-
-		// the plot is piecewise constant; this data will close the currently
-		// open piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
-
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("LaveLingeModel::userDefinedExternalTransition 3 " + this.state);
-		}
-
-		// execute the current external event on this model, changing its state
-		// and intensity level
-		if (ce instanceof TicEvent) {
-			ticReceived = true;
+//		if (this.hasDebugLevel(2)) {
+//			this.logMessage("LaveLingeModel::userDefinedExternalTransition 1");
+//		}
+		if(this.componentRef == null) {
+			// get the vector of current external events
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+			boolean ticReceived = false;
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+	
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("LaveLingeModel::userDefinedExternalTransition 2 " + ce.getClass().getCanonicalName());
+//			}
+	
+			// the plot is piecewise constant; this data will close the currently
+			// open piece
+			this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
+	
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("LaveLingeModel::userDefinedExternalTransition 3 " + this.state);
+//			}
+	
+			// execute the current external event on this model, changing its state
+			// and intensity level
+			if (ce instanceof TicEvent) {
+				ticReceived = true;
+			} else {
+				ce.executeOn(this);
+			}
+			if (ticReceived) {
+				this.triggerReading = true;
+//				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
+			}
+//			if (this.hasDebugLevel(1)) {
+//				this.logMessage("LaveLingeModel::userDefinedExternalTransition 4 ");
+//			}
+	
+			// add a new data on the plotter; this data will open a new piece
+			this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
+	
+			super.userDefinedExternalTransition(elapsedTime);
+//			if (this.hasDebugLevel(2)) {
+//				this.logMessage("LaveLingeModel::userDefinedExternalTransition 5");
+//			}
 		} else {
-			ce.executeOn(this);
-		}
-		if (ticReceived) {
+			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
+			// when this method is called, there is at least one external event
+			assert currentEvents != null;
+	
+			Event ce = (Event) currentEvents.get(0);
+
+			assert ce instanceof TicEvent;
 			this.triggerReading = true;
-			this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-		}
-		if (this.hasDebugLevel(1)) {
-			this.logMessage("LaveLingeModel::userDefinedExternalTransition 4 ");
-		}
-
-		// add a new data on the plotter; this data will open a new piece
-		this.intensityPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentIntensity);
-
-		super.userDefinedExternalTransition(elapsedTime);
-		if (this.hasDebugLevel(2)) {
-			this.logMessage("LaveLingeModel::userDefinedExternalTransition 5");
+			
+			try {
+				this.state = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("state");
+				this.lavage = (WashingMachineMode)this.componentRef.getEmbeddingComponentStateValue("mode");
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -295,7 +309,6 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		this.intensityPlotter.addData(SERIES, endTime.getSimulatedTime(), this.currentIntensity);
 		super.endSimulation(endTime);
 	}
-	
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
@@ -304,6 +317,10 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	public SimulationReportI getFinalReport() throws Exception {
 		return new WashingMachineReport(this.getURI());
 	}
+	
+	// ------------------------------------------------------------------------
+	// Model-specific methods
+	// ------------------------------------------------------------------------
 	
 	public double getIntensity() {
 		return this.currentIntensity;
@@ -339,12 +356,20 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	public void premiumLavage() {
 		this.lavage = WashingMachineMode.PREMIUM;
 		this.state = WashingMachineState.OFF;
-		
+	}
+	
+	public void start() {
+		this.state = WashingMachineState.ON;
+	}
+	
+	public void stop() {
+		this.state = WashingMachineState.OFF;
 	}
 
 	private void updateState() {
 		if(this.state == WashingMachineState.WORKING) {
 			if(this.lavage == WashingMachineMode.ECO) {
+				
 				this.currentIntensity += WashingMachineSetting.CONSO_ECO_MODE_SIM;
 			}
 			else {
@@ -355,5 +380,4 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			this.currentIntensity = 0.0;
 		}
 	}
-
 }

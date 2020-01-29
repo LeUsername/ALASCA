@@ -28,7 +28,7 @@ public class EngineGeneratorInPort extends AbstractInboundPort implements IEngin
 	}
 
 	@Override
-	public int getEnergy() throws Exception {
+	public double getEnergy() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((EngineGenerator) owner).getEnergie());
 	}
 

@@ -280,6 +280,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	 * @throws Exception<i>todo.</i>
 	 */
 	public double giveConso() throws Exception {
+		this.consomation = this.fridgeConsumption + this.washingMachineConsumption + this.hairDryerConsumption;
 		return consomation;
 	}
 

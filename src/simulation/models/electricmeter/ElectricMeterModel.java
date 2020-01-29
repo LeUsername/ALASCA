@@ -168,11 +168,11 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
 			double reading = this.getConsumption(); // Watt
-
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			ConsumptionEvent consumption = new ConsumptionEvent(currentTime, reading);
 			ret.add(consumption);
+			this.triggerReading = false;
 			return ret;
 		} else {
 			return null;
@@ -184,13 +184,12 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public Duration timeAdvance() {
-		if (this.componentRef == null) {
+		if (!this.triggerReading) {
 			// the model has no internal event, however, its state will evolve
 			// upon reception of external events.
 			return Duration.INFINITY;
 		} else {
-			// This is to test the embedding component access facility.
-			return new Duration(10.0, TimeUnit.SECONDS);
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
 
@@ -200,11 +199,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		if (this.componentRef != null) {
-			// This is an example showing how to access the component state
-			// from a simulation model; this must be done with care and here
-			// we are not synchronising with other potential component threads
-			// that may access the state of the component object at the same
-			// time.
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
 			try {
@@ -218,11 +212,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			}
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
-			if (this.triggerReading) {
-				this.triggerReading = false;
-			}
-		} else {
-			// TODO
+			
 		}
 	}
 
@@ -234,7 +224,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 		if (this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
-			assert currentEvents != null && currentEvents.size() == 1;
+			assert currentEvents != null ;
 
 			Event ce = (Event) currentEvents.get(0);
 
@@ -256,9 +246,13 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
-			assert currentEvents != null && currentEvents.size() == 1;
+			assert currentEvents != null;
 
 			Event ce = (Event) currentEvents.get(0);
+			
+			if(ce instanceof TicEvent) {
+				this.triggerReading = true;
+			}
 
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
@@ -323,7 +317,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	public void setFridgeConsumption(double p) {
 		this.fridgeConsumption = p;
 	}
-
 	public double getHairDryerConsumption() {
 		return this.hairDryerConsumption;
 	}
@@ -334,5 +327,9 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 
 	public double getFridgeConsumption() {
 		return this.fridgeConsumption;
+	}
+	
+	public void setConsumption(double p) {
+		this.totalConsumption = p;
 	}
 }

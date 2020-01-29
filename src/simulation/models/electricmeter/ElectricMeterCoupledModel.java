@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.SimulationEngineCreationMode;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
+import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicModel;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
@@ -89,18 +91,24 @@ public class ElectricMeterCoupledModel extends CoupledModel {
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 		atomicModelDescriptors.put(ElectricMeterStubModel.URI, AtomicModelDescriptor.create(ElectricMeterStubModel.class,
 				ElectricMeterStubModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+		atomicModelDescriptors.put(TicModel.URI + "-5", AtomicModelDescriptor.create(TicModel.class,
+				TicModel.URI + "-5", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterModel.URI);
 		submodels.add(ElectricMeterStubModel.URI);
+		submodels.add(TicModel.URI + "-5");
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 		EventSource from1 = new EventSource(ElectricMeterStubModel.URI, ConsumptionEvent.class);
 		EventSink[] to1 = new EventSink[] { new EventSink(ElectricMeterModel.URI, ConsumptionEvent.class) };
 		connections.put(from1, to1);
-
+		EventSource from5 = new EventSource(TicModel.URI + "-5", TicEvent.class);
+		EventSink[] to5 = new EventSink[] { new EventSink(ElectricMeterModel.URI, TicEvent.class) };
+		connections.put(from5, to5);
+		
 		coupledModelDescriptors.put(ElectricMeterCoupledModel.URI,
 				new CoupledHIOA_Descriptor(ElectricMeterCoupledModel.class, ElectricMeterCoupledModel.URI, submodels, null, null,
 						connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));

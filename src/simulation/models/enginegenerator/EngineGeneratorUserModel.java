@@ -171,7 +171,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	@Override
 	public Duration timeAdvance() {
 		Duration d = super.timeAdvance();
-		this.logMessage("EngineGeneratorUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
+//		this.logMessage("EngineGeneratorUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
 		return d;
 	}
 	
@@ -187,7 +187,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 
 		this.nextEvent = ret.get(0).getClass();
 
-		this.logMessage("EngineGeneratorUserModel::output() " + this.nextEvent.getCanonicalName());
+//		this.logMessage("EngineGeneratorUserModel::output() " + this.nextEvent.getCanonicalName());
 		return ret;
 	}
 	

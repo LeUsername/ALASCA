@@ -1,9 +1,5 @@
 package wattwatt.components.devices.suspendable.fridge;
 
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -12,22 +8,15 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
-import fr.sorbonne_u.utils.PlotterDescription;
-import simulation.deployment.WattWattMain;
 import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.fridge.FridgeModel;
-import simulation.models.fridge.FridgeSensorModel;
-import simulation.models.fridge.FridgeUserModel;
 import simulation.models.hairdryer.HairDryerModel;
 import simulation.plugins.FridgeSimulatorPlugin;
-import simulation.tools.TimeScale;
 import simulation.tools.fridge.FridgeConsumption;
 import simulation.tools.fridge.FridgeDoor;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.devices.suspendable.fridge.IFridge;
 import wattwatt.ports.devices.suspendable.fridge.FridgeInPort;
-import wattwatt.tools.URIS;
-import wattwatt.tools.controller.ControllerSetting;
 import wattwatt.tools.fridge.FridgeSetting;
 
 //-----------------------------------------------------------------------------
@@ -117,7 +106,7 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		this.currentDoorState = FridgeDoor.CLOSED;
 		this.intensity = 0.0;
 		this.temperature = (double) this.asp.getModelStateValue(FridgeModel.URI, "temperature");
-
+		this.on();
 		this.tracer.setRelativePosition(1, 0);
 	}
 
@@ -161,90 +150,90 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		// To give an example of the embedding component access facility, the
 		// following lines show how to set the reference to the embedding
 		// component or a proxy responding to the access calls.
-		HashMap<String, Object> simParams = new HashMap<String, Object>();
-		simParams.put(URIS.FRIDGE_URI, this);
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
-		simParams.put(
-				FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"RefrigerateurUserModel",
-						"Time (min)",
-						"Opened / Closed",
-						WattWattMain.getPlotterWidth(),
-						0,
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-		
-		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
-		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
-		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"RefrigerateurModel",
-						"Time (min)",
-						"Temperature (Celcius)",
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-		simParams.put(
-				FridgeModel.URI + ":"  + FridgeModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"RefrigerateurModel",
-						"Time (min)",
-						"Intensity (W)",
-						WattWattMain.getPlotterWidth(),
-						2*WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-
-		simParams.put(
-				FridgeSensorModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 2.5) ;
-		simParams.put(
-				FridgeSensorModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-		simParams.put(
-				FridgeSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription(
-						"RefrigerateurSensorModel",
-						"Time (min)",
-						"Temperature (Celcius)",
-						WattWattMain.getPlotterWidth(),
-						3*WattWattMain.getPlotterHeight(),
-						WattWattMain.getPlotterWidth(),
-						WattWattMain.getPlotterHeight())) ;
-		this.asp.setSimulationRunParameters(simParams);
-		// Start the simulation.
-		this.runTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-						((Fridge) this.getTaskOwner()).setDoorState(
-								(((FridgeDoor) asp.getModelStateValue(FridgeModel.URI, "door"))));
-						((Fridge) this.getTaskOwner()).setConsumptionState((((FridgeConsumption) asp
-								.getModelStateValue(FridgeModel.URI, "consumption"))));
-						((Fridge) this.getTaskOwner()).setTemperature(
-								((double) asp.getModelStateValue(FridgeModel.URI, "temperature")));
-						((Fridge) this.getTaskOwner())
-								.setIntensity(((double) asp.getModelStateValue(FridgeModel.URI, "intensity")));
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 0, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
+//		HashMap<String, Object> simParams = new HashMap<String, Object>();
+//		simParams.put(URIS.FRIDGE_URI, this);
+//		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
+//		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
+//		simParams.put(
+//				FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription(
+//						"RefrigerateurUserModel",
+//						"Time (min)",
+//						"Opened / Closed",
+//						WattWattMain.getPlotterWidth(),
+//						0,
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight())) ;
+//		
+//		simParams.put(
+//				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
+//		simParams.put(
+//				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
+//		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
+//		simParams.put(
+//				FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription(
+//						"RefrigerateurModel",
+//						"Time (min)",
+//						"Temperature (Celcius)",
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight(),
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight())) ;
+//		simParams.put(
+//				FridgeModel.URI + ":"  + FridgeModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription(
+//						"RefrigerateurModel",
+//						"Time (min)",
+//						"Intensity (W)",
+//						WattWattMain.getPlotterWidth(),
+//						2*WattWattMain.getPlotterHeight(),
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight())) ;
+//
+//		simParams.put(
+//				FridgeSensorModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 2.5) ;
+//		simParams.put(
+//				FridgeSensorModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
+//		simParams.put(
+//				FridgeSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+//				new PlotterDescription(
+//						"RefrigerateurSensorModel",
+//						"Time (min)",
+//						"Temperature (Celcius)",
+//						WattWattMain.getPlotterWidth(),
+//						3*WattWattMain.getPlotterHeight(),
+//						WattWattMain.getPlotterWidth(),
+//						WattWattMain.getPlotterHeight())) ;
+//		this.asp.setSimulationRunParameters(simParams);
+//		// Start the simulation.
+//		this.runTask(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		});
+//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
+//			@Override
+//			public void run() {
+//				try {
+//						((Fridge) this.getTaskOwner()).setDoorState(
+//								(((FridgeDoor) asp.getModelStateValue(FridgeModel.URI, "door"))));
+//						((Fridge) this.getTaskOwner()).setConsumptionState((((FridgeConsumption) asp
+//								.getModelStateValue(FridgeModel.URI, "consumption"))));
+//						((Fridge) this.getTaskOwner()).setTemperature(
+//								((double) asp.getModelStateValue(FridgeModel.URI, "temperature")));
+//						((Fridge) this.getTaskOwner())
+//								.setIntensity(((double) asp.getModelStateValue(FridgeModel.URI, "intensity")));
+//				} catch (Exception e) {
+//					throw new RuntimeException(e);
+//				}
+//			}
+//		}, 0, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

@@ -12,6 +12,10 @@ package simulation.tools.controller;
  * @author	<p>Bah Thierno, Zheng Pascal</p>
  */
 public enum Decision {
+	SUSPEND_FRIDGE, 
+	RESUME_FRIDGE,
+	START_WASHING, 
+	STOP_WASHING,
 	START_ENGINE, 
 	STOP_ENGINE,
 	START_TURBINE,

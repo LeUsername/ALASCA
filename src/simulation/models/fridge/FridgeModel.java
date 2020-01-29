@@ -23,6 +23,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
+import simulation.events.controller.ResumeFridgeEvent;
+import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.fridge.AbstractFridgeEvent;
 import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.FridgeConsumptionEvent;
@@ -39,7 +41,7 @@ import wattwatt.tools.fridge.FridgeSetting;
 								  OpenEvent.class, 
 								  ResumeEvent.class, 
 								  SuspendEvent.class,
-								  TicEvent.class},
+								  TicEvent.class, SuspendFridgeEvent.class, ResumeFridgeEvent.class},
 					exported = { FridgeConsumptionEvent.class})
 public class FridgeModel
 extends AtomicHIOAwithEquations

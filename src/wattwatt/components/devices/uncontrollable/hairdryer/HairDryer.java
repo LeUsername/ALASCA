@@ -222,29 +222,26 @@ public class HairDryer extends AbstractCyPhyComponent implements EmbeddingCompon
 			return this.isOn;
 		} else if (name.equals("powerLevel")) {
 			return this.powerLvl;
-		} else if (name.equals("switchOn")) {
-			this.on();
-			return null;
-		} else if (name.equals("switchOff")) {
-			this.off();
-			return null;
-		} else if (name.equals("increasePower")) {
-			this.increasePower();
-			return null;
-		} else if (name.equals("decreasePower")) {
-			this.decreasePower();
-			return null;
-		} else if (name.equals("switchMode")) {
-			this.switchMode();
-			return null;
 		} else {
+			assert name.equals("consumption");
 			return new Double(this.conso);
 		}
 	}
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+		if (name.equals("switchOn")) {
+			this.on();
+		} else if (name.equals("switchOff")) {
+			this.off();
+		} else if (name.equals("increasePower")) {
+			this.increasePower();
+		} else if (name.equals("decreasePower")) {
+			this.decreasePower();
+		} else{
+			assert name.equals("switchMode");
+			this.switchMode();
+		}
 	}
 	
 	public void behave(Random rand) {

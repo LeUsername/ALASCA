@@ -28,8 +28,10 @@ import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
+import simulation.events.controller.ResumeFridgeEvent;
 import simulation.events.controller.StartEngineGeneratorEvent;
 import simulation.events.controller.StopEngineGeneratorEvent;
+import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
@@ -391,15 +393,20 @@ public class WattWattMain {
 					new ReexportedEvent(FridgeModel.URI,
 							FridgeConsumptionEvent.class)) ;
 
+			Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
 			
-//						Map<Class<? extends EventI>,EventSink[]> imported6 =
-//								new HashMap<Class<? extends EventI>,EventSink[]>() ;
-//						imported6.put(
-//							StartEngineGenerator.class,
-//							new EventSink[] {
-//									new EventSink(EngineGeneratorModel.URI,
-//											StartEngineGenerator.class)
-//							}) ;
+			imported.put(
+					SuspendFridgeEvent.class,
+					new EventSink[] {
+							new EventSink(FridgeModel.URI,
+									SuspendFridgeEvent.class)
+					}) ;
+			imported.put(
+					ResumeFridgeEvent.class,
+					new EventSink[] {
+							new EventSink(FridgeModel.URI,
+									ResumeFridgeEvent.class)
+					});
 
 			Map<VariableSource, VariableSink[]> bindings7 = new HashMap<VariableSource, VariableSink[]>();
 			VariableSource source7 = new VariableSource("temperature", Double.class, FridgeModel.URI);
@@ -410,7 +417,7 @@ public class WattWattMain {
 
 			coupledModelDescriptors.put(FridgeCoupledModel.URI,
 					new CoupledHIOA_Descriptor(FridgeCoupledModel.class, FridgeCoupledModel.URI, submodels7,
-							null, reexported7, connections7, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+							imported, reexported7, connections7, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							bindings7));
 						
 			// ----------------------------------------------------------------
@@ -425,10 +432,11 @@ public class WattWattMain {
 			// Electric meter
 			// ----------------------------------------------------------------
 			
-			atomicModelDescriptors.put(ElectricMeterModel.URI,
-					AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
-							ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-			
+			atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
+					ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
+
+			atomicModelDescriptors.put(TicModel.URI + "-6", AtomicModelDescriptor.create(TicModel.class,
+					TicModel.URI + "-6", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			// ----------------------------------------------------------------
 			// Full architecture
 			// ----------------------------------------------------------------
@@ -441,6 +449,8 @@ public class WattWattMain {
 			submodels.add(ControllerModel.URI);
 			submodels.add(WashingMachineCoupledModel.URI);
 			submodels.add(FridgeCoupledModel.URI);
+			submodels.add(TicModel.URI + "-6");
+
 
 			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 
@@ -476,6 +486,20 @@ public class WattWattMain {
 			EventSink[] to8 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, FridgeConsumptionEvent.class) };
 			connections.put(from8, to8);
+			
+			EventSource from9 = new EventSource(ControllerModel.URI, SuspendFridgeEvent.class);
+			EventSink[] to9 = new EventSink[] {
+					new EventSink(FridgeCoupledModel.URI, SuspendFridgeEvent.class) };
+			connections.put(from9, to9);
+			EventSource from10 = new EventSource(ControllerModel.URI, ResumeFridgeEvent.class);
+			EventSink[] to10 = new EventSink[] {
+					new EventSink(FridgeCoupledModel.URI, ResumeFridgeEvent.class) };
+			connections.put(from10, to10);
+			EventSource from110 = new EventSource(TicModel.URI + "-6", TicEvent.class);
+			EventSink[] to110 = new EventSink[] {
+					new EventSink(ElectricMeterModel.URI, TicEvent.class) };
+			connections.put(from110, to110);
+
 			
 			
 			coupledModelDescriptors.put(
@@ -513,6 +537,12 @@ public class WattWattMain {
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(10.0, TimeUnit.SECONDS)) ;
 			modelURI = TicModel.URI  + "-4" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			modelURI = TicModel.URI  + "-5" ;
+			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
+						  new Duration(10.0, TimeUnit.SECONDS)) ;
+			modelURI = TicModel.URI  + "-6" ;
 			simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME,
 						  new Duration(10.0, TimeUnit.SECONDS)) ;
 			
@@ -649,6 +679,13 @@ public class WattWattMain {
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
+							WattWattMain.getPlotterHeight()));
+			
+			simParams.put(
+					ControllerModel.URI + ":" + ControllerModel.FRIDGE_SERIES + ":"
+							+ PlotterDescription.PLOTTING_PARAM_NAME,
+					new PlotterDescription("ControllerModel", "Time (sec)", "Fridge decision", WattWattMain.ORIGIN_X + 2 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			
 			

@@ -26,7 +26,7 @@ public class EngineGeneratorOutPort extends AbstractOutboundPort implements IEng
 	}
 
 	@Override
-	public int getEnergy() throws Exception {
+	public double getEnergy() throws Exception {
 		return ((IEngineGenerator) this.connector).getEnergy();
 	}
 

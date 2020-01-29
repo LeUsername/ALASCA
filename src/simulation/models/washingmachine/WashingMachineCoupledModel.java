@@ -27,6 +27,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
+import simulation.events.controller.StartWashingMachineEvent;
+import simulation.events.controller.StopWashingMachineEvent;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
 import simulation.events.washingmachine.StartAtEvent;
@@ -68,6 +70,7 @@ public class WashingMachineCoupledModel extends CoupledModel {
 		}
 		return ret;
 	}
+	
 
 	public static Architecture build() throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
@@ -112,15 +115,24 @@ public class WashingMachineCoupledModel extends CoupledModel {
 				new ReexportedEvent(WashingMachineModel.URI,
 						WashingMachineConsumptionEvent.class)) ;
 		
-		/*Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
-		VariableSource source = new VariableSource("fuelCapacity", Double.class, GroupeElectrogeneModel.URI);
-		VariableSink[] sinks = new VariableSink[] {
-				new VariableSink("fuelCapacity", Double.class, GroupeElectrogeneUserModel.URI) };
-		bindings.put(source, sinks);*/
+		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
+		imported.put(
+				StopWashingMachineEvent.class,
+				new EventSink[] {
+						new EventSink(WashingMachineModel.URI,
+								StopWashingMachineEvent.class)
+				}) ;
+		imported.put(
+				StartWashingMachineEvent.class,
+				new EventSink[] {
+						new EventSink(WashingMachineModel.URI,
+								StartWashingMachineEvent.class)
+				}) ;
+		
 
 		coupledModelDescriptors.put(WashingMachineCoupledModel.URI,
 				new CoupledHIOA_Descriptor(WashingMachineCoupledModel.class, WashingMachineCoupledModel.URI, submodels,
-						null, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+						imported, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 						null));
 
 		return new Architecture(WashingMachineCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

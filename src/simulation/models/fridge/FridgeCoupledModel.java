@@ -27,7 +27,10 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
+import simulation.events.controller.ResumeFridgeEvent;
+import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.fridge.CloseEvent;
+import simulation.events.fridge.FridgeConsumptionEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
@@ -109,9 +112,6 @@ public class FridgeCoupledModel extends CoupledModel {
 		submodels.add(TicModel.URI + "-2");
 		submodels.add(FridgeSensorModel.URI);
 
-		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
-
-
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 		EventSource from1 = new EventSource(FridgeUserModel.URI, OpenEvent.class);
 		EventSink[] to1 = new EventSink[] { new EventSink(FridgeModel.URI, OpenEvent.class) };
@@ -129,6 +129,27 @@ public class FridgeCoupledModel extends CoupledModel {
 		EventSink[] to5 = new EventSink[] { new EventSink(FridgeSensorModel.URI, TicEvent.class) };
 		connections.put(from5, to5);
 
+		Map<Class<? extends EventI>,ReexportedEvent> reexported =
+				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+		reexported.put(
+				FridgeConsumptionEvent.class,
+				new ReexportedEvent(FridgeModel.URI,
+						FridgeConsumptionEvent.class)) ;
+		
+		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
+		imported.put(
+				SuspendFridgeEvent.class,
+				new EventSink[] {
+						new EventSink(FridgeModel.URI,
+								SuspendFridgeEvent.class)
+				}) ;
+		imported.put(
+				ResumeFridgeEvent.class,
+				new EventSink[] {
+						new EventSink(FridgeModel.URI,
+								ResumeFridgeEvent.class)
+				}) ;
+		
 		Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
 		VariableSource source = new VariableSource("temperature", Double.class, FridgeModel.URI);
 		VariableSink[] sinks = new VariableSink[] {
@@ -137,7 +158,7 @@ public class FridgeCoupledModel extends CoupledModel {
 
 		coupledModelDescriptors.put(FridgeCoupledModel.URI,
 				new CoupledHIOA_Descriptor(FridgeCoupledModel.class, FridgeCoupledModel.URI, submodels,
-						imported, null, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null,
+						imported, reexported, connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null,
 						null, bindings));
 
 		return new Architecture(FridgeCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

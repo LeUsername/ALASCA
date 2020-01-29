@@ -28,6 +28,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
+import simulation.events.windturbine.WindTurbineProductionEvent;
 import wattwatt.tools.URIS;
 
 public class WindTurbineCoupledModel extends CoupledModel {
@@ -110,9 +111,16 @@ public class WindTurbineCoupledModel extends CoupledModel {
 		EventSource from13 = new EventSource(WindTurbineSensorModel.URI, SwitchOnEvent.class);
 		EventSink[] to13 = new EventSink[] { new EventSink(WindTurbineModel.URI, SwitchOnEvent.class) };
 		connections.put(from13, to13);
+		
+		Map<Class<? extends EventI>,ReexportedEvent> reexported =
+				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+		reexported.put(
+				WindTurbineProductionEvent.class,
+				new ReexportedEvent(WindTurbineModel.URI,
+						WindTurbineProductionEvent.class)) ;
 
 		coupledModelDescriptors.put(WindTurbineCoupledModel.URI,
-				new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels, null, null,
+				new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels, null, reexported,
 						connections, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));
 
 		return new Architecture(WindTurbineCoupledModel.URI, atomicModelDescriptors, coupledModelDescriptors,

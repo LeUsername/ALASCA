@@ -28,7 +28,7 @@ public class WindTurbineInPort extends AbstractInboundPort implements IWindTurbi
 	}
 
 	@Override
-	public int getEnergy() throws Exception {
+	public double getEnergy() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((WindTurbine) owner).getEnergie());
 	}
 

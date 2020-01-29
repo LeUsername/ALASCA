@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
-import fr.sorbonne_u.devs_simulation.examples.molene.tic.TicEvent;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -22,7 +21,7 @@ import simulation.events.windturbine.WindReadingEvent;
 import simulation.tools.windturbine.WindTurbineState;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(imported = { TicEvent.class }, exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
+@ModelExternalEvents(exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
 public class WindTurbineSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -186,7 +185,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 
 		Duration d;
 
-		d = new Duration(2.0 * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+		d = new Duration(2.0 * this.rg.nextBeta(2.5, 2.5), this.getSimulatedTimeUnit());
 		
 		Time t = this.getCurrentStateTime().add(d);
 

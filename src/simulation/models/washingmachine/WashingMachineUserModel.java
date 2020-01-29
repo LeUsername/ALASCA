@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -88,13 +89,46 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	protected final RandomDataGenerator rg;
 
 	protected XYPlotter plotter;
-	
-	
+	/**
+	 * reference on the object representing the component that holds the model;
+	 * enables the model to access the state of this component.
+	 */
+	protected EmbeddingComponentAccessI componentRef;
 
 	public WashingMachineUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.rg = new RandomDataGenerator();
 		this.setLogger(new StandardLogger());
+	}
+	
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+	
+	@Override
+	public void			setSimulationRunParameters(
+		Map<String, Object> simParams
+		) throws Exception
+	{
+		String vname = this.getURI() + ":" + MTWE ;
+		this.meanTimeWorkingEco = (double) simParams.get(vname) ;
+		
+		vname = this.getURI() + ":" + MTBU ;
+		this.meanTimeBetweenUsages = (double) simParams.get(vname) ;
+		
+		vname = this.getURI() + ":" + MTWP ;
+		this.meanTimeWorkingPremium = (double) simParams.get(vname) ;
+		
+		vname = this.getURI() + ":" + STD ;
+		this.startingTimeDelay = (double) simParams.get(vname) ;
+		
+		vname = this.getURI() + ":" + WashingMachineUserModel.ACTION + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
+		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
+		this.plotter = new XYPlotter(pdTemperature) ;
+		this.plotter.createSeries(WashingMachineUserModel.ACTION) ;
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.WASHING_MACHINE_URI);
 	}
 	
 	@Override
@@ -127,29 +161,6 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	}
 	
 	@Override
-	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws Exception
-	{
-		String vname = this.getURI() + ":" + MTWE ;
-		this.meanTimeWorkingEco = (double) simParams.get(vname) ;
-		
-		vname = this.getURI() + ":" + MTBU ;
-		this.meanTimeBetweenUsages = (double) simParams.get(vname) ;
-		
-		vname = this.getURI() + ":" + MTWP ;
-		this.meanTimeWorkingPremium = (double) simParams.get(vname) ;
-		
-		vname = this.getURI() + ":" + STD ;
-		this.startingTimeDelay = (double) simParams.get(vname) ;
-		
-		vname = this.getURI() + ":" + WashingMachineUserModel.ACTION + ":"+ PlotterDescription.PLOTTING_PARAM_NAME ;
-		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
-		this.plotter = new XYPlotter(pdTemperature) ;
-		this.plotter.createSeries(WashingMachineUserModel.ACTION) ;
-	}
-	
-	@Override
 	public Duration timeAdvance() {
 		Duration d = super.timeAdvance();
 		this.logMessage("LaveLingeUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
@@ -158,100 +169,192 @@ public class WashingMachineUserModel extends AtomicES_Model {
 
 	@Override
 	public ArrayList<EventI> output() {
-		assert !this.eventList.isEmpty();
-		ArrayList<EventI> ret = super.output();
-		assert ret.size() == 1;
-
-		
-		this.nextEvent = ret.get(0).getClass();
-
-		this.logMessage("LaveLingeUserModel::output() " + this.nextEvent.getCanonicalName());
-		return ret;
+		if (componentRef != null) {
+			this.nextEvent = super.output().get(0).getClass();
+			return null;
+		} else {
+			assert !this.eventList.isEmpty();
+			ArrayList<EventI> ret = super.output();
+			assert ret.size() == 1;
+	
+			
+			this.nextEvent = ret.get(0).getClass();
+	
+//			this.logMessage("LaveLingeUserModel::output() " + this.nextEvent.getCanonicalName());
+			return ret;
+		}
 	}
 	
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-
-		Duration d;
-		
-		if (this.nextEvent.equals(StartAtEvent.class) ) {
-
-			
-
-			Random r = new Random();
-			if(r.nextFloat() > 0.75) {
-				d = new Duration(2.0 * this.meanTimeWorkingPremium + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+		if (componentRef == null) {
+			Duration d;
+			if (this.nextEvent.equals(StartAtEvent.class) ) {
+				Random r = new Random();
+				if(r.nextFloat() > 0.75) {
+					d = new Duration(2.0 * this.meanTimeWorkingPremium + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+					Time t = this.getCurrentStateTime().add(d);
+					this.scheduleEvent(new PremiumModeEvent(t));
+					if (this.plotter != null) {
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								0.0) ;
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								2.0) ;
+					}
+				}
+				else {
+					d = new Duration(2.0 * this.meanTimeWorkingEco  + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+					Time t = this.getCurrentStateTime().add(d);
+					this.scheduleEvent(new EcoModeEvent(t));
+					if (this.plotter != null) {
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								0.0) ;
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								1.0) ;
+					}
+				}
+				
+	
+			} else if (this.nextEvent.equals(PremiumModeEvent.class)) {
+				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 				Time t = this.getCurrentStateTime().add(d);
-				this.scheduleEvent(new PremiumModeEvent(t));
+				
+				this.scheduleEvent(new StartAtEvent(t,this.startingTimeDelay));
+				
+				Random r = new Random();
+				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
+				
 				if (this.plotter != null) {
-					this.plotter.addData(
-							ACTION,
-							this.getCurrentStateTime().getSimulatedTime(),
-							0.0) ;
 					this.plotter.addData(
 							ACTION,
 							this.getCurrentStateTime().getSimulatedTime(),
 							2.0) ;
-				}
-			}
-			else {
-				d = new Duration(2.0 * this.meanTimeWorkingEco  + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-				Time t = this.getCurrentStateTime().add(d);
-				this.scheduleEvent(new EcoModeEvent(t));
-				if (this.plotter != null) {
 					this.plotter.addData(
 							ACTION,
 							this.getCurrentStateTime().getSimulatedTime(),
 							0.0) ;
+				}
+				
+			} else if (this.nextEvent.equals(EcoModeEvent.class)) {
+				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				
+				this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d),this.startingTimeDelay));
+				
+				Random r = new Random();
+				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
+				
+				if (this.plotter != null) {
 					this.plotter.addData(
 							ACTION,
 							this.getCurrentStateTime().getSimulatedTime(),
 							1.0) ;
+					this.plotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
+				}
+				
+			}
+		} else {
+			Duration d;
+			if (this.nextEvent.equals(StartAtEvent.class) ) {
+				try {
+					float val = (float) this.startingTimeDelay;
+					this.componentRef.setEmbeddingComponentStateValue("startAt", val);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Random r = new Random();
+				if(r.nextFloat() > 0.75) {
+					d = new Duration(2.0 * this.meanTimeWorkingPremium + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+					Time t = this.getCurrentStateTime().add(d);
+					this.scheduleEvent(new PremiumModeEvent(t));
+					if (this.plotter != null) {
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								0.0) ;
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								2.0) ;
+					}
+				}
+				else {
+					d = new Duration(2.0 * this.meanTimeWorkingEco  + this.startingTimeDelay * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+					Time t = this.getCurrentStateTime().add(d);
+					this.scheduleEvent(new EcoModeEvent(t));
+					if (this.plotter != null) {
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								0.0) ;
+						this.plotter.addData(
+								ACTION,
+								this.getCurrentStateTime().getSimulatedTime(),
+								1.0) ;
+					}
+				}
+				
+	
+			} else if (this.nextEvent.equals(PremiumModeEvent.class)) {
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("premiumMode", null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
+				
+				this.scheduleEvent(new StartAtEvent(t,this.startingTimeDelay));
+				
+				Random r = new Random();
+				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
+				
+				if (this.plotter != null) {
+					this.plotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							2.0) ;
+					this.plotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
+				}
+				
+			} else if (this.nextEvent.equals(EcoModeEvent.class)) {
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("ecoMode", null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				
+				this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d),this.startingTimeDelay));
+				
+				Random r = new Random();
+				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
+				
+				if (this.plotter != null) {
+					this.plotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							1.0) ;
+					this.plotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
 				}
 			}
-			
-
-		} else if (this.nextEvent.equals(PremiumModeEvent.class)) {
-			d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			Time t = this.getCurrentStateTime().add(d);
-			
-			this.scheduleEvent(new StartAtEvent(t,this.startingTimeDelay));
-			
-			Random r = new Random();
-			this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
-			
-			if (this.plotter != null) {
-				this.plotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						2.0) ;
-				this.plotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						0.0) ;
-			}
-			
-		} else if (this.nextEvent.equals(EcoModeEvent.class)) {
-			d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			
-			this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d),this.startingTimeDelay));
-			
-			Random r = new Random();
-			this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
-			
-			if (this.plotter != null) {
-				this.plotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						1.0) ;
-				this.plotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						0.0) ;
-			}
-			
 		}
-
 	}
 	
 	@Override
