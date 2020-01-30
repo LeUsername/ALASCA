@@ -45,14 +45,14 @@ public class FridgeSetting {
 	/**
 	 * Consumption when the fridge is on and not suspended
 	 */
-	public static final double ACTIVE_CONSUMPTION = 12.0;
+	public static final double ACTIVE_CONSUMPTION = 3.0;
 	
 	/**
 	 * Consumption when the fridge is suspended
 	 */
-	public static final double PASSIVE_CONSUMPTION = 6.0;
+	public static final double PASSIVE_CONSUMPTION = 1.5;
 	
-	public static final double OPENING_ENERGY_CONSUMPTION = 2.0;
+	public static final double OPENING_ENERGY_CONSUMPTION = 1.75;
 	
 	/**
 	 * The Rate at wich the fridge will send his energy consumption.

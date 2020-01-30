@@ -1,15 +1,16 @@
 package simulation.models.fridge;
 
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
-import fr.sorbonne_u.devs_simulation.examples.molene.utils.BooleanPiece;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
+import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
@@ -36,22 +37,10 @@ extends		AtomicES_Model
 	extends		AbstractSimulationReport
 	{
 		private static final long			serialVersionUID = 1L ;
-		public final int					numberOfTimesOpen ;
-		public final double					availability ;
-		public final Vector<BooleanPiece>	closeFunction ;
 
-		public			RefrigerateurUserModelReport(
-			String modelURI,
-			int numberOfTimesOpen,
-			double availability,
-			Vector<BooleanPiece> closeFunction
-			)
+		public			RefrigerateurUserModelReport(String modelURI)
 		{
 			super(modelURI) ;
-			this.numberOfTimesOpen =
-					numberOfTimesOpen ;
-			this.availability = availability ;
-			this.closeFunction = closeFunction ;
 		}
 
 		/**
@@ -60,18 +49,8 @@ extends		AtomicES_Model
 		@Override
 		public String	toString()
 		{
-			String ret = "\n-----------------------------------------\n" ;
-			ret += "RefrigerateurUserModelReport\n" ;
-			ret += "-----------------------------------------\n" ;
-			ret += "number of time the door was opened = " +
-								this.numberOfTimesOpen + "\n" ;
-			ret += "availability = " + this.availability + "\n" ;
-			ret += "closeFunction = \n" ;
-			for (int i = 0 ; i < this.closeFunction.size() ; i++) {
-				ret += "    " + this.closeFunction.get(i) + "\n" ;
-			}
-			ret += "-----------------------------------------\n" ;
-			return ret ;
+			return "RefrigerateurUserModelReport(" + this.getModelURI() + ")";
+			
 		}
 	}
 
@@ -99,31 +78,21 @@ extends		AtomicES_Model
 	 *  distribution with mean <code>meanInterruptionDuration</code>.		*/
 	protected double					meanInterruptionDuration ;
 	/**	a random number generator from common math library.					*/
-	protected final RandomDataGenerator	rgInterruptionIntervals ;
-	/**	a random number generator from common math library.					*/
-	protected final RandomDataGenerator	rgInterruptionDurations ;
+	protected final RandomDataGenerator	rg ;
 	/** 	the current state of the refrigerateur's door.					*/
 	protected FridgeDoor currentState ;
-
-	// Report generation
-	/** piecewise boolean function giving the opened time and the closed time
-	 *  of the door since the beginning of the run.							*/
-	protected Vector<BooleanPiece>		closeFunction ;
-	/** total time the door was closed since the beginning of the run.		*/
-	protected double					closedTime ;
-	/** total time of the run.												*/
-	protected double					totalTime ;
-	/** number of time the door was opened since the beginning of the run.	*/
-	protected int						numberOfTimeOpened ;
-	/** the time at which the last opening occurred.						*/
-	protected double					timeOfLastOpening ;
-	/** the time at which the last closing occurred.						*/
-	protected double					timeOfLastClosing ;
+	
+	/** next event to be sent. */
+	protected Class<?> nextEvent;
 
 	// Plotting
 	/** Frame used to plot the bandwidth interruption function during
 	 *  the simulation.														*/
 	protected XYPlotter					plotter ;
+	
+	/** reference on the object representing the component that holds the
+	 *  model; enables the model to access the state of this component.		*/
+	protected EmbeddingComponentAccessI componentRef ;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -158,14 +127,8 @@ extends		AtomicES_Model
 	{
 		super(uri, simulatedTimeUnit, simulationEngine) ;
 
-		// Uncomment to get a log of the events.
-		//this.setLogger(new StandardLogger()) ;
-
 		// Create the random number generators
-		this.rgInterruptionIntervals = new RandomDataGenerator() ;
-		this.rgInterruptionDurations = new RandomDataGenerator() ;
-		// Create the representation of the event occurrences function
-		this.closeFunction = new Vector<BooleanPiece>() ;
+		this.rg = new RandomDataGenerator() ;
 	}
 
 	// -------------------------------------------------------------------------
@@ -192,6 +155,9 @@ extends		AtomicES_Model
 		PlotterDescription pd = (PlotterDescription) simParams.get(vname) ;
 		this.plotter = new XYPlotter(pd) ;
 		this.plotter.createSeries(SERIES) ;
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.FRIDGE_URI) ;
 	}
 
 	/**
@@ -200,40 +166,71 @@ extends		AtomicES_Model
 	@Override
 	public void			initialiseState(Time initialTime)
 	{
-		// statistics gathered during each run and put in the report.
-		this.numberOfTimeOpened = 0 ;
-		this.closedTime = 0.0 ;
-		this.totalTime = 0.0 ;
-
-		// variables used to produce a function representing event occurrences
-		// in the report and a plot on the screen
-		this.timeOfLastOpening = -1.0 ;
-		this.timeOfLastClosing = 0.0 ;
 
 		// initialisation of the random number generators
-		this.rgInterruptionIntervals.reSeedSecure() ;
-		this.rgInterruptionDurations.reSeedSecure() ;
+		this.rg.reSeedSecure() ;
 
-		// initialisation of the event occurrences function for the report
-		this.closeFunction.clear() ;
+		super.initialiseState(initialTime);
+
+		// Schedule the first SwitchOn event.
+		Duration d1 = new Duration(0.0, this.getSimulatedTimeUnit());
+		Duration d2 = new Duration(2.0 * this.meanTimeBetweenInterruptions * this.rg.nextBeta(1.75, 1.75),
+				this.getSimulatedTimeUnit());
+		
+		Time t = this.getCurrentStateTime().add(d1).add(d2);
+		this.scheduleEvent(new OpenEvent(t));
+		
 		// initialisation of the event occurrences plotter on the screen
 		if (this.plotter != null) {
 			this.plotter.initialise() ;
 			this.plotter.showPlotter() ;
 		}
 
-		// standard initialisation (including the current state time)
-		super.initialiseState(initialTime) ;
 
 		// The model is set to start in the state interrupted and with a
 		// resumption event that occurs at time 0.
-		this.currentState = FridgeDoor.OPENED ;
-		this.scheduleEvent(new CloseEvent(initialTime)) ;
-		// re-initialisation of the time of occurrence of the next event
-		// required here after adding a new event in the schedule.
+		if(this.componentRef == null) {
+			this.currentState = FridgeDoor.OPENED ;
+		}
+		else {
+			try {
+				this.currentState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		this.nextTimeAdvance = this.timeAdvance() ;
 		this.timeOfNextEvent =
 				this.getCurrentStateTime().add(this.getNextTimeAdvance()) ;
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		Duration d = super.timeAdvance();
+		return d;
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
+	 */
+	@Override
+	public ArrayList<EventI> output() {
+		if (componentRef != null) {
+			this.nextEvent = super.output().get(0).getClass();
+			return null;
+		} else {
+			assert !this.eventList.isEmpty();
+			ArrayList<EventI> ret = super.output();
+			assert ret.size() == 1;
+
+			this.nextEvent = ret.get(0).getClass();
+
+			return ret;
+		}
 	}
 
 	/**
@@ -242,90 +239,108 @@ extends		AtomicES_Model
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
-		if (this.currentState == FridgeDoor.OPENED) {
-			// The event that forced the execution of an internal transition
-			// is a resumption event.
+		if(this.componentRef == null) {
+			if (this.currentState == FridgeDoor.OPENED) {
+				
+				this.currentState = FridgeDoor.CLOSED ;
 
-			// Log the event occurrence
-			this.logMessage(this.getCurrentStateTime() +
-												"|open event.") ;
-			// Switch to connected state.
-			this.currentState = FridgeDoor.CLOSED ;
+				// compute the time of occurrence (in the future)
+//				double closedTime = this.rg.nextExponential(this.meanTimeBetweenInterruptions);
+//				Duration d = new Duration(closedTime, this.getSimulatedTimeUnit());
+//				Time t = this.getCurrentStateTime().add(d);
+//				this.scheduleEvent(new CloseEvent(t)) ;
 
-			// Include a new point in the event occurrences function (report)
-			if (this.timeOfLastOpening >= 0.0) {
-				this.closeFunction.add(
-					new BooleanPiece(
-								this.timeOfLastOpening,
-								this.getCurrentStateTime().getSimulatedTime(),
-								true)) ;
-			}
-			this.timeOfLastClosing =
-							this.getCurrentStateTime().getSimulatedTime() ;
-			// Update the statistics for the report
-			double d = this.getCurrentStateTime().getSimulatedTime() -
-											this.timeOfLastOpening ;
-			this.totalTime += d ;
-
-			// Generate the next interruption event after a random delay and
-			// schedule it to be triggered at the corresponding time.
-			this.scheduleEvent(
-				this.generateNextOpening(this.getCurrentStateTime())) ;
-
-			// Update the plotter with the nex event occurrence
-			if (this.plotter != null) {
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						0.0) ;
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						1.0) ;
-			}
-		} else {
-			assert	this.currentState == FridgeDoor.CLOSED ;
-			// The event that forced the execution of an internal transition
-			// is an interruption event.
-
-			// Log the event occurrence
-			this.logMessage(this.getCurrentStateTime() +
-												"|interrupt transmission.") ;
-
-			// Switch to interrupted state.
-			this.currentState = FridgeDoor.OPENED ;
-
-			// Include a new point in the event occurrences function (report)
-			this.closeFunction.add(
-				new BooleanPiece(
-							this.timeOfLastClosing,
+				// Update the plotter with the next event occurrence
+				if (this.plotter != null) {
+					this.plotter.addData(
+							SERIES,
 							this.getCurrentStateTime().getSimulatedTime(),
-							false)) ;
-			this.timeOfLastOpening =
-							this.getCurrentStateTime().getSimulatedTime() ;
-			// Update the statistics for the report
-			double d = this.getCurrentStateTime().getSimulatedTime() -
-												this.timeOfLastClosing ;
-			this.totalTime += d ;
-			this.closedTime += d ;
+							0.0) ;
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							1.0) ;
+				}
+			} else {
+				assert	this.currentState == FridgeDoor.CLOSED ;
+				this.currentState = FridgeDoor.OPENED ;
 
-			// Generate the next resumption event after a random delay and
-			// schedule it to be triggered at the corresponding time.
-			this.scheduleEvent(this.generateNextClose(
-												this.getCurrentStateTime())) ;
+				// compute the time of occurrence (in the future)
+//				double openedTime = this.rg.nextExponential(this.meanInterruptionDuration);
+//				Duration d = new Duration(openedTime, this.getSimulatedTimeUnit());
+//				Time t = this.getCurrentStateTime().add(d);
+//				this.scheduleEvent(new OpenEvent(t)) ;
+//				
+				if (this.plotter != null) {
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							1.0) ;
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
+				}
+			}
+		}else {
+			try {
+				this.currentState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (this.currentState == FridgeDoor.OPENED) {
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("close", null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				double closedTime = this.rg.nextExponential(this.meanTimeBetweenInterruptions);
+				Duration d = new Duration(closedTime, this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
+				this.scheduleEvent(new CloseEvent(t)) ;
 
-			// Include a new point in the event occurrences function (report)
-			if (this.plotter != null) {
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						1.0) ;
-				this.plotter.addData(
-						SERIES,
-						this.getCurrentStateTime().getSimulatedTime(),
-						0.0) ;
+				if (this.plotter != null) {
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							1.0) ;
+				}
+			} else {
+				assert	this.currentState == FridgeDoor.CLOSED ;
+				try {
+					this.componentRef.setEmbeddingComponentStateValue("open", null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				double openedTime = this.rg.nextExponential(this.meanInterruptionDuration);
+				Duration d = new Duration(openedTime, this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
+				this.scheduleEvent(new OpenEvent(t)) ;
+
+				if (this.plotter != null) {
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							1.0) ;
+					this.plotter.addData(
+							SERIES,
+							this.getCurrentStateTime().getSimulatedTime(),
+							0.0) ;
+				}
+			}
+			try {
+				this.currentState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		
 	}
 
 	/**
@@ -358,120 +373,10 @@ extends		AtomicES_Model
 	public SimulationReportI	getFinalReport()
 	throws Exception
 	{
-		// Collect the event occurrences function and the statistics to
-		// create the report and return it.
-		Time end = this.getSimulationEngine().getSimulationEndTime() ;
-		if (this.timeOfLastOpening < end.getSimulatedTime() &&
-						this.timeOfLastClosing < end.getSimulatedTime()) {
-			if (this.timeOfLastOpening < this.timeOfLastOpening) {
-				// The last event was an interruption
-				this.closeFunction.add(
-						new BooleanPiece(this.timeOfLastOpening,
-										 end.getSimulatedTime(),
-										 true)) ;
-			} else {
-				// The last event was an resumption
-				this.closeFunction.add(
-						new BooleanPiece(this.timeOfLastClosing,
-										 end.getSimulatedTime(),
-										 false)) ;
-				
-			}
-		}
-		return new RefrigerateurUserModelReport(
-								this.getURI(),
-								this.numberOfTimeOpened,
-								this.closedTime/this.totalTime,
-								this.closeFunction) ;
+		
+		return new RefrigerateurUserModelReport(this.getURI()) ;
 	}
 
-	// -------------------------------------------------------------------------
-	// WiFi disconnection model proper methods
-	// -------------------------------------------------------------------------
 
-	/**
-	 * create and return the next interruption event.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param current	current simulation time.
-	 * @return			the next interruption event.
-	 */
-	protected OpenEvent		generateNextOpening(Time current)
-	{
-		// Generate the random delay until the next interruption
-		double delay =
-			this.rgInterruptionIntervals.nextExponential(
-										this.meanTimeBetweenInterruptions) ;
-		// Compute the corresponding tie of occurrence
-		Time interruptionOccurrenceTime =
-			current.add(new Duration(delay, this.getSimulatedTimeUnit())) ;
-		// Create the interruption event at the corresponding time of occurrence
-		OpenEvent gie =
-						new OpenEvent(interruptionOccurrenceTime) ;
-		// Update the statistics
-		this.numberOfTimeOpened++ ;
-		// Return the created event
-		return gie ;
-	}
-
-	/**
-	 * create and return the next resumption event.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true			// no precondition.
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param current	current simulation time.
-	 * @return			the next resumption event.
-	 */
-	protected CloseEvent 	generateNextClose(Time current)
-	{
-		// Generate the random delay until the next interruption
-		double interruptedTime =
-				this.rgInterruptionDurations.nextExponential(
-											this.meanInterruptionDuration) ;
-		Time endOfInterruption =
-				current.add(new Duration(interruptedTime,
-							this.getSimulatedTimeUnit())) ;
-		// Create and return the resumption event at the corresponding
-		// time of occurrence
-		return new CloseEvent(endOfInterruption) ;
-	}
-
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#modelContentAsString(java.lang.String)
-	 */
-	@Override
-	protected String	modelContentAsString(String indent)
-	{
-		return super.modelContentAsString(indent) +
-							indent + "door = " + this.currentState ;
-	}
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#showCurrentStateContent(java.lang.String, fr.sorbonne_u.devs_simulation.models.time.Duration)
-	 */
-	@Override
-	public void			showCurrentStateContent(
-		String indent,
-		Duration elapsedTime
-		)
-	{
-		super.showCurrentStateContent(indent, elapsedTime) ;
-		System.out.println(indent + "door = " + this.currentState) ;
-	}
 }
 // -----------------------------------------------------------------------------

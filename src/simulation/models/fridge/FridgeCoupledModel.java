@@ -128,6 +128,9 @@ public class FridgeCoupledModel extends CoupledModel {
 		EventSource from5 = new EventSource(TicModel.URI + "-2", TicEvent.class);
 		EventSink[] to5 = new EventSink[] { new EventSink(FridgeSensorModel.URI, TicEvent.class) };
 		connections.put(from5, to5);
+		EventSource from6 = new EventSource(TicModel.URI + "-2", TicEvent.class);
+		EventSink[] to6 = new EventSink[] { new EventSink(FridgeModel.URI, TicEvent.class) };
+		connections.put(from6, to6);
 
 		Map<Class<? extends EventI>,ReexportedEvent> reexported =
 				new HashMap<Class<? extends EventI>,ReexportedEvent>() ;

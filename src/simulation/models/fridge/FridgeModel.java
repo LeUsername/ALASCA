@@ -283,8 +283,8 @@ extends AtomicHIOAwithEquations
 	@Override
 	public ArrayList<EventI>	output()
 	{
-		if (componentRef == null) {
-			double reading = this.temperature.v; // Watt
+		if (triggerReading) {
+			double reading = this.consumption; // Watt
 
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
@@ -306,7 +306,6 @@ extends AtomicHIOAwithEquations
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
-		System.out.println("oqsfjioegjgkml");
 		if(this.componentRef != null) {
 			if (this.temperaturePlotter != null) {
 				this.temperaturePlotter.addData(
@@ -348,7 +347,6 @@ extends AtomicHIOAwithEquations
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
 		super.userDefinedExternalTransition(elapsedTime);
-		System.out.println(this.componentRef);
 		if(this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset() ;
 			assert	currentEvents != null && currentEvents.size() == 1 ;
@@ -373,7 +371,7 @@ extends AtomicHIOAwithEquations
 			} else {
 				ce.executeOn(this);
 			}
-			
+			this.computeNextState();
 			if (this.temperaturePlotter != null) {
 				this.temperaturePlotter.addData(
 						TEMPERATURE_SERIES,
@@ -386,8 +384,7 @@ extends AtomicHIOAwithEquations
 					this.getCurrentStateTime().getSimulatedTime(), 
 					this.consumption) ;
 			}
-		}
-		else {
+		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset() ;
 			assert	currentEvents != null && currentEvents.size() == 1 ;
 
@@ -405,15 +402,17 @@ extends AtomicHIOAwithEquations
 					this.consumption) ;
 			}
 				
-			Event ce =(Event) currentEvents.get(0);
+			Event ce = (Event) currentEvents.get(0);
 			if (ce instanceof TicEvent) {
 				triggerReading = true;
+				this.computeNextState();
 			} else {
 				try {
 					this.currentDoorState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
 					this.currentState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("state");
-					this.temperature.v = (Double)this.componentRef.getEmbeddingComponentStateValue("temperature") ;
-					this.consumption = (Double)this.componentRef.getEmbeddingComponentStateValue("consumption");
+					this.computeNextState();
+					this.componentRef.setEmbeddingComponentStateValue("temperature", this.temperature.v) ;
+					this.componentRef.setEmbeddingComponentStateValue("consumption", this.consumption);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -453,12 +452,11 @@ extends AtomicHIOAwithEquations
 
 	protected void		computeNextState()
 	{
-		System.out.println("compite");
 		if(this.currentState == FridgeConsumption.RESUMED) {
 			this.consumption = FridgeModel.TENSION * FridgeSetting.ACTIVE_CONSUMPTION;
 			if (this.currentDoorState == FridgeDoor.OPENED) {
-				this.consumption += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
-				this.temperature.v = this.temperature.v + 0.8 * FridgeModel.TEMPERATURE_CHANGE;
+				this.consumption += FridgeSetting.OPENING_ENERGY_CONSUMPTION;
+				this.temperature.v = this.temperature.v - 0.1 * FridgeModel.TEMPERATURE_CHANGE;
 			} else {
 				assert	this.currentDoorState == FridgeDoor.CLOSED ;
 				this.temperature.v = this.temperature.v - FridgeModel.TEMPERATURE_CHANGE;
@@ -470,14 +468,16 @@ extends AtomicHIOAwithEquations
 			assert	this.currentState == FridgeConsumption.SUSPENDED ;
 			this.consumption = FridgeModel.TENSION * FridgeSetting.PASSIVE_CONSUMPTION;
 			if (this.currentDoorState == FridgeDoor.OPENED) {
-				this.consumption += FridgeSetting.OPENING_ENERGY_CONSUMPTION * FridgeModel.TENSION;
+				this.consumption += FridgeSetting.OPENING_ENERGY_CONSUMPTION;
 				this.temperature.v = this.temperature.v + 0.5 * FridgeModel.TEMPERATURE_CHANGE;
 			} else {
 				assert	this.currentDoorState == FridgeDoor.CLOSED ;
 				this.temperature.v = this.temperature.v + 0.25*FridgeModel.TEMPERATURE_CHANGE;
-				
 			}
 		}
+		// As consumption were too massive, we choose to divide them by 100
+		// to not overshadow other devices' consumtpion
+		this.consumption/=10;
 	}
 	
 	public FridgeDoor getDoorState() {
@@ -486,22 +486,18 @@ extends AtomicHIOAwithEquations
 	
 	public void closeDoor() {
 		this.currentDoorState = FridgeDoor.CLOSED;
-		this.computeNextState();
 	}
 	
 	public void openDoor() {
 		this.currentDoorState = FridgeDoor.OPENED;
-		this.computeNextState();
 	}
 	
 	public void resume() {
 		this.currentState = FridgeConsumption.RESUMED;
-		this.computeNextState();
 	}
 	
 	public void suspend() {
 		this.currentState = FridgeConsumption.SUSPENDED;
-		this.computeNextState();
 	}
 	
 	public FridgeConsumption getState() {

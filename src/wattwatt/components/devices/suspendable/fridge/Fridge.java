@@ -282,8 +282,20 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		// TODO Auto-generated method stub
-		EmbeddingComponentAccessI.super.setEmbeddingComponentStateValue(name, value);
+		if (name.equals("close")) {
+			this.currentDoorState = FridgeDoor.CLOSED;
+		} else if (name.equals("open")) {
+			this.currentDoorState = FridgeDoor.OPENED;
+		} else if (name.equals("suspend")) {
+			this.suspend();
+		} else if (name.equals("temperature")) {
+			this.temperature = (double) value;
+		} else if (name.equals("consumption")) {
+			this.conso = (double) value;
+		} else {
+			assert name.equals("resume");
+			this.consumptionState = (FridgeConsumption) value;
+		}
 	}
 	
 	public double getTempHaut() {

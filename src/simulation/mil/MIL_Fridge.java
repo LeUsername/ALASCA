@@ -60,10 +60,10 @@ public class MIL_Fridge {
 							WattWattMain.getPlotterHeight())) ;
 			
 			simParams.put(
-					FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
+					FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 3.0) ;
 			simParams.put(
 					FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-			simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
+			simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 2.0) ;
 			simParams.put(
 					FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
