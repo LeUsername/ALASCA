@@ -245,14 +245,16 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			Event ce = (Event) currentEvents.get(0);
 
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
-			this.fuelQuantityPlotter.addData(FUEL_QUANTITY, this.getCurrentStateTime().getSimulatedTime(),
-					this.fuelCapacity);
+			this.fuelQuantityPlotter.addData(FUEL_QUANTITY, this.getCurrentStateTime().getSimulatedTime(),this.fuelCapacity);
 
 			if (ce instanceof TicEvent) {
 				this.triggerReading = true;
-			} try {
-				this.production = (Double) this.componentRef.getEmbeddingComponentStateValue("production");
-				this.fuelCapacity = (Double) this.componentRef.getEmbeddingComponentStateValue("capacity");
+			} 
+			try {
+				this.state = (EngineGeneratorState) this.componentRef.getEmbeddingComponentStateValue("state");
+				this.fuelCapacity = (double) this.componentRef.getEmbeddingComponentStateValue("capacity");
+				this.updateState();
+				this.componentRef.setEmbeddingComponentStateValue("production",new Double(this.production));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

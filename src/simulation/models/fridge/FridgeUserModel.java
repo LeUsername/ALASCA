@@ -285,6 +285,7 @@ extends		AtomicES_Model
 		}else {
 			try {
 				this.currentState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -334,11 +335,7 @@ extends		AtomicES_Model
 							0.0) ;
 				}
 			}
-			try {
-				this.currentState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+
 		}
 		
 	}

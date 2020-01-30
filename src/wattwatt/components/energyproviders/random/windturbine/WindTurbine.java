@@ -8,6 +8,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import simulation.models.windturbine.WindTurbineCoupledModel;
+import simulation.models.windturbine.WindTurbineModel;
 import simulation.plugins.WindTurbineSimulatorPlugin;
 import simulation.tools.windturbine.WindTurbineState;
 import wattwatt.interfaces.controller.IController;
@@ -194,6 +195,7 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
 		if(name.equals("production")) {
+
 			return new Double(this.production);
 		}
 		else {
@@ -206,7 +208,14 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
 		if(name.equals("production")) {
-			this.production = (double) value;
+			this.setProduction((double)value);
+		}
+		else if(name.equals("start")) {
+			this.On();
+		}
+		else{
+			assert name.equals("stop");
+			this.Off();
 		}
 	}
 
@@ -246,6 +255,24 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	public boolean isOn() {
 
 		return this.isOn;
+	}
+	
+	public double windDensity(double tempKelvin) {
+		return 1.292 * (273.15 / tempKelvin);
+	}
+	
+	public void setProduction(double windSpeed) {
+		if(this.isOn()) {
+			this.production = 0.5 * (WindTurbineModel.BLADES_AREA
+					* windDensity(WindTurbineModel.KELVIN_TEMP)) * windSpeed * windSpeed ;
+			// We tried to calculate realistic value but the production was much too
+			// high compared to the consumption thus, we choose to divide this
+			// production by 100
+			this.production *= 3;
+			this.production /= 100.0;
+		}
+		
+		
 	}
 
 

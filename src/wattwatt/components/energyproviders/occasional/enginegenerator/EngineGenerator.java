@@ -1,5 +1,6 @@
 package wattwatt.components.energyproviders.occasional.enginegenerator;
 
+import fr.sorbonne_u.components.ComponentState;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -235,6 +236,19 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		if(name.equals("production")) {
 			this.production = (double) value;
 		}
+		else if(name.equals("state")) {
+			this.state = (ComponentState) value;
+		}
+		else if(name.equals("start")) {
+			this.on();
+		}
+		else if(name.equals("stop")) {
+			this.off();
+		}else {
+			assert name.equals("refill");
+			this.fuelQuantity = EngineGeneratorSetting.FUEL_CAPACITY;
+		}
+		
 	}
 
 	@Override

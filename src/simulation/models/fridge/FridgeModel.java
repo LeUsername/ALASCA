@@ -386,7 +386,7 @@ extends AtomicHIOAwithEquations
 			}
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset() ;
-			assert	currentEvents != null && currentEvents.size() == 1 ;
+			assert	currentEvents != null  ;
 
 			if (this.temperaturePlotter != null) {
 				this.temperaturePlotter.addData(
@@ -405,18 +405,15 @@ extends AtomicHIOAwithEquations
 			Event ce = (Event) currentEvents.get(0);
 			if (ce instanceof TicEvent) {
 				triggerReading = true;
+			} 
+			try {
+				this.currentDoorState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
+				this.currentState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("state");
 				this.computeNextState();
-			} else {
-				try {
-					this.currentDoorState = (FridgeDoor) this.componentRef.getEmbeddingComponentStateValue("door");
-					this.currentState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("state");
-					this.computeNextState();
-					this.componentRef.setEmbeddingComponentStateValue("temperature", this.temperature.v) ;
-					this.componentRef.setEmbeddingComponentStateValue("consumption", this.consumption);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
+				this.componentRef.setEmbeddingComponentStateValue("temperature", this.temperature.v) ;
+				this.componentRef.setEmbeddingComponentStateValue("consumption", this.consumption);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			if (this.temperaturePlotter != null) {
 				this.temperaturePlotter.addData(
@@ -452,6 +449,7 @@ extends AtomicHIOAwithEquations
 
 	protected void		computeNextState()
 	{
+
 		if(this.currentState == FridgeConsumption.RESUMED) {
 			this.consumption = FridgeModel.TENSION * FridgeSetting.ACTIVE_CONSUMPTION;
 			if (this.currentDoorState == FridgeDoor.OPENED) {

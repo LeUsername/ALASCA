@@ -294,7 +294,7 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 			this.conso = (double) value;
 		} else {
 			assert name.equals("resume");
-			this.consumptionState = (FridgeConsumption) value;
+			this.resume();
 		}
 	}
 	
@@ -307,10 +307,12 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 	}
 
 	public void suspend() {
+		this.consumptionState = FridgeConsumption.SUSPENDED;
 		this.isWorking = false;
 	}
 
 	public void resume() {
+		this.consumptionState = FridgeConsumption.RESUMED;
 		if (this.isOn) {
 			this.isWorking = true;
 		} else {

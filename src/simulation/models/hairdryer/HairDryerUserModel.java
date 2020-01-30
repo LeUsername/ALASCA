@@ -124,8 +124,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 
 		this.rg = new RandomDataGenerator();
 
-		// create a standard logger (logging on the terminal)
-		// this.setLogger(new StandardLogger());
 	}
 
 	// -------------------------------------------------------------------------
@@ -178,12 +176,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 		this.nextTimeAdvance = this.timeAdvance();
 		this.timeOfNextEvent = this.getCurrentStateTime().add(this.nextTimeAdvance);
 
-		try {
-			// set the debug level triggering the production of log messages.
-			// this.setDebugLevel(1) ;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
@@ -195,7 +187,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 		// model is given by the earliest time among the currently scheduled
 		// events.
 		Duration d = super.timeAdvance();
-		this.logMessage("HairDryerUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
 		return d;
 	}
 

@@ -180,6 +180,7 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 				this.plotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.temperature.v);
 			}
 			this.triggerReading = false;
+			
 			if (this.componentRef == null) {
 				ArrayList<EventI> ret = new ArrayList<EventI>(1);
 				Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
@@ -194,6 +195,7 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 				return ret;
 				
 			} else {
+				
 				try {
 					if (this.temperature.v <= this.minTemperature) {
 						this.componentRef.setEmbeddingComponentStateValue("suspend", null);

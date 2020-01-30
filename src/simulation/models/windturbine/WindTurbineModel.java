@@ -72,9 +72,9 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 
 	protected WindTurbineState state;
 
-	protected static final double KELVIN_TEMP = 288.15; // On suppose la temperatur en Kelvin et constante
+	public static final double KELVIN_TEMP = 288.15; // On suppose la temperatur en Kelvin et constante
 
-	protected static final int BLADES_AREA = 5; // m2
+	public static final int BLADES_AREA = 5; // m2
 
 	/** plotter for the production level over time. */
 	protected XYPlotter productionPlotter;
@@ -107,6 +107,9 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 		PlotterDescription pd =(PlotterDescription) simParams.get(vname) ;
 		this.productionPlotter = new XYPlotter(pd);
 		this.productionPlotter.createSeries(PRODUCTION);
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.WIND_TURBINE_URI);
 	}
 
 	/**
@@ -220,7 +223,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 		if(this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 	
-			assert currentEvents != null && currentEvents.size() == 1;
+			assert currentEvents != null ;
 	
 			Event ce = (Event) currentEvents.get(0);
 	
@@ -234,19 +237,16 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 			
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-			assert currentEvents != null && currentEvents.size() == 1;
+			assert currentEvents != null;
 			Event ce = (Event) currentEvents.get(0);
-	
 			if (ce instanceof TicEvent) {
 				this.triggerReading = true;
-			} else {
-				assert ce instanceof AbstractWindTurbineEvent;
-				ce.executeOn(this);
-				try {
-					this.componentRef.setEmbeddingComponentStateValue("production", this.production);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			} 
+			try {
+				this.production = (double) this.componentRef.getEmbeddingComponentStateValue("production");
+				this.state = (WindTurbineState) this.componentRef.getEmbeddingComponentStateValue("state");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 			
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
@@ -285,12 +285,16 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	}
 
 	public void setProduction(double windSpeed) {
-		this.production = 0.5 * (BLADES_AREA
-				* windDensity(KELVIN_TEMP)) * windSpeed * windSpeed ;
-		// We tried to calculate realistic value but the production was much too
-		// high compared to the consumption thus, we choose to divide this
-		// production by 100
-		this.production /= 100.0;
+		if(this.isOn()) {
+			this.production = 0.5 * (BLADES_AREA
+					* windDensity(KELVIN_TEMP)) * windSpeed * windSpeed ;
+			// We tried to calculate realistic value but the production was much too
+			// high compared to the consumption thus, we choose to divide this
+			// production by 100
+			this.production *= 3;
+			this.production /= 100.0;
+		}
+		
 		
 	}
 

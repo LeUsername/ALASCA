@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
@@ -102,45 +103,18 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	 * 
 	 */
 	protected XYPlotter actionPlotter;
+	
+	/**
+	 * reference on the object representing the component that holds the model;
+	 * enables the model to access the state of this component.
+	 */
+	protected EmbeddingComponentAccessI componentRef;
 
 	public EngineGeneratorUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.rg = new RandomDataGenerator();
 
-		// create a standard logger (logging on the terminal)
-//		this.setLogger(new StandardLogger());
-	}
-	
-	@Override
-	public void initialiseState(Time initialTime) {
-//		this.initialDelay = EngineGeneratorUserBehaviour.INITIAL_DELAY;
-//		this.interdayDelay = EngineGeneratorUserBehaviour.INTER_DAY_DELAY;
-//		this.meanTimeBetweenUsages = GroupeElectrogeneUserBehaviour.MEAN_TIME_BETWEEN_USAGES;
-//		this.meanTimeWorking = GroupeElectrogeneUserBehaviour.MEAN_TIME_WORKING;
-//		this.meanTimeAtRefill = GroupeElectrogeneUserBehaviour.MEAN_TIME_AT_REFILL;
-
-		this.rg.reSeedSecure();
-
-		super.initialiseState(initialTime);
-
-		Duration d1 = new Duration(this.initialDelay, this.getSimulatedTimeUnit());
-		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),this.getSimulatedTimeUnit());
-		Time t = this.getCurrentStateTime().add(d1).add(d2);
-		this.scheduleEvent(new StartEvent(t));
-
-		this.nextTimeAdvance = this.timeAdvance();
-		this.timeOfNextEvent = this.getCurrentStateTime().add(this.nextTimeAdvance);
-		if (this.actionPlotter != null) {
-			this.actionPlotter.initialise() ;
-			this.actionPlotter.showPlotter() ;
-		}
-
-		try {
-			this.setDebugLevel(1);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	@Override
@@ -163,7 +137,33 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		PlotterDescription pdTemperature = (PlotterDescription) simParams.get(vname) ;
 		this.actionPlotter = new XYPlotter(pdTemperature) ;
 		this.actionPlotter.createSeries(EngineGeneratorUserModel.ACTION) ;
+		
+		// The reference to the embedding component
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.ENGINE_GENERATOR_URI);
 	}
+	
+	@Override
+	public void initialiseState(Time initialTime) {
+		this.rg.reSeedSecure();
+
+		super.initialiseState(initialTime);
+
+		Duration d1 = new Duration(this.initialDelay, this.getSimulatedTimeUnit());
+		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),this.getSimulatedTimeUnit());
+		Time t = this.getCurrentStateTime().add(d1).add(d2);
+		this.scheduleEvent(new StartEvent(t));
+
+		this.nextTimeAdvance = this.timeAdvance();
+		this.timeOfNextEvent = this.getCurrentStateTime().add(this.nextTimeAdvance);
+		if (this.actionPlotter != null) {
+			this.actionPlotter.initialise() ;
+			this.actionPlotter.showPlotter() ;
+		}
+
+		
+	}
+	
+	
 	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
@@ -171,7 +171,6 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	@Override
 	public Duration timeAdvance() {
 		Duration d = super.timeAdvance();
-//		this.logMessage("EngineGeneratorUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
 		return d;
 	}
 	
@@ -180,15 +179,20 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	 */
 	@Override
 	public ArrayList<EventI> output() {
+		if (componentRef != null) {
+			this.nextEvent = super.output().get(0).getClass();
+			return null;
+		}
+		else {
+			assert !this.eventList.isEmpty();
+			ArrayList<EventI> ret = super.output();
+			assert ret.size() == 1;
+
+			this.nextEvent = ret.get(0).getClass();
+
+			return ret;
+		}
 		
-		assert !this.eventList.isEmpty();
-		ArrayList<EventI> ret = super.output();
-		assert ret.size() == 1;
-
-		this.nextEvent = ret.get(0).getClass();
-
-//		this.logMessage("EngineGeneratorUserModel::output() " + this.nextEvent.getCanonicalName());
-		return ret;
 	}
 	
 	/**
@@ -197,53 +201,97 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 
-		Duration d;
-		
-		if (this.nextEvent.equals(StartEvent.class) ) {
+		if (componentRef == null) {
+			Duration d;
+			if (this.nextEvent.equals(StartEvent.class) ) {
 
-			d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			Time t = this.getCurrentStateTime().add(d);
+				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
 
-			this.scheduleEvent(new StopEvent(t));
-			if (this.actionPlotter != null) {
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.STOP)) ;
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.START)) ;
+				this.scheduleEvent(new StopEvent(t));
+				if (this.actionPlotter != null) {
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.STOP)) ;
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.START)) ;
+				}
+			} else if (this.nextEvent.equals(StopEvent.class)) {
+
+				d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				this.scheduleEvent(new RefillEvent(this.getCurrentStateTime().add(d)));
+				if (this.actionPlotter != null) {
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.START)) ;
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.REFILL)) ;
+				}
+			} else if (this.nextEvent.equals(RefillEvent.class)) {
+
+				d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+				this.scheduleEvent(new StartEvent(this.getCurrentStateTime().add(d)));
+				if (this.actionPlotter != null) {
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.REFILL)) ;
+					this.actionPlotter.addData(
+							ACTION,
+							this.getCurrentStateTime().getSimulatedTime(),
+							actionToInteger(EngineGeneratorUserAction.STOP)) ;
+				}
 			}
-		} else if (this.nextEvent.equals(StopEvent.class)) {
+		}else {
+			try {
+				Duration d;
+				if (this.nextEvent.equals(StartEvent.class)) {
+					this.componentRef.setEmbeddingComponentStateValue("start", null);
 
-			d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new RefillEvent(this.getCurrentStateTime().add(d)));
-			if (this.actionPlotter != null) {
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.START)) ;
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.REFILL)) ;
-			}
-		} else if (this.nextEvent.equals(RefillEvent.class)) {
-
-			d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new StartEvent(this.getCurrentStateTime().add(d)));
-			if (this.actionPlotter != null) {
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.REFILL)) ;
-				this.actionPlotter.addData(
-						ACTION,
-						this.getCurrentStateTime().getSimulatedTime(),
-						actionToInteger(EngineGeneratorUserAction.STOP)) ;
+					d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					Time t = this.getCurrentStateTime().add(d);
+					this.scheduleEvent(new StopEvent(t));
+					if (this.actionPlotter != null) {
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.STOP));
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.START));
+					}
+				} else if (this.nextEvent.equals(StopEvent.class)) {
+					this.componentRef.setEmbeddingComponentStateValue("stop", null);
+					d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					this.scheduleEvent(new RefillEvent(this.getCurrentStateTime().add(d)));
+					if (this.actionPlotter != null) {
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.START));
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.REFILL));
+					}
+				} else if (this.nextEvent.equals(RefillEvent.class)) {
+					this.componentRef.setEmbeddingComponentStateValue("refill", null);
+					d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75),
+							this.getSimulatedTimeUnit());
+					this.scheduleEvent(new StartEvent(this.getCurrentStateTime().add(d)));
+					if (this.actionPlotter != null) {
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.REFILL));
+						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
+								actionToInteger(EngineGeneratorUserAction.STOP));
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 	public int actionToInteger(EngineGeneratorUserAction action) {

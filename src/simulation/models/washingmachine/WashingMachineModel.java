@@ -257,7 +257,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			try {
 				this.state = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("state");
 				this.washingMode = (WashingMachineMode)this.componentRef.getEmbeddingComponentStateValue("mode");
-				
+				this.updateState();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -332,11 +332,10 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	private void updateState() {
 		if(this.state == WashingMachineState.WORKING) {
 			if(this.washingMode == WashingMachineMode.ECO) {
-				
-				this.currentConsumption += WashingMachineSetting.CONSO_ECO_MODE_SIM;
+				this.currentConsumption = WashingMachineSetting.CONSO_ECO_MODE_SIM;
 			}
 			else {
-				this.currentConsumption += WashingMachineSetting.CONSO_PREMIUM_MODE;
+				this.currentConsumption = WashingMachineSetting.CONSO_PREMIUM_MODE;
 			}
 		}
 		else {
