@@ -119,11 +119,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	{
 		this.state = EngineGeneratorState.OFF ;
 		this.triggerReading = false;
-		
-			this.productionPlotter.initialise() ;
-			this.productionPlotter.showPlotter() ;
-			this.fuelQuantityPlotter.initialise() ;
-			this.fuelQuantityPlotter.showPlotter() ;
+		this.productionPlotter.initialise() ;
+		this.productionPlotter.showPlotter() ;
+		this.fuelQuantityPlotter.initialise() ;
+		this.fuelQuantityPlotter.showPlotter() ;
 
 		super.initialiseState(initialTime) ;
 	}
@@ -156,11 +155,11 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	{
 		if(this.triggerReading) {
 			double reading = this.production ; // Watt
-
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			EngineGeneratorProductionEvent production = new EngineGeneratorProductionEvent(currentTime, reading);
 			ret.add(production);
+			this.triggerReading = false;
 			return ret;
 		} else  {
 			return null;
@@ -177,10 +176,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 //							+ elapsedTime) ;
 //		}
 		if(this.componentRef != null) {
-			if(this.triggerReading) {
 				this.updateState();
-				this.triggerReading = false;
-			}
 			if (elapsedTime.greaterThan(Duration.zero(getSimulatedTimeUnit()))) {
 				super.userDefinedInternalTransition(elapsedTime) ;
 	
@@ -216,7 +212,6 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		if(this.componentRef == null) {
 			// get the vector of current external events
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-			boolean ticReceived = false;
 			// when this method is called, there is at least one external event
 			assert currentEvents != null;
 	
@@ -238,15 +233,12 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			// execute the current external event on this model, changing its state
 			// and intensity level
 			if (ce instanceof TicEvent) {
-				ticReceived = true;
+				this.triggerReading = true;
 			} else {
 				assert ce instanceof AbstractEngineGeneratorEvent || ce instanceof AbstractControllerEvent;
 				ce.executeOn(this);
 			}
-			if (ticReceived) {
-				this.triggerReading = true;
-				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-			}
+
 	//		 if (this.hasDebugLevel(1)) {
 	//		 this.logMessage("GroupeElectrogeneModel::userDefinedExternalTransition 4 ");
 	//		 }

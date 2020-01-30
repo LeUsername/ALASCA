@@ -316,11 +316,6 @@ public class ControllerModel extends AtomicModel {
 	@Override
 	public ArrayList<EventI> output() {
 		if (componentRef == null) {
-			// if (this.hasDebugLevel(1)) {
-			// this.logMessage("output|"
-			// + this.lastDecisionEngineGenerator + " "
-			// + this.triggeredDecisionEngineGenerator) ;
-			// }
 
 			ArrayList<EventI> ret = null;
 			ret = new ArrayList<EventI>(1);
@@ -504,7 +499,7 @@ public class ControllerModel extends AtomicModel {
 
 					this.mustTransmitDecision = true;
 				}
-			} if(this.WMState == WashingMachineState.WORKING) {
+			} else if(this.WMState == WashingMachineState.WORKING) {
 				if (production <= this.consumption) {
 					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
 					this.WMState = WashingMachineState.OFF;

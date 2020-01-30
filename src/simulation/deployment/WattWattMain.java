@@ -30,7 +30,9 @@ import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.events.controller.ResumeFridgeEvent;
 import simulation.events.controller.StartEngineGeneratorEvent;
+import simulation.events.controller.StartWashingMachineEvent;
 import simulation.events.controller.StopEngineGeneratorEvent;
+import simulation.events.controller.StopWashingMachineEvent;
 import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
@@ -115,22 +117,15 @@ public class WattWattMain {
 			// Hair dryer
 			// ----------------------------------------------------------------
 			Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
+			Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 			atomicModelDescriptors.put(HairDryerModel.URI, AtomicHIOA_Descriptor.create(HairDryerModel.class,
 					HairDryerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			atomicModelDescriptors.put(HairDryerUserModel.URI,
 					AtomicModelDescriptor.create(HairDryerUserModel.class, HairDryerUserModel.URI,
 							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-			atomicModelDescriptors.put(
-					TicModel.URI + "-1",
-					AtomicModelDescriptor.create(
-							TicModel.class,
-							TicModel.URI + "-1",
-							TimeUnit.SECONDS,
-							null,
-							SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
-
-			Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
+			atomicModelDescriptors.put(TicModel.URI + "-1",AtomicModelDescriptor.create(TicModel.class,TicModel.URI + "-1",
+					TimeUnit.SECONDS,null, SimulationEngineCreationMode.ATOMIC_ENGINE)) ;
 
 			Set<String> submodels1 = new HashSet<String>();
 			submodels1.add(HairDryerModel.URI);
@@ -138,30 +133,26 @@ public class WattWattMain {
 			submodels1.add(TicModel.URI + "-1") ;
 
 			Map<EventSource, EventSink[]> connections1 = new HashMap<EventSource, EventSink[]>();
-			EventSource from11 = new EventSource(HairDryerUserModel.URI, SwitchOnEvent.class);
-			EventSink[] to11 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOnEvent.class) };
-			connections1.put(from11, to11);
-			EventSource from12 = new EventSource(HairDryerUserModel.URI, SwitchOffEvent.class);
-			EventSink[] to12 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOffEvent.class) };
-			connections1.put(from12, to12);
-			EventSource from13 = new EventSource(HairDryerUserModel.URI, SwitchModeEvent.class);
-			EventSink[] to13 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchModeEvent.class) };
-			connections1.put(from13, to13);
-			EventSource from14 =
-					new EventSource(TicModel.URI + "-1",
-									TicEvent.class) ;
-			EventSink[] to14 =
-					new EventSink[] {
-						new EventSink(HairDryerModel.URI,
-									  TicEvent.class)} ;
-			connections1.put(from14, to14);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported1 =
-					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			EventSource from1 = new EventSource(HairDryerUserModel.URI, SwitchOnEvent.class);
+			EventSink[] to1 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOnEvent.class) };
+			connections1.put(from1, to1);
+			EventSource from2 = new EventSource(HairDryerUserModel.URI, SwitchOffEvent.class);
+			EventSink[] to2 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchOffEvent.class) };
+			connections1.put(from2, to2);
+			EventSource from3 = new EventSource(HairDryerUserModel.URI, SwitchModeEvent.class);
+			EventSink[] to3 = new EventSink[] { new EventSink(HairDryerModel.URI, SwitchModeEvent.class) };
+			connections1.put(from3, to3);
+			
+			EventSource from4 = new EventSource(TicModel.URI + "-1",TicEvent.class) ;
+			EventSink[] to4 = new EventSink[] {new EventSink(HairDryerModel.URI,TicEvent.class)} ;
+			connections1.put(from4, to4);
+			
+			Map<Class<? extends EventI>,ReexportedEvent> reexported1 = new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
 			reexported1.put(
 					HairDryerConsumptionEvent.class,
 					new ReexportedEvent(HairDryerModel.URI,
-							HairDryerConsumptionEvent.class)) ;
+					HairDryerConsumptionEvent.class)) ;
 
 			coupledModelDescriptors.put(HairDryerCoupledModel.URI,
 					new CoupledHIOA_Descriptor(HairDryerCoupledModel.class, HairDryerCoupledModel.URI, submodels1,
@@ -175,42 +166,33 @@ public class WattWattMain {
 			atomicModelDescriptors.put(EngineGeneratorModel.URI,
 					AtomicHIOA_Descriptor.create(EngineGeneratorModel.class, EngineGeneratorModel.URI, TimeUnit.SECONDS,
 							null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-
 			atomicModelDescriptors.put(EngineGeneratorUserModel.URI,
 					AtomicModelDescriptor.create(EngineGeneratorUserModel.class, EngineGeneratorUserModel.URI,
 							TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			atomicModelDescriptors.put(TicModel.URI + "-2", AtomicModelDescriptor.create(TicModel.class,
 					TicModel.URI + "-2", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 			
-			Set<String> submodels3 = new HashSet<String>();
-			submodels3.add(EngineGeneratorModel.URI);
-			submodels3.add(EngineGeneratorUserModel.URI);
-			submodels3.add(TicModel.URI + "-2");
+			Set<String> submodels2 = new HashSet<String>();
+			submodels2.add(EngineGeneratorModel.URI);
+			submodels2.add(EngineGeneratorUserModel.URI);
+			submodels2.add(TicModel.URI + "-2");
 			
-			Map<EventSource, EventSink[]> connections3 = new HashMap<EventSource, EventSink[]>();
-			EventSource from31 = new EventSource(EngineGeneratorUserModel.URI, StartEvent.class);
-			EventSink[] to31 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEvent.class) };
-			connections3.put(from31, to31);
-			EventSource from32 = new EventSource(EngineGeneratorUserModel.URI, StopEvent.class);
-			EventSink[] to32 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEvent.class) };
-			connections3.put(from32, to32);
-			EventSource from33 = new EventSource(EngineGeneratorUserModel.URI, RefillEvent.class);
-			EventSink[] to33 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, RefillEvent.class) };
-			connections3.put(from33, to33);
-			EventSource from34 =
-					new EventSource(TicModel.URI + "-2",
-									TicEvent.class) ;
-			EventSink[] to34 =
-					new EventSink[] {
-						new EventSink(EngineGeneratorModel.URI,
-									  TicEvent.class)} ;
-			connections3.put(from34, to34);
+			Map<EventSource, EventSink[]> connections2 = new HashMap<EventSource, EventSink[]>();
+			EventSource from21 = new EventSource(EngineGeneratorUserModel.URI, StartEvent.class);
+			EventSink[] to21 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEvent.class) };
+			connections2.put(from21, to21);
+			EventSource from22 = new EventSource(EngineGeneratorUserModel.URI, StopEvent.class);
+			EventSink[] to22 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEvent.class) };
+			connections2.put(from22, to22);
+			EventSource from23 = new EventSource(EngineGeneratorUserModel.URI, RefillEvent.class);
+			EventSink[] to23 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, RefillEvent.class) };
+			connections2.put(from23, to23);
+			EventSource from24 = new EventSource(TicModel.URI + "-2", TicEvent.class) ;
+			EventSink[] to24 = new EventSink[] {new EventSink(EngineGeneratorModel.URI, TicEvent.class)} ;
+			connections2.put(from24, to24);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported2 =
-					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported2.put(
-					EngineGeneratorProductionEvent.class,
-					new ReexportedEvent(EngineGeneratorModel.URI,
+			Map<Class<? extends EventI>,ReexportedEvent> reexported2 = new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
+			reexported2.put(EngineGeneratorProductionEvent.class,new ReexportedEvent(EngineGeneratorModel.URI,
 							EngineGeneratorProductionEvent.class)) ;
 			
 			Map<Class<? extends EventI>,EventSink[]> imported2 =
@@ -229,8 +211,8 @@ public class WattWattMain {
 					}) ;
 			
 			coupledModelDescriptors.put(EngineGeneratorCoupledModel.URI,
-					new CoupledHIOA_Descriptor(EngineGeneratorCoupledModel.class, EngineGeneratorCoupledModel.URI, submodels3,
-							imported2, reexported2, connections3, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+					new CoupledHIOA_Descriptor(EngineGeneratorCoupledModel.class, EngineGeneratorCoupledModel.URI, submodels2,
+							imported2, reexported2, connections2, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
 			
 			// ----------------------------------------------------------------
@@ -244,40 +226,40 @@ public class WattWattMain {
 			atomicModelDescriptors.put(TicModel.URI + "-3", AtomicModelDescriptor.create(TicModel.class,
 					TicModel.URI + "-3", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
-			Set<String> submodels5 = new HashSet<String>();
-			submodels5.add(WindTurbineModel.URI);
-			submodels5.add(WindTurbineSensorModel.URI);
-			submodels5.add(TicModel.URI + "-3");
+			Set<String> submodels3 = new HashSet<String>();
+			submodels3.add(WindTurbineModel.URI);
+			submodels3.add(WindTurbineSensorModel.URI);
+			submodels3.add(TicModel.URI + "-3");
 
-			Map<EventSource, EventSink[]> connections5 = new HashMap<EventSource, EventSink[]>();
-			EventSource from51 = new EventSource(WindTurbineSensorModel.URI, WindReadingEvent.class);
-			EventSink[] to51 = new EventSink[] { new EventSink(WindTurbineModel.URI, WindReadingEvent.class) };
-			connections5.put(from51, to51);
-			EventSource from52 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOnEvent.class);
-			EventSink[] to52 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOnEvent.class) };
-			connections5.put(from52, to52);
-			EventSource from53 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOffEvent.class);
-			EventSink[] to53 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOffEvent.class) };
-			connections5.put(from53, to53);
-			EventSource from54 =
+			Map<EventSource, EventSink[]> connections3 = new HashMap<EventSource, EventSink[]>();
+			EventSource from31 = new EventSource(WindTurbineSensorModel.URI, WindReadingEvent.class);
+			EventSink[] to31 = new EventSink[] { new EventSink(WindTurbineModel.URI, WindReadingEvent.class) };
+			connections3.put(from31, to31);
+			EventSource from32 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOnEvent.class);
+			EventSink[] to32 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOnEvent.class) };
+			connections3.put(from32, to32);
+			EventSource from33 = new EventSource(WindTurbineSensorModel.URI, simulation.events.windturbine.SwitchOffEvent.class);
+			EventSink[] to33 = new EventSink[] { new EventSink(WindTurbineModel.URI, simulation.events.windturbine.SwitchOffEvent.class) };
+			connections3.put(from33, to33);
+			EventSource from34 =
 					new EventSource(TicModel.URI + "-3",
 									TicEvent.class) ;
-			EventSink[] to54 =
+			EventSink[] to34 =
 					new EventSink[] {
 						new EventSink(WindTurbineModel.URI,
 									  TicEvent.class)} ;
-			connections5.put(from54, to54);
+			connections3.put(from34, to34);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported5 =
+			Map<Class<? extends EventI>,ReexportedEvent> reexported3 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported5.put(
+			reexported3.put(
 					WindTurbineProductionEvent.class,
 					new ReexportedEvent(WindTurbineModel.URI,
 							WindTurbineProductionEvent.class)) ;
 
 			coupledModelDescriptors.put(WindTurbineCoupledModel.URI,
-					new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels5, null, reexported5,
-							connections5, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));
+					new CoupledHIOA_Descriptor(WindTurbineCoupledModel.class, WindTurbineCoupledModel.URI, submodels3, null, reexported3,
+							connections3, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null, null));
 
 			
 			// ----------------------------------------------------------------
@@ -295,47 +277,53 @@ public class WattWattMain {
 			atomicModelDescriptors.put(TicModel.URI + "-4", AtomicModelDescriptor.create(TicModel.class,
 					TicModel.URI + "-4", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
-			Set<String> submodels6 = new HashSet<String>();
-			submodels6.add(WashingMachineModel.URI);
-			submodels6.add(WashingMachineUserModel.URI);
-			submodels6.add(TicModel.URI + "-4");
+			Set<String> submodels4 = new HashSet<String>();
+			submodels4.add(WashingMachineModel.URI);
+			submodels4.add(WashingMachineUserModel.URI);
+			submodels4.add(TicModel.URI + "-4");
 
-			Map<EventSource, EventSink[]> connections6 = new HashMap<EventSource, EventSink[]>();
-			EventSource from61 = new EventSource(WashingMachineUserModel.URI, StartAtEvent.class);
-			EventSink[] to61 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartAtEvent.class) };
-			connections6.put(from61, to61);
-			EventSource from62 = new EventSource(WashingMachineUserModel.URI, EcoModeEvent.class);
-			EventSink[] to62 = new EventSink[] { new EventSink(WashingMachineModel.URI, EcoModeEvent.class) };
-			connections6.put(from62, to62);
-			EventSource from63 = new EventSource(WashingMachineUserModel.URI, PremiumModeEvent.class);
-			EventSink[] to63 = new EventSink[] { new EventSink(WashingMachineModel.URI, PremiumModeEvent.class) };
-			connections6.put(from63, to63);
+			Map<EventSource, EventSink[]> connections4 = new HashMap<EventSource, EventSink[]>();
+			EventSource from41 = new EventSource(WashingMachineUserModel.URI, StartAtEvent.class);
+			EventSink[] to41 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartAtEvent.class) };
+			connections4.put(from41, to41);
+			EventSource from42 = new EventSource(WashingMachineUserModel.URI, EcoModeEvent.class);
+			EventSink[] to42 = new EventSink[] { new EventSink(WashingMachineModel.URI, EcoModeEvent.class) };
+			connections4.put(from42, to42);
+			EventSource from43 = new EventSource(WashingMachineUserModel.URI, PremiumModeEvent.class);
+			EventSink[] to43 = new EventSink[] { new EventSink(WashingMachineModel.URI, PremiumModeEvent.class) };
+			connections4.put(from43, to43);
 			
-			EventSource from65 = new EventSource(TicModel.URI + "-4", TicEvent.class);
-			EventSink[] to65 = new EventSink[] { new EventSink(WashingMachineModel.URI, TicEvent.class) };
-			connections6.put(from65, to65);
+			EventSource from45 = new EventSource(TicModel.URI + "-4", TicEvent.class);
+			EventSink[] to45 = new EventSink[] { new EventSink(WashingMachineModel.URI, TicEvent.class) };
+			connections4.put(from45, to45);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported6 =
+			Map<Class<? extends EventI>,ReexportedEvent> reexported4 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported6.put(
+			reexported4.put(
 					WashingMachineConsumptionEvent.class,
 					new ReexportedEvent(WashingMachineModel.URI,
 							WashingMachineConsumptionEvent.class)) ;
 
+			Map<Class<? extends EventI>,EventSink[]> imported4 =
+					new HashMap<Class<? extends EventI>,EventSink[]>() ;
+			imported4.put(
+				StartWashingMachineEvent.class,
+				new EventSink[] {
+						new EventSink(WashingMachineModel.URI,
+								StartWashingMachineEvent.class)
+				}) ;
+			imported4.put(
+					StopWashingMachineEvent.class,
+					new EventSink[] {
+							new EventSink(WashingMachineModel.URI,
+									StopWashingMachineEvent.class)
+					}) ;
 			
-//			Map<Class<? extends EventI>,EventSink[]> imported6 =
-//					new HashMap<Class<? extends EventI>,EventSink[]>() ;
-//			imported6.put(
-//				StartEngineGenerator.class,
-//				new EventSink[] {
-//						new EventSink(EngineGeneratorModel.URI,
-//								StartEngineGenerator.class)
-//				}) ;
 
 
 			coupledModelDescriptors.put(WashingMachineCoupledModel.URI,
-					new CoupledHIOA_Descriptor(WashingMachineCoupledModel.class, WashingMachineCoupledModel.URI, submodels6,
-							null, reexported6, connections6, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+					new CoupledHIOA_Descriptor(WashingMachineCoupledModel.class, WashingMachineCoupledModel.URI, submodels4,
+							imported4, reexported4, connections4, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
 							null));
 			
 			
@@ -359,66 +347,66 @@ public class WattWattMain {
 			atomicModelDescriptors.put(TicModel.URI + "-5", AtomicModelDescriptor.create(TicModel.class,
 					TicModel.URI + "-5", TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
-			Set<String> submodels7 = new HashSet<String>();
-			submodels7.add(FridgeModel.URI);
-			submodels7.add(FridgeUserModel.URI);
-			submodels7.add(FridgeSensorModel.URI);
-			submodels7.add(TicModel.URI + "-5");
+			Set<String> submodels5 = new HashSet<String>();
+			submodels5.add(FridgeModel.URI);
+			submodels5.add(FridgeUserModel.URI);
+			submodels5.add(FridgeSensorModel.URI);
+			submodels5.add(TicModel.URI + "-5");
 
-			Map<EventSource, EventSink[]> connections7 = new HashMap<EventSource, EventSink[]>();
-			EventSource from71 = new EventSource(FridgeSensorModel.URI, ResumeEvent.class);
-			EventSink[] to71 = new EventSink[] { new EventSink(FridgeModel.URI, ResumeEvent.class) };
-			connections7.put(from71, to71);
-			EventSource from72 = new EventSource(FridgeSensorModel.URI, SuspendEvent.class);
-			EventSink[] to72 = new EventSink[] { new EventSink(FridgeModel.URI, SuspendEvent.class) };
-			connections7.put(from72, to72);
-			EventSource from73 = new EventSource(FridgeUserModel.URI, OpenEvent.class);
-			EventSink[] to73 = new EventSink[] { new EventSink(FridgeModel.URI, OpenEvent.class) };
-			connections7.put(from73, to73);
-			EventSource from74 = new EventSource(FridgeUserModel.URI, CloseEvent.class);
-			EventSink[] to74 = new EventSink[] { new EventSink(FridgeModel.URI, CloseEvent.class) };
-			connections7.put(from74, to74);
+			Map<EventSource, EventSink[]> connections5 = new HashMap<EventSource, EventSink[]>();
+			EventSource from51 = new EventSource(FridgeSensorModel.URI, ResumeEvent.class);
+			EventSink[] to51 = new EventSink[] { new EventSink(FridgeModel.URI, ResumeEvent.class) };
+			connections5.put(from51, to51);
+			EventSource from52 = new EventSource(FridgeSensorModel.URI, SuspendEvent.class);
+			EventSink[] to52 = new EventSink[] { new EventSink(FridgeModel.URI, SuspendEvent.class) };
+			connections5.put(from52, to52);
+			EventSource from53 = new EventSource(FridgeUserModel.URI, OpenEvent.class);
+			EventSink[] to53 = new EventSink[] { new EventSink(FridgeModel.URI, OpenEvent.class) };
+			connections5.put(from53, to53);
+			EventSource from54 = new EventSource(FridgeUserModel.URI, CloseEvent.class);
+			EventSink[] to54 = new EventSink[] { new EventSink(FridgeModel.URI, CloseEvent.class) };
+			connections5.put(from54, to54);
 			
-			EventSource from75 = new EventSource(TicModel.URI + "-5", TicEvent.class);
-			EventSink[] to75 = new EventSink[] { new EventSink(FridgeModel.URI, TicEvent.class) };
-			connections7.put(from75, to75);
-			EventSource from76 = new EventSource(TicModel.URI + "-5", TicEvent.class);
-			EventSink[] to76 = new EventSink[] { new EventSink(FridgeSensorModel.URI, TicEvent.class) };
-			connections7.put(from76, to76);
+			EventSource from55 = new EventSource(TicModel.URI + "-5", TicEvent.class);
+			EventSink[] to55 = new EventSink[] { new EventSink(FridgeModel.URI, TicEvent.class) };
+			connections5.put(from55, to55);
+			EventSource from56 = new EventSource(TicModel.URI + "-5", TicEvent.class);
+			EventSink[] to56 = new EventSink[] { new EventSink(FridgeSensorModel.URI, TicEvent.class) };
+			connections5.put(from56, to56);
 			
-			Map<Class<? extends EventI>,ReexportedEvent> reexported7 =
+			Map<Class<? extends EventI>,ReexportedEvent> reexported5 =
 					new HashMap<Class<? extends EventI>,ReexportedEvent>() ;
-			reexported7.put(
+			reexported5.put(
 					FridgeConsumptionEvent.class,
 					new ReexportedEvent(FridgeModel.URI,
 							FridgeConsumptionEvent.class)) ;
 
-			Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
+			Map<Class<? extends EventI>, EventSink[]> imported5 = new HashMap<Class<? extends EventI>, EventSink[]>();
 			
-			imported.put(
+			imported5.put(
 					SuspendFridgeEvent.class,
 					new EventSink[] {
 							new EventSink(FridgeModel.URI,
 									SuspendFridgeEvent.class)
 					}) ;
-			imported.put(
+			imported5.put(
 					ResumeFridgeEvent.class,
 					new EventSink[] {
 							new EventSink(FridgeModel.URI,
 									ResumeFridgeEvent.class)
 					});
 
-			Map<VariableSource, VariableSink[]> bindings7 = new HashMap<VariableSource, VariableSink[]>();
-			VariableSource source7 = new VariableSource("temperature", Double.class, FridgeModel.URI);
-			VariableSink[] sinks7 = new VariableSink[] {
+			Map<VariableSource, VariableSink[]> bindings5 = new HashMap<VariableSource, VariableSink[]>();
+			VariableSource source5 = new VariableSource("temperature", Double.class, FridgeModel.URI);
+			VariableSink[] sinks5 = new VariableSink[] {
 					new VariableSink("temperature", Double.class, FridgeSensorModel.URI) };
-			bindings7.put(source7, sinks7);
+			bindings5.put(source5, sinks5);
 			
 
 			coupledModelDescriptors.put(FridgeCoupledModel.URI,
-					new CoupledHIOA_Descriptor(FridgeCoupledModel.class, FridgeCoupledModel.URI, submodels7,
-							imported, reexported7, connections7, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
-							bindings7));
+					new CoupledHIOA_Descriptor(FridgeCoupledModel.class, FridgeCoupledModel.URI, submodels5,
+							imported5, reexported5, connections5, null, SimulationEngineCreationMode.COORDINATION_ENGINE, null, null,
+							bindings5));
 						
 			// ----------------------------------------------------------------
 			// Controller
@@ -454,53 +442,51 @@ public class WattWattMain {
 
 			Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
 
-			EventSource from1 = new EventSource(HairDryerCoupledModel.URI, HairDryerConsumptionEvent.class);
-			EventSink[] to1 = new EventSink[] {
+			EventSource from61 = new EventSource(HairDryerCoupledModel.URI, HairDryerConsumptionEvent.class);
+			EventSink[] to61 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, HairDryerConsumptionEvent.class) };
-			connections.put(from1, to1);
-			EventSource from2 = new EventSource(EngineGeneratorCoupledModel.URI, EngineGeneratorProductionEvent.class);
-			EventSink[] to2 = new EventSink[] {
+			connections.put(from61, to61);
+			EventSource from62 = new EventSource(EngineGeneratorCoupledModel.URI, EngineGeneratorProductionEvent.class);
+			EventSink[] to62 = new EventSink[] {
 					new EventSink(ControllerModel.URI, EngineGeneratorProductionEvent.class) };
-			connections.put(from2, to2);
-			EventSource from3 = new EventSource(WindTurbineCoupledModel.URI, WindTurbineProductionEvent.class);
-			EventSink[] to3 = new EventSink[] {
+			connections.put(from62, to62);
+			EventSource from63 = new EventSource(WindTurbineCoupledModel.URI, WindTurbineProductionEvent.class);
+			EventSink[] to63 = new EventSink[] {
 					new EventSink(ControllerModel.URI, WindTurbineProductionEvent.class) };
-			connections.put(from3, to3);
-			EventSource from4 = new EventSource(ElectricMeterModel.URI, ConsumptionEvent.class);
-			EventSink[] to4 = new EventSink[] {
+			connections.put(from63, to63);
+			EventSource from64 = new EventSource(ElectricMeterModel.URI, ConsumptionEvent.class);
+			EventSink[] to64 = new EventSink[] {
 					new EventSink(ControllerModel.URI, ConsumptionEvent.class) };
-			connections.put(from4, to4);
-			EventSource from5 = new EventSource(ControllerModel.URI, StartEngineGeneratorEvent.class);
-			EventSink[] to5 = new EventSink[] {
+			connections.put(from64, to64);
+			EventSource from65 = new EventSource(ControllerModel.URI, StartEngineGeneratorEvent.class);
+			EventSink[] to65 = new EventSink[] {
 					new EventSink(EngineGeneratorCoupledModel.URI, StartEngineGeneratorEvent.class) };
-			connections.put(from5, to5);
-			EventSource from6 = new EventSource(ControllerModel.URI, StopEngineGeneratorEvent.class);
-			EventSink[] to6 = new EventSink[] {
+			connections.put(from65, to65);
+			EventSource from66 = new EventSource(ControllerModel.URI, StopEngineGeneratorEvent.class);
+			EventSink[] to66 = new EventSink[] {
 					new EventSink(EngineGeneratorCoupledModel.URI, StopEngineGeneratorEvent.class) };
-			connections.put(from6, to6);
-			EventSource from7 = new EventSource(WashingMachineCoupledModel.URI, WashingMachineConsumptionEvent.class);
-			EventSink[] to7 = new EventSink[] {
+			connections.put(from66, to66);
+			EventSource from67 = new EventSource(WashingMachineCoupledModel.URI, WashingMachineConsumptionEvent.class);
+			EventSink[] to67 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, WashingMachineConsumptionEvent.class) };
-			connections.put(from7, to7);
-			EventSource from8 = new EventSource(FridgeCoupledModel.URI, FridgeConsumptionEvent.class);
-			EventSink[] to8 = new EventSink[] {
+			connections.put(from67, to67);
+			EventSource from68 = new EventSource(FridgeCoupledModel.URI, FridgeConsumptionEvent.class);
+			EventSink[] to68 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, FridgeConsumptionEvent.class) };
-			connections.put(from8, to8);
+			connections.put(from68, to68);
 			
-			EventSource from9 = new EventSource(ControllerModel.URI, SuspendFridgeEvent.class);
-			EventSink[] to9 = new EventSink[] {
+			EventSource from69 = new EventSource(ControllerModel.URI, SuspendFridgeEvent.class);
+			EventSink[] to69 = new EventSink[] {
 					new EventSink(FridgeCoupledModel.URI, SuspendFridgeEvent.class) };
-			connections.put(from9, to9);
-			EventSource from10 = new EventSource(ControllerModel.URI, ResumeFridgeEvent.class);
-			EventSink[] to10 = new EventSink[] {
+			connections.put(from69, to69);
+			EventSource from610 = new EventSource(ControllerModel.URI, ResumeFridgeEvent.class);
+			EventSink[] to610 = new EventSink[] {
 					new EventSink(FridgeCoupledModel.URI, ResumeFridgeEvent.class) };
-			connections.put(from10, to10);
-			EventSource from110 = new EventSource(TicModel.URI + "-6", TicEvent.class);
-			EventSink[] to110 = new EventSink[] {
+			connections.put(from610, to610);
+			EventSource from611 = new EventSource(TicModel.URI + "-6", TicEvent.class);
+			EventSink[] to611 = new EventSink[] {
 					new EventSink(ElectricMeterModel.URI, TicEvent.class) };
-			connections.put(from110, to110);
-
-			
+			connections.put(from611, to611);
 			
 			coupledModelDescriptors.put(
 					WattWattModel.URI,
@@ -734,7 +720,7 @@ public class WattWattMain {
 							"RefrigerateurModel",
 							"Time (sec)",
 							"Temperature (�C)",
-							WattWattMain.ORIGIN_X + 4 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_X + 3 * WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y +
 							WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
@@ -745,7 +731,7 @@ public class WattWattMain {
 							"RefrigerateurModel",
 							"Time (min)",
 							"Consumption (W)",
-							WattWattMain.ORIGIN_X + 4 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_X + 3 * WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y +
 							2*WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
@@ -757,7 +743,7 @@ public class WattWattMain {
 							"RefrigerateurSensorModel",
 							"Time (min)",
 							"Temperature (Celcius)",
-							WattWattMain.ORIGIN_X + 4 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_X + 3 * WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y +
 							3*WattWattMain.getPlotterHeight(),
 							WattWattMain.getPlotterWidth(),
@@ -769,7 +755,7 @@ public class WattWattMain {
 							"RefrigerateurUserModel",
 							"Time (min)",
 							"Opened / Closed",
-							WattWattMain.ORIGIN_X +  4 * WattWattMain.getPlotterWidth(),
+							WattWattMain.ORIGIN_X +  3 * WattWattMain.getPlotterWidth(),
 							WattWattMain.ORIGIN_Y,
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
@@ -781,11 +767,11 @@ public class WattWattMain {
 			se.setSimulationRunParameters(simParams) ;
 			
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			long start = System.currentTimeMillis() ;
+//			long start = System.currentTimeMillis() ;
 			se.doStandAloneSimulation(0.0, 10000.0) ;
-			long end = System.currentTimeMillis() ;
-			System.out.println(se.getFinalReport()) ;
-			System.out.println("Simulation ends. " + (end - start)) ;
+//			long end = System.currentTimeMillis() ;
+			//System.out.println(se.getFinalReport()) ;
+			//System.out.println("Simulation ends. " + (end - start)) ;
 			Thread.sleep(1000000L);
 			System.exit(0) ;
 		} catch (Exception e) {

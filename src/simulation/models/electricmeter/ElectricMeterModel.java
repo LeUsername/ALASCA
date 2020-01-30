@@ -156,7 +156,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 
 		// first data in the plotter to start the plot.
 		this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getConsumption());
-
 		this.triggerReading = false;
 		super.initialiseVariables(startTime);
 	}
@@ -185,8 +184,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	@Override
 	public Duration timeAdvance() {
 		if (!this.triggerReading) {
-			// the model has no internal event, however, its state will evolve
-			// upon reception of external events.
 			return Duration.INFINITY;
 		} else {
 			return Duration.zero(this.getSimulatedTimeUnit());
@@ -212,7 +209,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			}
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
-			
 		}
 	}
 
@@ -236,7 +232,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			} else {
 				ce.executeOn(this);
 			}
-			// add a new data on the plotter; this data will open a new piece
 
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
