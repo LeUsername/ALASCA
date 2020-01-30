@@ -8,8 +8,8 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import simulation.models.enginegenerator.EngineGeneratorCoupledModel;
-import simulation.models.enginegenerator.EngineGeneratorModel;
 import simulation.plugins.EngineGeneratorSimulatorPlugin;
+import simulation.tools.enginegenerator.EngineGeneratorState;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.occasional.IEngineGenerator;
 import wattwatt.ports.energyproviders.occasional.enginegenerator.EngineGeneratorInPort;
@@ -56,12 +56,6 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	/** The fuel quantity of the engine generator */
 	protected int fuelQuantity;
 	
-	/** The state of the fridge on simulation */
-	protected boolean isOnSim;
-	/** The energy production of the engine generator on simulation*/
-	protected double productionSim;
-	/** The fuel quantity of the engine generator on simulation */
-	protected double fuelQuantitySim;
 	
 	protected boolean isFull;
 	protected boolean isEmpty;
@@ -87,12 +81,11 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		this.groupein = new EngineGeneratorInPort(groupeIn, this);
 		this.groupein.publishPort();
 		
-		this.isOnSim = (Boolean)asp.getModelStateValue(EngineGeneratorModel.URI, "isOn");
-		this.isFull = (Boolean)asp.getModelStateValue(EngineGeneratorModel.URI, "isFull");
-		this.isEmpty = (Boolean)asp.getModelStateValue(EngineGeneratorModel.URI, "isEmpty");
-		
-		this.productionSim = (Double)asp.getModelStateValue(EngineGeneratorModel.URI, "production");
-		this.fuelQuantitySim = (Double)asp.getModelStateValue(EngineGeneratorModel.URI, "capacity");
+		this.isOn = false;
+		this.production = 0.0;
+		this.fuelQuantity = EngineGeneratorSetting.FUEL_CAPACITY;
+		this.isFull = true;
+		this.isEmpty = false;
 		
 		this.tracer.setRelativePosition(2, 1);
 	}
@@ -122,7 +115,6 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.fuelQuantity = EngineGeneratorSetting.FUEL_CAPACITY;
 
 		this.logMessage("Groupe Electro starting");
 		try {
@@ -226,7 +218,16 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		return null;
+		if(name.equals("state")) {
+			return this.isOn?EngineGeneratorState.ON:EngineGeneratorState.OFF;
+		}
+		else if(name.equals("capacity")) {
+			return new Double(this.fuelQuantity);
+		}
+		else {
+			assert name.equals("production");
+			return new Double(this.production);
+		}
 	}
 	
 	@Override

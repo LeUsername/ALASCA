@@ -6,7 +6,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.windturbine.WindTurbineModel;
 
-public class WindReadingEvent extends AbstractEolienneEvent {
+public class WindReadingEvent extends AbstractWindTurbineEvent {
 
 	public static class		Reading
 	implements EventInformationI

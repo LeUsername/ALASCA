@@ -195,7 +195,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 //		});
 
 		// When there is no simulation
-		
+
 //		this.scheduleTask(new AbstractComponent.AbstractTask() {
 //			@Override
 //			public void run() {
@@ -239,7 +239,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		} else if (name.equals("washingMachineConsumption")) {
 			return new Double(this.washingMachineConsumption);
 		} else if (name.equals("totalConsumption")) {
-			return new Double(this.consomation);
+			return new Double(this.giveConso());
 		} else if (name.equals("setFridgeConsumption")) {
 			this.fridgeConsumption = (double) this.asp.getModelStateValue(ElectricMeterModel.URI, "fridgeConsumption");
 			return null;
@@ -264,7 +264,7 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
-		
+
 		atomicModelDescriptors.put(ElectricMeterModel.URI, AtomicHIOA_Descriptor.create(ElectricMeterModel.class,
 				ElectricMeterModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
 
@@ -276,7 +276,8 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 	/**
 	 * Get the overall energy consumption
-	 * @return	the overall energy consumption
+	 * 
+	 * @return the overall energy consumption
 	 * @throws Exception<i>todo.</i>
 	 */
 	public double giveConso() throws Exception {
@@ -286,7 +287,8 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 
 	/**
 	 * Update the overall energy consumption randomly
-	 * @return	void
+	 * 
+	 * @return void
 	 * @throws Exception<i>todo.</i>
 	 */
 	public void majConso() {

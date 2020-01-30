@@ -10,7 +10,6 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import simulation.models.fridge.FridgeCoupledModel;
 import simulation.models.fridge.FridgeModel;
-import simulation.models.hairdryer.HairDryerModel;
 import simulation.plugins.FridgeSimulatorPlugin;
 import simulation.tools.fridge.FridgeConsumption;
 import simulation.tools.fridge.FridgeDoor;
@@ -270,14 +269,14 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
 		if (name.equals("door")) {
-			return this.asp.getModelStateValue(HairDryerModel.URI, "door");
+			return this.currentDoorState;
 		} else if (name.equals("consumption")) {
-			return this.asp.getModelStateValue(HairDryerModel.URI, "consumption");
+			return new Double(this.conso);
 		} else if (name.equals("temperature")) {
-			return this.asp.getModelStateValue(HairDryerModel.URI, "temperature");
+			return new Double(this.temperature);
 		} else {
-			assert name.equals("intensity");
-			return this.asp.getModelStateValue(HairDryerModel.URI, "intensity");
+			assert name.equals("state");
+			return this.consumptionState;
 		}
 	}
 	

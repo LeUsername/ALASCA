@@ -17,7 +17,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
-import simulation.events.windturbine.AbstractEolienneEvent;
+import simulation.events.windturbine.AbstractWindTurbineEvent;
 import simulation.events.windturbine.SwitchOffEvent;
 import simulation.events.windturbine.SwitchOnEvent;
 import simulation.events.windturbine.WindReadingEvent;
@@ -76,10 +76,6 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 
 	protected static final int BLADES_AREA = 5; // m2
 
-	protected Time lastWindReadingTime;
-
-	protected Time currentWindReadingTime;
-	
 	/** plotter for the production level over time. */
 	protected XYPlotter productionPlotter;
 
@@ -95,8 +91,6 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 
 	public WindTurbineModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-		// create a standard logger (logging on the terminal)
-//		this.setLogger(new StandardLogger());
 	}
 
 	// ------------------------------------------------------------------------
@@ -121,15 +115,17 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	@Override
 	public void initialiseState(Time initialTime) {
 		// initialisation of the production plotter
-		if(this.productionPlotter != null) {
-			this.productionPlotter.initialise();
-			this.productionPlotter.showPlotter();
+		
+		if(componentRef == null) {
+			this.state = WindTurbineState.OFF;
+		}else {
+			try {
+				this.state = (WindTurbineState) this.componentRef.getEmbeddingComponentStateValue("state");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
-		this.state = WindTurbineState.OFF;
-
-		this.lastWindReadingTime = new Time(0.0, TimeUnit.SECONDS);
-		this.currentWindReadingTime = new Time(0.0, TimeUnit.SECONDS);
 		
 		this.triggerReading = false;
 
@@ -140,6 +136,11 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 			throw new RuntimeException(e);
 		}
 
+		if(this.productionPlotter != null) {
+			this.productionPlotter.initialise();
+			this.productionPlotter.showPlotter();
+		}
+		
 		super.initialiseState(initialTime);
 	}
 
@@ -148,7 +149,15 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	protected void initialiseVariables(Time startTime) {
-		this.production = 0.0;
+		if(componentRef == null) {
+			this.production = 0.0;
+		} else {
+			try {
+				this.production =  (Double)this.componentRef.getEmbeddingComponentStateValue("production");;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		// first data in the plotter to start the plot.
 		this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.production);
@@ -194,13 +203,8 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		if (this.componentRef != null) {
-			// This is an example showing how to access the component state
-			// from a simulation model; this must be done with care and here
-			// we are not synchronising with other potential component threads
-			// that may access the state of the component object at the same
-			// time.
 			try {
-				this.logMessage("component state = " + componentRef.getEmbeddingComponentStateValue("production"));
+				this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -212,51 +216,31 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
+		super.userDefinedExternalTransition(elapsedTime);
 		if(this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 	
 			assert currentEvents != null && currentEvents.size() == 1;
 	
 			Event ce = (Event) currentEvents.get(0);
-			boolean ticReceived = false;
 	
 			if (ce instanceof TicEvent) {
-				ticReceived = true;
+				this.triggerReading = true;
 			} else {
-				assert ce instanceof AbstractEolienneEvent;
-				if (ce instanceof WindReadingEvent) {
-					this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
-				}
+				assert ce instanceof AbstractWindTurbineEvent;
 				ce.executeOn(this);
 			}
-			if (ticReceived) {
-				this.triggerReading = true;
-				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-			}
-			
-			// add a new data on the plotter; this data will open a new piece
-	
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
-	
-			if (ce instanceof WindReadingEvent) {
-				this.lastWindReadingTime = this.currentWindReadingTime;
-			}
-			super.userDefinedExternalTransition(elapsedTime);
+			
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
-			
 			assert currentEvents != null && currentEvents.size() == 1;
-	
 			Event ce = (Event) currentEvents.get(0);
-			boolean ticReceived = false;
 	
 			if (ce instanceof TicEvent) {
-				ticReceived = true;
+				this.triggerReading = true;
 			} else {
-				assert ce instanceof AbstractEolienneEvent;
-				if (ce instanceof WindReadingEvent) {
-					this.currentWindReadingTime = ((WindReadingEvent) ce).getTimeOfOccurrence();
-				}
+				assert ce instanceof AbstractWindTurbineEvent;
 				ce.executeOn(this);
 				try {
 					this.componentRef.setEmbeddingComponentStateValue("production", this.production);
@@ -264,18 +248,9 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 					e.printStackTrace();
 				}
 			}
-			if (ticReceived) {
-				this.triggerReading = true;
-				this.logMessage(this.getCurrentStateTime() + "|external|tic event received.");
-			}
 			
-			// add a new data on the plotter; this data will open a new piece
-	
 			this.productionPlotter.addData(PRODUCTION, this.getCurrentStateTime().getSimulatedTime(), this.getProduction());
 	
-			if (ce instanceof WindReadingEvent) {
-				this.lastWindReadingTime = this.currentWindReadingTime;
-			}
 			super.userDefinedExternalTransition(elapsedTime);
 		}
 	}
@@ -286,7 +261,6 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
 		this.productionPlotter.addData(PRODUCTION, endTime.getSimulatedTime(), this.getProduction());
-
 		super.endSimulation(endTime);
 	}
 

@@ -8,8 +8,8 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import simulation.models.windturbine.WindTurbineCoupledModel;
-import simulation.models.windturbine.WindTurbineModel;
 import simulation.plugins.WindTurbineSimulatorPlugin;
+import simulation.tools.windturbine.WindTurbineState;
 import wattwatt.interfaces.controller.IController;
 import wattwatt.interfaces.energyproviders.random.windturbine.IWindTurbine;
 import wattwatt.ports.energyproviders.random.windturbine.WindTurbineInPort;
@@ -54,10 +54,6 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	/** The energy production of the wind turbine */
 	protected double production;
 	
-	/** The state of the wind turbine on simulation */
-	protected boolean isOnSim;
-	/** The energy production of the wind turbine on simulation */
-	protected double productionSim;
 	
 	/** the simulation plug-in holding the simulation models. */
 	protected WindTurbineSimulatorPlugin asp;
@@ -77,12 +73,12 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	protected WindTurbine(String uri, String eoIn) throws Exception {
 		super(uri, 2, 1);
 		this.initialise();
+		
+		this.isOn = true;
+		this.production = 0.0;
 
 		this.eoin = new WindTurbineInPort(eoIn, this);
 		this.eoin.publishPort();
-		
-		this.isOnSim = (boolean)this.asp.getModelStateValue(WindTurbineModel.URI, "isOn");
-		this.productionSim = (double)this.asp.getModelStateValue(WindTurbineModel.URI, "production");
 
 		this.tracer.setRelativePosition(2, 0);
 	}
@@ -197,7 +193,14 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 
 	@Override
 	public Object getEmbeddingComponentStateValue(String name) throws Exception {
-		return null;
+		if(name.equals("production")) {
+			return new Double(this.production);
+		}
+		else {
+			assert name.equals("state");
+			return this.isOn()?WindTurbineState.ON:WindTurbineState.OFF;
+				
+		}
 	}
 	
 	@Override

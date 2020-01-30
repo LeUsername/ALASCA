@@ -70,7 +70,7 @@ public class MIL_WashingMachine {
 							WattWattMain.getPlotterHeight()));
 
 			simParams.put(
-					WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
+					WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", WattWattMain.ORIGIN_X,
 							WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),

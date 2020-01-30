@@ -66,14 +66,6 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	/** The energy consumption of the washing machine */
 	protected double conso;
 
-	// -------------------------------------------------------------------------
-	// Constants and variables used in the simulation
-	// -------------------------------------------------------------------------
-	protected boolean isOnSim;
-	protected WashingMachineMode state2;
-	protected boolean isWorkingSim;
-	protected double consoSim;
-
 	/** the simulation plug-in holding the simulation models. */
 	protected WashingMachineSimulatorPlugin asp;
 

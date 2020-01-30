@@ -63,7 +63,7 @@ public class MIL_HairDryer {
 					HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
 			
 			simParams.put(
-					HairDryerModel.URI + ":" + HairDryerModel.INTENSITY_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					HairDryerModel.URI + ":" + HairDryerModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"Hair dryer model",
 							"Time (min)",

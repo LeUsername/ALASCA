@@ -138,13 +138,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			this.consumptionPlotter.showPlotter();
 		}
 
-		// try {
-		// // set the debug level triggering the production of log messages.
-		// this.setDebugLevel(1) ;
-		// } catch (Exception e) {
-		// throw new RuntimeException(e) ;
-		// }
-
 		super.initialiseState(initialTime);
 	}
 
@@ -155,6 +148,23 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	protected void initialiseVariables(Time startTime) {
 
 		// first data in the plotter to start the plot.
+		
+		if(componentRef == null) {
+			this.hairDryerConsumption = 0.0;
+			this.washingMachineConsumption = 0.0;
+			this.fridgeConsumption = 0.0;
+			this.totalConsumption = 0.0;
+			
+		} else {
+			try {
+				this.hairDryerConsumption = (Double)this.componentRef.getEmbeddingComponentStateValue("hairDryerConsumption");
+				this.washingMachineConsumption = (Double)this.componentRef.getEmbeddingComponentStateValue("washingMachineConsumption");
+				this.fridgeConsumption = (Double)this.componentRef.getEmbeddingComponentStateValue("fridgeConsumption");
+				this.totalConsumption = (Double)this.componentRef.getEmbeddingComponentStateValue("totalConsumption");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getConsumption());
 		this.triggerReading = false;
 		super.initialiseVariables(startTime);
@@ -204,6 +214,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 						.getEmbeddingComponentStateValue("hairDryerConsumption");
 				this.washingMachineConsumption = (double) componentRef
 						.getEmbeddingComponentStateValue("washingMachineConsumption");
+				this.totalConsumption = (Double)this.componentRef.getEmbeddingComponentStateValue("totalConsumption");
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -217,6 +228,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
+		super.userDefinedExternalTransition(elapsedTime);
 		if (this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 
@@ -236,7 +248,7 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
 
-			super.userDefinedExternalTransition(elapsedTime);
+			
 
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
@@ -263,12 +275,10 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			// add a new data on the plotter; this data will open a new piece
 
 			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(),
 					this.getConsumption());
 
-			super.userDefinedExternalTransition(elapsedTime);
 
 		}
 	}

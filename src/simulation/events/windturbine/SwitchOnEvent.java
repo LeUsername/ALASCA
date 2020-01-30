@@ -5,7 +5,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.windturbine.WindTurbineModel;
 
-public class SwitchOnEvent extends AbstractEolienneEvent {
+public class SwitchOnEvent extends AbstractWindTurbineEvent {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------

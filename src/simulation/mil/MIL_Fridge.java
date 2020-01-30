@@ -76,7 +76,7 @@ public class MIL_Fridge {
 							WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight())) ;
 			simParams.put(
-					FridgeModel.URI + ":"  + FridgeModel.INTENSITY + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
+					FridgeModel.URI + ":"  + FridgeModel.CONSUMPTION + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription(
 							"RefrigerateurModel",
 							"Time (min)",

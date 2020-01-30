@@ -69,7 +69,7 @@ public class MIL_EngineGenerator {
 							WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 							WattWattMain.getPlotterHeight()));
 			simParams.put(
-					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
+					EngineGeneratorModel.URI + ":" + EngineGeneratorModel.FUEL_QUANTITY_SERIES + ":"
 							+ PlotterDescription.PLOTTING_PARAM_NAME,
 					new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
 							2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
