@@ -43,13 +43,19 @@ import simulation.models.fridge.FridgeSensorModel;
 import simulation.models.fridge.FridgeUserModel;
 import simulation.models.hairdryer.HairDryerCoupledModel;
 import simulation.models.hairdryer.HairDryerModel;
+import simulation.models.hairdryer.HairDryerUserModel;
 import simulation.models.washingmachine.WashingMachineCoupledModel;
 import simulation.models.washingmachine.WashingMachineModel;
 import simulation.models.washingmachine.WashingMachineUserModel;
 import simulation.models.wattwatt.WattWattModel;
 import simulation.models.windturbine.WindTurbineCoupledModel;
 import simulation.models.windturbine.WindTurbineModel;
+import simulation.models.windturbine.WindTurbineSensorModel;
 import simulation.tools.TimeScale;
+import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
+import simulation.tools.hairdryer.HairDryerUserBehaviour;
+import simulation.tools.washingmachine.WashingMachineUserBehaviour;
+import wattwatt.tools.washingmachine.WashingMachineSetting;
 
 public class WattWattSupervisorComponent extends AbstractComponent {
 	// -------------------------------------------------------------------------
@@ -489,9 +495,80 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		this.logMessage("SupervisorComponent#execute 1");
 
 		Map<String, Object> simParams = new HashMap<String, Object>();
+		
+		
+		
 
 		String modelURI = TicModel.URI + "-10";
 		simParams.put(modelURI + ":" + TicModel.DELAY_PARAMETER_NAME, new Duration(10.0, TimeUnit.SECONDS));
+		
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
+				EngineGeneratorUserBehaviour.INITIAL_DELAY);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
+				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
+				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
+				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
+		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
+				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
+		
+		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
+		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
+		
+		
+		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
+		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
+		simParams.put(
+				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
+		simParams.put(
+				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
+		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
+		simParams.put(
+				FridgeSensorModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 2.5) ;
+		simParams.put(
+				FridgeSensorModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
+		
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.INITIAL_DELAY,
+				HairDryerUserBehaviour.INITIAL_DELAY) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.INTERDAY_DELAY,
+				HairDryerUserBehaviour.INTERDAY_DELAY) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_BETWEEN_USAGES,
+				HairDryerUserBehaviour.MEAN_TIME_BETWEEN_USAGES) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_HIGH,
+				HairDryerUserBehaviour.MEAN_TIME_AT_HIGH) ;
+		simParams.put(
+				HairDryerUserModel.URI + ":" + HairDryerUserModel.MEAN_TIME_AT_LOW,
+				HairDryerUserBehaviour.MEAN_TIME_AT_LOW) ;
+		
+		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,
+				WashingMachineUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
+		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWE,
+				WashingMachineUserBehaviour.MEAN_TIME_WORKING_ECO);
+		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWP,
+				WashingMachineUserBehaviour.MEAN_TIME_WORKING_PREMIUM);
+		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.STD,
+				10.0);
+		
+		
+		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_ECO,
+				WashingMachineSetting.CONSO_ECO_MODE_SIM);
+		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_PREMIUM,
+				WashingMachineSetting.CONSO_PREMIUM_MODE_SIM);
+		simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD,
+				10.0);
+		
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
+				10.0) ;
+		simParams.put(
+				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
+				200.0) ;
+		
 		
 		simParams.put(
 				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,

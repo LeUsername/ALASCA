@@ -263,13 +263,11 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	
 	public void setProduction(double windSpeed) {
 		if(this.isOn()) {
-			this.production = 0.5 * (WindTurbineModel.BLADES_AREA
-					* windDensity(WindTurbineModel.KELVIN_TEMP)) * windSpeed * windSpeed ;
+//			this.production = 0.5 * (WindTurbineModel.BLADES_AREA
+//					* windDensity(WindTurbineModel.KELVIN_TEMP)) * windSpeed * windSpeed ;
 			// We tried to calculate realistic value but the production was much too
-			// high compared to the consumption thus, we choose to divide this
-			// production by 100
-			this.production *= 3;
-			this.production /= 100.0;
+			// high compared to the consumption 
+			this.production = windSpeed;
 		}
 		
 		

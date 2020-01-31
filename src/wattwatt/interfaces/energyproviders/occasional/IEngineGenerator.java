@@ -36,7 +36,7 @@ public interface IEngineGenerator extends IEnergyProviders {
 	 * @return quantity of fuel in the engine generator
 	 * @throws Exception<i>todo.</i>
 	 */
-	public int fuelQuantity() throws Exception;
+	public double fuelQuantity() throws Exception;
 
 	/**
 	 * Add fuel into the engine generator

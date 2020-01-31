@@ -41,7 +41,7 @@ public class EngineGeneratorOutPort extends AbstractOutboundPort implements IEng
 	}
 
 	@Override
-	public int fuelQuantity() throws Exception {
+	public double fuelQuantity() throws Exception {
 		return ((IEngineGenerator) this.connector).fuelQuantity();
 	}
 

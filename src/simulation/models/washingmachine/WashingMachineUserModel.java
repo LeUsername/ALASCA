@@ -180,7 +180,6 @@ public class WashingMachineUserModel extends AtomicES_Model {
 			
 			this.nextEvent = ret.get(0).getClass();
 	
-//			this.logMessage("LaveLingeUserModel::output() " + this.nextEvent.getCanonicalName());
 			return ret;
 		}
 	}

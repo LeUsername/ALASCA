@@ -43,7 +43,7 @@ public class EngineGeneratorInPort extends AbstractInboundPort implements IEngin
 	}
 
 	@Override
-	public int fuelQuantity() throws Exception {
+	public double fuelQuantity() throws Exception {
 		return this.getOwner().handleRequestSync(owner -> ((EngineGenerator) owner).fuelQuantity());
 	}
 

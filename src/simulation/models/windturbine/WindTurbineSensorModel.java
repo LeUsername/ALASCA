@@ -58,7 +58,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	protected double initialDelay;
 	protected double interdayDelay;
 
-	protected static final double MAX_WIND = 14.0;
+	protected static final double MAX_WIND = 15.0;
 	protected static final double MIN_WIND = 3.0;
 
 	protected double currentWind;
@@ -126,8 +126,8 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 				e.printStackTrace();
 			}
 		}
-		this.currentWind = WindTurbineSensorModel.MAX_WIND * this.rg.nextBeta(2., 2.);
-
+		this.currentWind = WindTurbineSensorModel.MAX_WIND * this.rg.nextBeta(1.75, 1.75);
+		
 		this.rg.reSeedSecure();
 
 		super.initialiseState(initialTime);
@@ -190,6 +190,9 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 			if (this.currentWind <= 0.0) {
 				this.currentWind = 0.0;
 			}
+			if(this.currentWind >= 2 * WindTurbineSensorModel.MAX_WIND) {
+				this.currentWind = 2 * WindTurbineSensorModel.MAX_WIND;
+			}
 
 			if (this.currentWind > WindTurbineSensorModel.MAX_WIND) {
 				if (this.state.equals(WindTurbineState.ON)) {
@@ -208,7 +211,7 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 				}
 			}
 
-			d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
+			d = new Duration( this.interdayDelay, this.getSimulatedTimeUnit());
 			this.scheduleEvent(new WindReadingEvent(this.getCurrentStateTime().add(d), this.currentWind));
 		} else {
 			try {
@@ -224,6 +227,9 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 
 				if (this.currentWind <= 0.0) {
 					this.currentWind = 0.0;
+				}
+				if(this.currentWind >= 2 * WindTurbineSensorModel.MAX_WIND) {
+					this.currentWind = 2 * WindTurbineSensorModel.MAX_WIND;
 				}
 
 				if (this.currentWind > WindTurbineSensorModel.MAX_WIND) {
@@ -249,7 +255,8 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 					}
 				}
 				
-				d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
+				d = new Duration( this.interdayDelay, this.getSimulatedTimeUnit());
+				
 				this.scheduleEvent(new WindReadingEvent(this.getCurrentStateTime().add(d), this.currentWind));
 				this.componentRef.setEmbeddingComponentStateValue("production", new Double(this.currentWind));
 			} catch (Exception e) {

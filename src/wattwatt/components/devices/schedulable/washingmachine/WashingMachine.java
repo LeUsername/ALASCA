@@ -230,7 +230,10 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	
 	@Override
 	public void setEmbeddingComponentStateValue(String name, Object value) throws Exception {
-		if (name.equals("startAt")) {
+		if (name.equals("consumption")) {
+			this.conso = (double) value;
+		
+		}else if (name.equals("startAt")) {
 			this.On(); // revoir les planifable pour faire marcher le start at et tout
 		} 
 		else if (name.equals("stop")) {

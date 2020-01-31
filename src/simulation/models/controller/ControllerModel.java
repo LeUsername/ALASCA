@@ -468,7 +468,7 @@ public class ControllerModel extends AtomicModel {
 				assert this.EGState == EngineGeneratorState.OFF;
 				if (production <= this.consumption) {
 					// on l'allume
-					if (production <= this.consumption - 20) {
+					if (production <= this.consumption - 15) {
 						this.triggeredDecisionEngineGenerator = Decision.START_ENGINE;
 						this.EGState = EngineGeneratorState.ON;
 						this.mustTransmitDecision = true;
@@ -542,15 +542,11 @@ public class ControllerModel extends AtomicModel {
 					}
 				}
 			}
-			// if (this.hasDebugLevel(1)) {
-			// this.logMessage("userDefinedExternalTransition|"
-			// + this.EGState + "<<<<<<<<<<<<<<<<<<<") ;
-			// }
+
 		} else {
 			try {
 				this.consumption = (double) this.componentRef.getEmbeddingComponentStateValue("consumption");
-				this.productionEngineGenerator = (double) this.componentRef
-						.getEmbeddingComponentStateValue("productionEG");
+				this.productionEngineGenerator = (double) this.componentRef.getEmbeddingComponentStateValue("productionEG");
 				this.productionWindTurbine = (double) this.componentRef.getEmbeddingComponentStateValue("productionWT");
 				this.EGState = (EngineGeneratorState) this.componentRef.getEmbeddingComponentStateValue("stateEG");
 				this.FridgeState = (FridgeConsumption) this.componentRef.getEmbeddingComponentStateValue("stateFridge");
@@ -584,7 +580,6 @@ public class ControllerModel extends AtomicModel {
 				if (production > this.consumption) {
 					this.triggeredDecisionFridge = Decision.RESUME_FRIDGE;
 					this.FridgeState = FridgeConsumption.RESUMED;
-
 					this.mustTransmitDecision = true;
 				}
 			} else {
@@ -607,7 +602,6 @@ public class ControllerModel extends AtomicModel {
 				if (production <= this.consumption) {
 					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
 					this.WMState = WashingMachineState.OFF;
-
 					this.mustTransmitDecision = true;
 				}
 			}

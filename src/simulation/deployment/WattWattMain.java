@@ -567,7 +567,7 @@ public class WattWattMain {
 					10.0) ;
 			simParams.put(
 					WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
-					100.0) ;
+					200.0) ;
 			
 			
 			simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,

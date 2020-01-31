@@ -240,6 +240,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			if (ce instanceof TicEvent) {
 				this.triggerReading = true;
 			} else {
+				
 				assert ce instanceof AbstractWashingMachineEvent || ce instanceof AbstractControllerEvent;
 				ce.executeOn(this);
 			}
@@ -248,9 +249,10 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		} else {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 			assert currentEvents != null;
-	
 			Event ce = (Event) currentEvents.get(0);
-
+			
+			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentConsumption);
+			
 			if(ce instanceof TicEvent) {
 				this.triggerReading = true;
 			}
@@ -258,9 +260,12 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 				this.state = (WashingMachineState) this.componentRef.getEmbeddingComponentStateValue("state");
 				this.washingMode = (WashingMachineMode)this.componentRef.getEmbeddingComponentStateValue("mode");
 				this.updateState();
+				this.componentRef.setEmbeddingComponentStateValue("consumption", this.currentConsumption);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.currentConsumption);
 		}
 	}
 
@@ -330,7 +335,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	}
 
 	private void updateState() {
-		if(this.state == WashingMachineState.WORKING) {
+		if(this.state == WashingMachineState.WORKING || this.state == WashingMachineState.ON) {
 			if(this.washingMode == WashingMachineMode.ECO) {
 				this.currentConsumption = WashingMachineSetting.CONSO_ECO_MODE_SIM;
 			}

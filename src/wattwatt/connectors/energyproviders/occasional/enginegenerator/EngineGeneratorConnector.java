@@ -31,7 +31,7 @@ public class EngineGeneratorConnector extends EnergyProviderConnector implements
 	}
 
 	@Override
-	public int fuelQuantity() throws Exception {
+	public double fuelQuantity() throws Exception {
 		return ((IEngineGenerator) this.offering).fuelQuantity();
 	}
 

@@ -5,8 +5,6 @@ import java.util.Map;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.fridge.FridgeModel;
-import simulation.models.fridge.FridgeSensorModel;
-import simulation.models.fridge.FridgeUserModel;
 import wattwatt.tools.URIS;
 
 //------------------------------------------------------------------------------
@@ -40,21 +38,7 @@ public class FridgeSimulatorPlugin extends AtomicSimulatorPlugin {
 		simParams.put(URIS.FRIDGE_URI,
 					  this.owner) ;
 
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 		
-		
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
-		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
-		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
-		simParams.put(
-				FridgeSensorModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 2.5) ;
-		simParams.put(
-				FridgeSensorModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
 		
 		
 		super.setSimulationRunParameters(simParams) ;

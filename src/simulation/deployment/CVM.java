@@ -176,7 +176,7 @@ extends		AbstractCVM
 	{
 		try {
 			CVM vm = new CVM() ;
-			vm.startStandardLifeCycle(50000L) ;
+			vm.startStandardLifeCycle(80000L) ;
 
 			System.out.println("ending...") ;
 			System.exit(0) ;

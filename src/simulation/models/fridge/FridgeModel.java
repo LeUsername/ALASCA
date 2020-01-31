@@ -92,9 +92,9 @@ extends AtomicHIOAwithEquations
 	public static final String	INITIAL_TEMP = "inital-temp" ;
 	// Model implementation variables
 	/** the maximum temperature												*/
-	protected double					maxTemperature ;
+	protected double maxTemperature ;
 	/** the minimum temperature												*/
-	protected double					minTemperature ;
+	protected double minTemperature ;
 	
 	protected double initialTemp;
 
@@ -190,8 +190,7 @@ extends AtomicHIOAwithEquations
 		this.consumptionPlotter.createSeries(CONSUMPTION_SERIES) ;
 		
 		// The reference to the embedding component
-		this.componentRef =
-			(EmbeddingComponentAccessI) simParams.get(URIS.FRIDGE_URI) ;
+		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.FRIDGE_URI) ;
 	}
 
 	/**
@@ -285,7 +284,6 @@ extends AtomicHIOAwithEquations
 	{
 		if (triggerReading) {
 			double reading = this.consumption; // Watt
-
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());
 			FridgeConsumptionEvent consommation = new FridgeConsumptionEvent(currentTime, reading);
@@ -349,7 +347,7 @@ extends AtomicHIOAwithEquations
 		super.userDefinedExternalTransition(elapsedTime);
 		if(this.componentRef == null) {
 			ArrayList<EventI> currentEvents = this.getStoredEventAndReset() ;
-			assert	currentEvents != null && currentEvents.size() == 1 ;
+			assert	currentEvents != null;
 
 			if (this.temperaturePlotter != null) {
 				this.temperaturePlotter.addData(
@@ -449,7 +447,6 @@ extends AtomicHIOAwithEquations
 
 	protected void		computeNextState()
 	{
-
 		if(this.currentState == FridgeConsumption.RESUMED) {
 			this.consumption = FridgeModel.TENSION * FridgeSetting.ACTIVE_CONSUMPTION;
 			if (this.currentDoorState == FridgeDoor.OPENED) {
@@ -475,7 +472,7 @@ extends AtomicHIOAwithEquations
 		}
 		// As consumption were too massive, we choose to divide them by 100
 		// to not overshadow other devices' consumtpion
-		this.consumption/=10;
+		this.consumption/=100;
 	}
 	
 	public FridgeDoor getDoorState() {

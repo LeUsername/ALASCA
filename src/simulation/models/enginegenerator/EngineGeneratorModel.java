@@ -255,6 +255,7 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 				this.fuelCapacity = (double) this.componentRef.getEmbeddingComponentStateValue("capacity");
 				this.updateState();
 				this.componentRef.setEmbeddingComponentStateValue("production",new Double(this.production));
+				this.componentRef.setEmbeddingComponentStateValue("state", this.state);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -324,12 +325,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			if (this.fuelCapacity - EngineGeneratorSetting.PROD_THR <= 0) {
 				this.fuelCapacity = 0.0;
 			} else {
-				this.fuelCapacity -= EngineGeneratorSetting.PROD_THR;
+				this.fuelCapacity -= 2*EngineGeneratorSetting.PROD_THR;
 			}
 		} else {
-			if (this.isEmpty()) {
-				this.state = EngineGeneratorState.OFF;
-			}
+			this.state = EngineGeneratorState.OFF;
 			this.production = 0.0;
 		}
 	}

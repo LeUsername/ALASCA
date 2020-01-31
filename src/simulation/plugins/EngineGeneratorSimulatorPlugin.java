@@ -5,8 +5,6 @@ import java.util.Map;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.enginegenerator.EngineGeneratorModel;
-import simulation.models.enginegenerator.EngineGeneratorUserModel;
-import simulation.tools.enginegenerator.EngineGeneratorUserBehaviour;
 import wattwatt.tools.URIS;
 
 //------------------------------------------------------------------------------
@@ -39,16 +37,7 @@ public class EngineGeneratorSimulatorPlugin extends AtomicSimulatorPlugin{
 		// component and pass it to the simulation model.
 		simParams.put(URIS.ENGINE_GENERATOR_URI,
 					  this.owner) ;
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
-				EngineGeneratorUserBehaviour.INITIAL_DELAY);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
-				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
-				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
-				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
-		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
-				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
+		
 
 		
 		super.setSimulationRunParameters(simParams) ;

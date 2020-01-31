@@ -1,6 +1,5 @@
 package wattwatt.components.energyproviders.occasional.enginegenerator;
 
-import fr.sorbonne_u.components.ComponentState;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -55,7 +54,7 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	/** The energy production of the engine generator */
 	protected double production;
 	/** The fuel quantity of the engine generator */
-	protected int fuelQuantity;
+	protected double fuelQuantity;
 	
 	
 	protected boolean isFull;
@@ -237,7 +236,10 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 			this.production = (double) value;
 		}
 		else if(name.equals("state")) {
-			this.state = (ComponentState) value;
+			this.isOn = (EngineGeneratorState) value == EngineGeneratorState.ON?true:false;
+		}
+		else if(name.equals("capacity")) {
+			this.fuelQuantity = (double) value;
 		}
 		else if(name.equals("start")) {
 			this.on();
@@ -268,7 +270,7 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		return this.fuelQuantity == EngineGeneratorSetting.FUEL_CAPACITY;
 	}
 
-	public int fuelQuantity() throws Exception {
+	public double fuelQuantity() throws Exception {
 		return this.fuelQuantity;
 	}
 
@@ -302,10 +304,8 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 				this.fuelQuantity -= EngineGeneratorSetting.PROD_THR;
 			}
 		} else {
-			if (this.fuelIsEmpty()) {
-				this.off();
-				this.logMessage("No more fuel");
-			}
+			this.off();
+			this.logMessage("No more fuel");
 		}
 	}
 

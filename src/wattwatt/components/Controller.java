@@ -391,7 +391,6 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 			assert name.equals("stateWM");
 			boolean on  = this.laveout.isOn();
 			boolean isWorking = this.laveout.isWorking();
-			
 			if(on && isWorking) {
 				return WashingMachineState.WORKING;
 			}
@@ -428,10 +427,8 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 	@Override
 	protected Architecture createLocalArchitecture(String architectureURI) throws Exception {
 		Map<String, AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
-
 		atomicModelDescriptors.put(ControllerModel.URI, AtomicModelDescriptor.create(ControllerModel.class,
 				ControllerModel.URI, TimeUnit.SECONDS, null, SimulationEngineCreationMode.ATOMIC_ENGINE));
-
 		Map<String, CoupledModelDescriptor> coupledModelDescriptors = new HashMap<String, CoupledModelDescriptor>();
 
 		return new Architecture(ControllerModel.URI, atomicModelDescriptors, coupledModelDescriptors, TimeUnit.SECONDS);

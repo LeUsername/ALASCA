@@ -5,10 +5,7 @@ import java.util.Map;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI;
 import simulation.models.washingmachine.WashingMachineModel;
-import simulation.models.washingmachine.WashingMachineUserModel;
-import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 import wattwatt.tools.URIS;
-import wattwatt.tools.washingmachine.WashingMachineSetting;
 
 //------------------------------------------------------------------------------
 /**
@@ -45,22 +42,7 @@ public class WashingMachineSimulatorPlugin extends AtomicSimulatorPlugin {
 		simParams.put(URIS.WASHING_MACHINE_URI,
 					  this.owner) ;
 		
-		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,
-				WashingMachineUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWE,
-				WashingMachineUserBehaviour.MEAN_TIME_WORKING_ECO);
-		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWP,
-				WashingMachineUserBehaviour.MEAN_TIME_WORKING_PREMIUM);
-		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.STD,
-				10.0);
 		
-		
-		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_ECO,
-				WashingMachineSetting.CONSO_ECO_MODE_SIM);
-		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_PREMIUM,
-				WashingMachineSetting.CONSO_PREMIUM_MODE_SIM);
-		simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD,
-				10.0);
 
 		
 		super.setSimulationRunParameters(simParams) ;

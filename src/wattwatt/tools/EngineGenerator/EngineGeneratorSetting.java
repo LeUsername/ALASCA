@@ -16,13 +16,13 @@ public class EngineGeneratorSetting {
 	/**
 	 * The maximum fuel capacity of the engine generator
 	 */
-	public static final int FUEL_CAPACITY = 100;
-	public static final double FULL_CAPACITY = 100.0;
+	public static final int FUEL_CAPACITY = 20;
+	public static final double FULL_CAPACITY = 20.0;
 	
 	/**
 	 * The value that we will use to compute how much energy is produce depending on how much fuel we burn.
 	 */
-	public static final int PROD_THR = 10;
+	public static final int PROD_THR = 5;
 	
 	/**
 	 * The Rate at wich the engine generator will send his production.
