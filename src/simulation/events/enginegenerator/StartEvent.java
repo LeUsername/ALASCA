@@ -5,16 +5,33 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.enginegenerator.EngineGeneratorModel;
 
+//----------------------------------------------------------------------------
+/**
+* The class <code>RefillEvent</code> define an event sent by the engine generator user to start the engine generator fuel 
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*        <p>
+*        Bah Thierno, Zheng Pascal
+*        </p>
+*/
 public class StartEvent extends AbstractEngineGeneratorEvent{
 
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create an StartEvent sent by the engine generator user
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 */
 	public StartEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

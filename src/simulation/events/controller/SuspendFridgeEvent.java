@@ -8,17 +8,42 @@ import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.models.fridge.FridgeModel;
 
+//----------------------------------------------------------------------------
+/**
+* The class <code>SuspendFridgeEvent</code> define an event sent by the controller to order to the fridge to suspend his behaviour
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class SuspendFridgeEvent extends AbstractControllerEvent {
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create an SuspendFridgeEvent sent by the controller 
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 * @param content			content of the event.
+	 */
 	public SuspendFridgeEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
+	/**
+	 * Create an SuspendFridgeEvent sent by the controller 
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 */
 	public SuspendFridgeEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}

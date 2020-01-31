@@ -53,15 +53,25 @@ public class HairDryerConsumptionEvent extends AbstractHairDryerEvent {
 		}
 	}
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Create an HairDryerConsumptionEvent sent by the hair dryer
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 * @param content			content of the event.
+	 */
 	public HairDryerConsumptionEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
+	/**
+	 * Create an HairDryerConsumptionEvent sent by the hair dryer
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 */
 	public HairDryerConsumptionEvent(Time timeOfOccurrence, double content) {
 		super(timeOfOccurrence, new Reading(content));
 	}

@@ -8,45 +8,50 @@ import simulation.models.hairdryer.HairDryerModel;
 
 //-----------------------------------------------------------------------------
 /**
-* The class <code>DecreasePowerEvent</code> defines the event of the power level of the hair dryer being decreased
-*
-* <p><strong>Description</strong></p>
-* 
-* <p><strong>Invariant</strong></p>
-* 
-* <pre>
-* invariant		true
-* </pre>
-* 
- * <p>Created on : 2020-01-27</p>
+ * The class <code>DecreasePowerEvent</code> defines the event of the power
+ * level of the hair dryer being decreased
+ *
+ * <p>
+ * <strong>Description</strong>
+ * </p>
  * 
- * @author	<p>Bah Thierno, Zheng Pascal</p>
+ * <p>
+ * <strong>Invariant</strong>
+ * </p>
+ * 
+ * <pre>
+* invariant		true
+ * </pre>
+ * 
+ * <p>
+ * Created on : 2020-01-27
+ * </p>
+ * 
+ * @author
+ *         <p>
+ *         Bah Thierno, Zheng Pascal
+ *         </p>
  */
 public class DecreasePowerEvent extends AbstractHairDryerEvent {
-	// -------------------------------------------------------------------------
-	// Constants and variables
-	// -------------------------------------------------------------------------
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	// -------------------------------------------------------------------------
-	// Constructors
-	// -------------------------------------------------------------------------
-
 	/**
 	 * create a DecreasePower event.
 	 * 
-	 * <p><strong>Contract</strong></p>
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
 	 * 
 	 * <pre>
 	 * pre	timeOfOccurrence != null 
 	 * post	this.getTimeOfOccurrence().equals(timeOfOccurrence)
 	 * </pre>
 	 *
-	 * @param timeOfOccurrence	time of occurrence of the event.
+	 * @param timeOfOccurrence time of occurrence of the event.
 	 */
 	public DecreasePowerEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
@@ -55,22 +60,20 @@ public class DecreasePowerEvent extends AbstractHairDryerEvent {
 	/**
 	 * create a DecreasePower event.
 	 * 
-	 * <p><strong>Contract</strong></p>
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
 	 * 
 	 * <pre>
 	 * pre	timeOfOccurrence != null 
 	 * post	this.getTimeOfOccurrence().equals(timeOfOccurrence)
 	 * </pre>
 	 *
-	 * @param timeOfOccurrence	time of occurrence of the event.
+	 * @param timeOfOccurrence time of occurrence of the event.
 	 */
 	public DecreasePowerEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
-
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
 
 	@Override
 	public String eventAsString() {

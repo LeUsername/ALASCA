@@ -5,13 +5,30 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.enginegenerator.EngineGeneratorModel;
 
+//----------------------------------------------------------------------------
+/**
+* The class <code>StopEvent</code> define an event sent by the engine generator user to stop the engine generator fuel 
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*        <p>
+*        Bah Thierno, Zheng Pascal
+*        </p>
+*/
 public class StopEvent extends AbstractEngineGeneratorEvent {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create an StopEvent sent by the engine generator user
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 */
 	public StopEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}

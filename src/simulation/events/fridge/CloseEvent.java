@@ -5,27 +5,29 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.fridge.FridgeModel;
 
+//----------------------------------------------------------------------------
+/**
+* The class <code>CloseEvent</code> define an event sent by the fridge user to close the fridge door 
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*        <p>
+*        Bah Thierno, Zheng Pascal
+*        </p>
+*/
 public class CloseEvent  extends AbstractFridgeEvent
 {
-	// -------------------------------------------------------------------------
-	// Constants and variables
-	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
 
-	// -------------------------------------------------------------------------
-	// Constructors
-	// -------------------------------------------------------------------------
 
 	/**
-	 * create a new event.
+	 * create a new CloseEvent.
 	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	timeOfOccurrence != null
-	 * post	true			// no postcondition.
-	 * </pre>
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */

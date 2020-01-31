@@ -8,17 +8,42 @@ import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.OpenEvent;
 import simulation.models.fridge.FridgeModel;
 
+//----------------------------------------------------------------------------
+/**
+* The class <code>ResumeFridgeEvent</code> define an event sent by the controller to order to the fridge to resume his behaviour
+*
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class ResumeFridgeEvent extends AbstractControllerEvent {
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Create an ResumeFridgeEvent sent by the controller 
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 * @param content			content of the event.
+	 */
 	public ResumeFridgeEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 	}
 	
+	/**
+	 * Create an ResumeFridgeEvent sent by the controller 
+	 * 
+	 *
+	 * @param timeOfOccurrence	time of occurrence of the event.
+	 */
 	public ResumeFridgeEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
