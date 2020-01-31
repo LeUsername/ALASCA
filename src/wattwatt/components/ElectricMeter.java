@@ -148,8 +148,6 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
 
-		// Toggle logging on to get a log on the screen.
-		this.toggleLogging();
 	}
 
 	// -------------------------------------------------------------------------
@@ -159,7 +157,6 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.logMessage("Compteur starting");
 		try {
 			Thread.sleep(10);
 		} catch (Exception e) {
@@ -170,50 +167,10 @@ public class ElectricMeter extends AbstractCyPhyComponent implements EmbeddingCo
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-//
-//		HashMap<String, Object> simParams = new HashMap<String, Object>();
-//
-//		simParams.put(URIS.ELECTRIC_METER_URI, this);
-//		simParams.put(
-//				ElectricMeterModel.URI + ":" + ElectricMeterModel.CONSUMPTION_SERIES + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("Electric meter model", "Time (min)", "Consumption (Watt)",
-//						2 * WattWattMain.getPlotterWidth(), 3 * WattWattMain.getPlotterHeight(),
-//						WattWattMain.getPlotterWidth(), WattWattMain.getPlotterHeight()));
-//
-//		this.asp.setSimulationRunParameters(simParams);
-//		// Start the simulation.
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					 asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-
-		// When there is no simulation
-
-//		this.scheduleTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					while (true) {
-//						((ElectricMeter) this.getTaskOwner()).majConso();
-//						Thread.sleep(ElectricMeterSetting.UPDATE_RATE);
-//					}
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}, 100, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Compteur shutdown");
 		try {
 			this.cptin.unpublishPort();
 			this.sechout.unpublishPort();

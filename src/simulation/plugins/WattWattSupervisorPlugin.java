@@ -19,6 +19,26 @@ import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>SupervisorComponent</code> implements the components that
+* act as the supervisor of the global simulation architecture.
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>Created on : 2018-06-13</p>
+* 
+* @author	         
+* 		  <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class WattWattSupervisorPlugin 
 	extends		AbstractPlugin
 	implements	SupervisorPluginI
@@ -26,7 +46,7 @@ public class WattWattSupervisorPlugin
 		private static final long serialVersionUID = 1L;
 
 		// -------------------------------------------------------------------------
-		// Plug-in internal constants and variables
+		// Constants and variables
 		// -------------------------------------------------------------------------
 
 		/** the global simulation architecture associated to the plug-in.		*/
@@ -195,17 +215,6 @@ public class WattWattSupervisorPlugin
 			return this.getRootSmop().getSimulationEndTime() ;
 		}
 
-//		/**
-//		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#readyForSimulation()
-//		 */
-//		@Override
-//		public boolean		readyForSimulation() throws Exception
-//		{
-//			return this.getRootSmop() != null &&
-//						this.getRootSmop().connected() &&
-//										this.getRootSmop().readyForSimulation() ;
-//		}
-
 		/**
 		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#setSimulationRunParameters(java.util.Map)
 		 */
@@ -231,19 +240,6 @@ public class WattWattSupervisorPlugin
 			this.getRootSmop().doStandAloneSimulation(
 												startTime, simulationDuration) ;
 		}
-
-//		/**
-//		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#startCollaborativeSimulation(double, double)
-//		 */
-//		@Override
-//		public void			startCollaborativeSimulation(
-//			double startTime,
-//			double simulationDuration
-//			) throws Exception
-//		{
-//			this.getRootSmop().startCollaborativeSimulation(
-//											startTime, simulationDuration) ;
-//		}
 
 		/**
 		 * @see fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationManagementI#isSimulationRunning()
@@ -316,20 +312,17 @@ public class WattWattSupervisorPlugin
 
 		@Override
 		public void startRealTimeSimulation(double startTime, double simulationDuration) throws Exception {
-			// TODO Auto-generated method stub
 			this.getRootSmop().startRealTimeSimulation(
 					startTime, simulationDuration) ;
 		}
 
 		@Override
 		public void finaliseSimulation() throws Exception {
-			// TODO Auto-generated method stub
 			this.getRootSmop().finaliseSimulation() ;
 		}
 
 		@Override
 		public void resetArchitecture(ComponentModelArchitectureI architecture) throws Exception {
-			// TODO Auto-generated method stub
 			assert	architecture != null ;
 			
 			this.rootModelSmop.reinitialise() ;

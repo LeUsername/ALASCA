@@ -104,8 +104,6 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
 
-		// Toggle logging on to get a log on the screen.
-		this.toggleLogging();
 	}
 
 	// -------------------------------------------------------------------------
@@ -127,87 +125,10 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-//		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
-//		HashMap<String, Object> simParams = new HashMap<String, Object>();
-//		simParams.put(URIS.ENGINE_GENERATOR_URI, this);
-//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INITIAL_DELAY,
-//				EngineGeneratorUserBehaviour.INITIAL_DELAY);
-//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.INTERDAY_DELAY,
-//				EngineGeneratorUserBehaviour.INTERDAY_DELAY);
-//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_BETWEEN_USAGES,
-//				EngineGeneratorUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_USAGE,
-//				EngineGeneratorUserBehaviour.MEAN_TIME_USAGE);
-//		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
-//				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
-//		simParams.put(
-//				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "Start / Stop / Refill",
-//						2*WattWattMain.getPlotterWidth(),
-//						0, WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight()));
-//
-//		simParams.put(
-//				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Production (W)", 2*WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight()));
-//		simParams.put(
-//				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.QUANTITY_SERIES + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Fuel Quantity (L)", 2*WattWattMain.getPlotterWidth(),
-//						2*WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight()));
-//		this.asp.setSimulationRunParameters(simParams);
-//		// Start the simulation.
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//						((EngineGenerator) this.getTaskOwner()).isOnSim = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isOn"));
-//						((EngineGenerator) this.getTaskOwner()).isEmpty = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isEmpty"));
-//						((EngineGenerator) this.getTaskOwner()).isFull = ((boolean) asp.getModelStateValue(EngineGeneratorModel.URI, "isFull"));
-//						((EngineGenerator) this.getTaskOwner()).fuelQuantitySim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "capacity"));
-//						((EngineGenerator) this.getTaskOwner()).productionSim = ((double) asp.getModelStateValue(EngineGeneratorModel.URI, "production"));
-//						
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}, 0, 1000, TimeUnit.MILLISECONDS);
-		/*
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						((GroupeElectrogene) this.getTaskOwner()).behave();
-						;
-						Thread.sleep(GroupreElectrogeneReglage.REGUL_RATE);
-
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 100, TimeUnit.MILLISECONDS);*/
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Groupe Electro shutdown");
 		try {
 			this.groupein.unpublishPort();
 		} catch (Exception e) {
@@ -305,7 +226,6 @@ public class EngineGenerator  extends AbstractCyPhyComponent implements Embeddin
 			}
 		} else {
 			this.off();
-			this.logMessage("No more fuel");
 		}
 	}
 

@@ -163,12 +163,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 				HairDryerCoupledModel.URI,
 				ComponentAtomicModelDescriptor.create(
 						HairDryerCoupledModel.URI,
-						/*(Class<? extends EventI>[])
-							new Class<?>[]{
-								SwitchOffEvent.class,
-								SwitchOnEvent.class,
-								SwitchModeEvent.class
-							}*/null,
+						null,
 						(Class<? extends EventI>[])
 							new Class<?>[]{
 							HairDryerConsumptionEvent.class
@@ -584,26 +579,26 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(					
 				ControllerModel.URI + ":" + ControllerModel.PRODUCTION_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "W", WattWattMain.ORIGIN_X ,
+				new PlotterDescription("Controller Model", "Time (min)", "W", WattWattMain.ORIGIN_X ,
 						WattWattMain.ORIGIN_Y , WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		simParams.put(
 				ControllerModel.URI + ":" + ControllerModel.ENGINE_GENERATOR_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "EG decision", WattWattMain.ORIGIN_X ,
+				new PlotterDescription("Controller Model", "Time (min)", "EG decision", WattWattMain.ORIGIN_X ,
 						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		simParams.put(
 				ControllerModel.URI + ":" + ControllerModel.FRIDGE_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "Fridge decision", WattWattMain.ORIGIN_X ,
+				new PlotterDescription("Controller Model", "Time (min)", "Fridge decision", WattWattMain.ORIGIN_X ,
 						WattWattMain.ORIGIN_Y + 2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		
 		simParams.put(
 				ControllerModel.URI + ":" + ControllerModel.WASHING_MACHINE_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("ControllerModel", "Time (sec)", "WM decision", WattWattMain.ORIGIN_X ,
+				new PlotterDescription("Controller Model", "Time (min)", "WM decision", WattWattMain.ORIGIN_X ,
 						WattWattMain.ORIGIN_Y + 3 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
 						WattWattMain.getPlotterHeight()));
 		
@@ -622,7 +617,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeModel", "Time (min)", "Consumption (W)",
+				new PlotterDescription("Washing Machine Model", "Time (min)", "Consumption (W)",
 						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(),
 						WattWattMain.getPlotterWidth(),
@@ -631,7 +626,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				WashingMachineUserModel.URI + ":" + WashingMachineUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions",
+				new PlotterDescription("Washing Machine User Model", "Time (min)", "User actions",
 						WattWattMain.ORIGIN_X + WattWattMain.getPlotterWidth(), 
 						WattWattMain.ORIGIN_Y+ 3*WattWattMain.getPlotterHeight(), 
 						WattWattMain.getPlotterWidth(),
@@ -652,7 +647,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.FUEL_QUANTITY_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Volume (Liters)", 
+				new PlotterDescription("Engine Generator Model", "Time (min)", "Volume (Liters)", 
 						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y + WattWattMain.getPlotterHeight(), 
 						WattWattMain.getPlotterWidth(),
@@ -662,7 +657,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				EngineGeneratorModel.URI + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneModel", "Time (min)", "Power (Watt)", 
+				new PlotterDescription("Engine Generator Model", "Time (min)", "Power (Watt)", 
 						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), 
 						WattWattMain.getPlotterWidth(),
@@ -671,7 +666,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.ACTION + ":"
 						+ PlotterDescription.PLOTTING_PARAM_NAME,
-				new PlotterDescription("GroupeElectrogeneUserModel", "Time (min)", "User actions",
+				new PlotterDescription("Engine Generator User Model", "Time (min)", "User actions",
 						WattWattMain.ORIGIN_X + 2*WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y + 3*WattWattMain.getPlotterHeight() ,
 						WattWattMain.getPlotterWidth(),
@@ -681,8 +676,8 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				FridgeModel.URI + ":" + FridgeModel.TEMPERATURE + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
-						"RefrigerateurModel",
-						"Time (sec)",
+						"Fridge Model",
+						"Time (min)",
 						"Temperature (Celsius)",
 						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y , 
@@ -691,7 +686,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				FridgeModel.URI + ":"  + FridgeModel.CONSUMPTION + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
-						"RefrigerateurModel",
+						"Fridge Model",
 						"Time (min)",
 						"Consumption (W)",
 						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
@@ -702,7 +697,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				FridgeSensorModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
-						"RefrigerateurSensorModel",
+						"Fridge Sensor Model",
 						"Time (min)",
 						"Temperature (Celcius)",
 						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
@@ -713,7 +708,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(
 				FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
 				new PlotterDescription(
-						"RefrigerateurUserModel",
+						"Fridge User Model",
 						"Time (min)",
 						"Opened / Closed",
 						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),

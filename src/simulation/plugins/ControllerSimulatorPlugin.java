@@ -61,7 +61,6 @@ public class ControllerSimulatorPlugin extends AtomicSimulatorPlugin {
 		// alternatively, the simulation model could take care of the
 		// link between names and values.
 		
-		// TODO
 		return null;
 
 	}

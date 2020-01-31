@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -34,7 +33,6 @@ import wattwatt.ports.devices.uncontrollable.hairdryer.HairDryerOutPort;
 import wattwatt.ports.electricmeter.ElectricMeterOutPort;
 import wattwatt.ports.energyproviders.occasional.enginegenerator.EngineGeneratorOutPort;
 import wattwatt.ports.energyproviders.random.windturbine.WindTurbineOutPort;
-import wattwatt.tools.URIS;
 
 //-----------------------------------------------------------------------------
 /**
@@ -177,8 +175,6 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
 
-		// Toggle logging on to get a log on the screen.
-		this.toggleLogging();
 	}
 
 	// -------------------------------------------------------------------------
@@ -188,166 +184,15 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-		this.logMessage("Controleur starting");
 	}
 
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-		HashMap<String, Object> simParams = new HashMap<String, Object>();
-
-		simParams.put(URIS.CONTROLLER_URI, this);
-
-		this.asp.setSimulationRunParameters(simParams);
-		// Start the simulation.
-		this.runTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					// asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		// Create a scheduleTask to handle each other devices and by using the overall
-		// energy consommation and production
-		// send order by calling services from these devices
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		//
-		// try {
-		// ((Controller) this.getTaskOwner()).allCons = ((Controller)
-		// this.getTaskOwner()).cptout
-		// .getAllConso();
-		// ((Controller) this.getTaskOwner())
-		// .logMessage("Compteur>> : " + ((Controller) this.getTaskOwner()).allCons);
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 100, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
-		//
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// double cons = 0;
-		// try {
-		// ((Controller) this.getTaskOwner()).refriout.On();
-		// cons = ((Controller) this.getTaskOwner()).allCons;
-		// if (cons > 1220 && ((Controller) this.getTaskOwner()).refriout.isWorking()) {
-		// ((Controller) this.getTaskOwner()).refriout.suspend();
-		// } else {
-		// if (!((Controller) this.getTaskOwner()).refriout.isWorking()) {
-		// ((Controller) this.getTaskOwner()).refriout.resume();
-		// }
-		// }
-		// if (((Controller) this.getTaskOwner()).refriout.isOn()
-		// && ((Controller) this.getTaskOwner()).refriout.isWorking()) {
-		// ((Controller) this.getTaskOwner()).logMessage("Refri>> ON and Working Conso :
-		// [ "
-		// + ((Controller) this.getTaskOwner()).refriout.getConso() + " ] : ");
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 100, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
-		//
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// if (((Controller) this.getTaskOwner()).sechout.isOn()) {
-		// ((Controller) this.getTaskOwner()).logMessage("SecheCheveux>> ON Conso : [ "
-		// + ((Controller) this.getTaskOwner()).sechout.getConso() + " ] : ");
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 1000, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
-		//
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// ((Controller) this.getTaskOwner()).eoout.On();
-		// Random rand = new Random(); // use to simulate wind condition for now
-		// if (((Controller) this.getTaskOwner()).eoout.isOn()) {
-		// ((Controller) this.getTaskOwner()).logMessage("Eolienne>> ON Prod : [ "
-		// + ((Controller) this.getTaskOwner()).eoout.getEnergy() + " ] : ");
-		// } else {
-		// ((Controller) this.getTaskOwner()).logMessage("Eolienne>> OFF Prod : [ "
-		// + ((Controller) this.getTaskOwner()).eoout.getEnergy() + " ] : ");
-		// }
-		// if (rand.nextInt(100) > 60) {
-		//
-		// if (((Controller) this.getTaskOwner()).eoout.isOn()) {
-		// ((Controller) this.getTaskOwner()).eoout.Off();
-		// } else {
-		// ((Controller) this.getTaskOwner()).eoout.On();
-		// }
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 100, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
-		//
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// ((Controller) this.getTaskOwner()).laveout.On();
-		// // need to adapt to the energy consumption and production => Simulation.jar
-		// Random rand = new Random();
-		// if (!((Controller) this.getTaskOwner()).laveout.isWorking()) {
-		// boolean changementMode = rand.nextBoolean();
-		// if (changementMode) {
-		// ((Controller) this.getTaskOwner()).laveout.ecoWashing();
-		// } else {
-		// ((Controller) this.getTaskOwner()).laveout.premiumWashing();
-		// }
-		// }
-		// ((Controller) this.getTaskOwner())
-		// .logMessage("LaveLinge>> ON: "+ ((Controller)
-		// this.getTaskOwner()).laveout.isOn() + " Conso: " + ((Controller)
-		// this.getTaskOwner()).laveout.getConso());
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 100, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
-		//
-		// this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-		// @Override
-		// public void run() {
-		// try {
-		// ((Controller) this.getTaskOwner()).groupeout.on();
-		// while (((Controller) this.getTaskOwner()).groupeout.isOn()) {
-		// if (((Controller) this.getTaskOwner()).groupeout.isOn()) {
-		// ((Controller) this.getTaskOwner()).logMessage("Groupe Electro>> ON prod : ["
-		// + ((Controller) this.getTaskOwner()).groupeout.getEnergy() + "]"
-		// + " fuel at : " + ((Controller) this.getTaskOwner()).groupeout.fuelQuantity()
-		// + " / " + EngineGeneratorSetting.FUEL_CAPACITY);
-		// }
-		// Thread.sleep(2 * ControllerSetting.UPDATE_RATE);
-		// ((Controller)
-		// this.getTaskOwner()).groupeout.addFuel(EngineGeneratorSetting.FUEL_CAPACITY);
-		//
-		// }
-		// } catch (Exception e) {
-		// throw new RuntimeException(e);
-		// }
-		// }
-		// }, 3000, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Controleur shutdown");
 		try {
 			this.cptout.unpublishPort();
 			this.refriout.unpublishPort();
@@ -380,7 +225,6 @@ public class Controller extends AbstractCyPhyComponent implements EmbeddingCompo
 		} else if(name.equals("stateFridge")){
 			boolean on  = this.refriout.isOn();
 			boolean isWorking = this.refriout.isWorking();
-			
 			if(on && isWorking) {
 				return FridgeConsumption.RESUMED;
 			}

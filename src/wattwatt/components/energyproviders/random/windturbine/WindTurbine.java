@@ -97,8 +97,6 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
 
-		// Toggle logging on to get a log on the screen.
-		this.toggleLogging();
 	}
 	
 	// -------------------------------------------------------------------------
@@ -120,69 +118,10 @@ public class WindTurbine extends AbstractCyPhyComponent implements EmbeddingComp
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-//		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
-//		HashMap<String, Object> simParams = new HashMap<String, Object>();
-//		simParams.put(URIS.WIND_TURBINE_URI, this);
-//		simParams.put(
-//				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INITIAL_DELAY,
-//				10.0) ;
-//		simParams.put(
-//				WindTurbineSensorModel.URI + ":" + WindTurbineSensorModel.INTERDAY_DELAY,
-//				100.0) ;
-//		simParams.put(
-//				WindTurbineModel.URI + ":" + WindTurbineModel.PRODUCTION_SERIES + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("Production", "Time (min)", "Production (W)",
-//						3 * WattWattMain.getPlotterWidth(),
-//						0,
-//						WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight())) ;
-//		
-//		this.asp.setSimulationRunParameters(simParams);
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-//		
-//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//						((WindTurbine) this.getTaskOwner()).isOnSim = 
-//								(((boolean) asp.getModelStateValue(WashingMachineModel.URI, "isOn")));
-//						((WindTurbine) this.getTaskOwner()).productionSim = 
-//								(((double) asp.getModelStateValue(WashingMachineModel.URI, "production")));
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}, 0, 1000, TimeUnit.MILLISECONDS);
-		/*
-		this.scheduleTask(new AbstractComponent.AbstractTask() {
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						((Eolienne) this.getTaskOwner()).behave();
-						((Eolienne) this.getTaskOwner())
-								.logMessage("Production : [" + ((Eolienne) this.getTaskOwner()).production + "]");
-						Thread.sleep(EolienneReglage.REGUL_RATE);
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}, 100, TimeUnit.MILLISECONDS);*/
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("Eolienne shutdown");
 		try {
 			this.eoin.unpublishPort();
 		} catch (Exception e) {

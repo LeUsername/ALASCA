@@ -108,9 +108,6 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 		this.asp.setSimulationArchitecture(localArchitecture);
 		// Install the plug-in on the component, starting its own life-cycle.
 		this.installPlugin(this.asp);
-
-		// Toggle logging on to get a log on the screen.
-		this.toggleLogging();
 	}
 	
 	// -------------------------------------------------------------------------
@@ -131,76 +128,10 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 	@Override
 	public void execute() throws Exception {
 		super.execute();
-//		SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 10L;
-//		HashMap<String, Object> simParams = new HashMap<String, Object>();
-//		// Set the component ref to another key
-//		simParams.put(URIS.WASHING_MACHINE_URI, this);
-//		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTBU,
-//				WashingMachineUserBehaviour.MEAN_TIME_BETWEEN_USAGES);
-//		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWE,
-//				WashingMachineUserBehaviour.MEAN_TIME_WORKING_ECO);
-//		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.MTWP,
-//				WashingMachineUserBehaviour.MEAN_TIME_WORKING_PREMIUM);
-//		simParams.put(WashingMachineUserModel.URI + ":" + WashingMachineUserModel.STD, 10.0);
-//
-//		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_ECO,
-//				WashingMachineSetting.CONSO_ECO_MODE_SIM);
-//		simParams.put(WashingMachineModel.URI + ":" + WashingMachineModel.CONSUMPTION_PREMIUM,
-//				WashingMachineSetting.CONSO_PREMIUM_MODE_SIM);
-//		simParams.put(WashingMachineModel.URI + ":" + WashingMachineUserModel.STD, 10.0);
-//
-//		simParams.put(
-//				WashingMachineUserModel.URI + ":" + WashingMachineUserModel.ACTION + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("LaveLingeUserModel", "Time (min)", "User actions", 0,
-//						WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlotterHeight()));
-//
-//		simParams.put(
-//				WashingMachineModel.URI + ":" + WashingMachineModel.INTENSITY_SERIES + ":"
-//						+ PlotterDescription.PLOTTING_PARAM_NAME,
-//				new PlotterDescription("LaveLingeModel", "Time (min)", "Consommation (W)", 0,
-//						2 * WattWattMain.getPlotterHeight(), WattWattMain.getPlotterWidth(),
-//						WattWattMain.getPlottstateerHeight()));
-//		
-//		this.asp.toggleDebugMode(); // Debug
-//		this.asp.setSimulationRunParameters(simParams);
-//		// Start the simulation.
-//		this.runTask(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					asp.doStandAloneSimulation(0.0, TimeScale.WEEK);
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		});
-//
-//		this.scheduleTaskAtFixedRate(new AbstractComponent.AbstractTask() {
-//			@Override
-//			public void run() {
-//				try {
-//					// not currently using thoses ////////////////////
-//						((WashingMachine) this.getTaskOwner()).isOnSim = (((boolean) asp
-//								.getModelStateValue(WashingMachineModel.URI, "isOn")));
-//						((WashingMachine) this.getTaskOwner()).isWorkingSim = (((boolean) asp
-//								.getModelStateValue(WashingMachineModel.URI, "isWorking")));
-//						((WashingMachine) this.getTaskOwner()).consoSim = (((double) asp
-//								.getModelStateValue(WashingMachineModel.URI, "consomation")));
-//						((WashingMachine) this.getTaskOwner()).state = (((WashingMachineMode) asp
-//								.getModelStateValue(WashingMachineModel.URI, "lavageMode")));
-//					//////////////////////////////////////////////////
-//				} catch (Exception e) {
-//					throw new RuntimeException(e);
-//				}
-//			}
-//		}, 0, ControllerSetting.UPDATE_RATE, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public void shutdown() throws ComponentShutdownException {
-		this.logMessage("LaveLinge shutdown");
 		try {
 			this.lavein.unpublishPort();
 		} catch (Exception e) {
@@ -234,7 +165,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 			this.conso = (double) value;
 		
 		}else if (name.equals("start")) {
-			this.On(); // revoir les planifable pour faire marcher le start at et tout
+			this.On(); 
 		} 
 		else if (name.equals("stop")) {
 			this.Off();
