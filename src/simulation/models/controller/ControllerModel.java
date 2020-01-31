@@ -10,6 +10,7 @@ import fr.sorbonne_u.components.cyphy.interfaces.EmbeddingComponentAccessI;
 import fr.sorbonne_u.devs_simulation.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
+import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -361,27 +362,21 @@ public class ControllerModel extends AtomicModel {
 			try {
 				if (this.triggeredDecisionEngineGenerator != this.lastDecisionEngineGenerator) {
 					if (this.triggeredDecisionEngineGenerator == Decision.START_ENGINE) {
-						System.out.println("1");
 						this.componentRef.setEmbeddingComponentStateValue("startEngine", null);
 					} else if (this.triggeredDecisionEngineGenerator == Decision.STOP_ENGINE) {
-						System.out.println("2");
 						this.componentRef.setEmbeddingComponentStateValue("stopEngine", null);
 					}
 				} else if (this.triggeredDecisionFridge != this.lastDecisionFridge) {
 					if (this.triggeredDecisionFridge == Decision.SUSPEND_FRIDGE) {
-						System.out.println("3");
 						this.componentRef.setEmbeddingComponentStateValue("suspendFridge", null);
 					} else if (this.triggeredDecisionFridge == Decision.RESUME_FRIDGE) {
-						System.out.println("4");
 						this.componentRef.setEmbeddingComponentStateValue("resumeFridge", null);
 					}
 				}
 				 else if (this.triggeredDecisionWashingMachine != this.lastDecisionWashingMachine) {
 						if (this.triggeredDecisionWashingMachine == Decision.START_WASHING) {
-							System.out.println("5");
 							this.componentRef.setEmbeddingComponentStateValue("startWM", null);
 						} else if (this.triggeredDecisionWashingMachine == Decision.STOP_WASHING) {
-							System.out.println("6");
 							this.componentRef.setEmbeddingComponentStateValue("stopWM", null);
 						}
 					}
@@ -429,31 +424,12 @@ public class ControllerModel extends AtomicModel {
 	@Override
 	public void userDefinedExternalTransition(Duration elapsedTime) {
 		if (componentRef == null) {
-			// if (this.hasDebugLevel(1)) {
-			// this.logMessage("userDefinedExternalTransition|"
-			// + this.EGState + ">>>>>>>>>>>>>>>") ;
-			// }
 
 			ArrayList<EventI> current = this.getStoredEventAndReset();
-
-			for (int i = 0; i < current.size(); i++) {
-
-				if (current.get(i) instanceof EngineGeneratorProductionEvent) {
-					this.productionEngineGenerator = ((EngineGeneratorProductionEvent.Reading) ((EngineGeneratorProductionEvent) current
-							.get(i)).getEventInformation()).value;
-					this.logMessage("userDefinedExternalTransition|" + this.getCurrentStateTime() + "|EG production = "
-							+ this.productionEngineGenerator);
-				} else if (current.get(i) instanceof WindTurbineProductionEvent) {
-					this.productionWindTurbine = ((WindTurbineProductionEvent.Reading) ((WindTurbineProductionEvent) current
-							.get(i)).getEventInformation()).value;
-					this.logMessage("userDefinedExternalTransition|" + this.getCurrentStateTime() + "|WT production = "
-							+ this.productionWindTurbine);
-				} else if (current.get(i) instanceof ConsumptionEvent) {
-					this.consumption = ((ConsumptionEvent.Reading) ((ConsumptionEvent) current.get(i))
-							.getEventInformation()).value;
-				}
-			}
-			// GroupeElectrogeneState oldState = this.EGState ;
+			
+			Event ce = (Event) current.get(0);
+			ce.executeOn(this);
+			
 			double production = this.productionEngineGenerator + this.productionWindTurbine;
 
 			if (this.EGState == EngineGeneratorState.ON) {
@@ -598,14 +574,13 @@ public class ControllerModel extends AtomicModel {
 
 					this.mustTransmitDecision = true;
 				}
-			} if(this.WMState == WashingMachineState.WORKING) {
+			}else if(this.WMState == WashingMachineState.WORKING) {
 				if (production <= this.consumption) {
 					this.triggeredDecisionWashingMachine = Decision.STOP_WASHING;
 					this.WMState = WashingMachineState.OFF;
 					this.mustTransmitDecision = true;
 				}
-			}
-			else {
+			} else {
 				assert this.WMState == WashingMachineState.OFF;
 				if (production > this.consumption + 20) {
 					this.triggeredDecisionWashingMachine = Decision.START_WASHING;
@@ -639,7 +614,6 @@ public class ControllerModel extends AtomicModel {
 					}
 				}
 			}
-
 		}
 	}
 
@@ -687,6 +661,14 @@ public class ControllerModel extends AtomicModel {
 
 	public void setConsumption(double consumption) {
 		this.consumption = consumption;
+	}
+	
+	public void setProductionWindTurbine(double prod) {
+		this.productionWindTurbine = prod;
+	}
+	
+	public void setProductionEngineGenerator(double prod) {
+		this.productionEngineGenerator = prod;
 	}
 }
 // -----------------------------------------------------------------------------

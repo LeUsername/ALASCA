@@ -22,7 +22,7 @@ public class EngineGeneratorSetting {
 	/**
 	 * The value that we will use to compute how much energy is produce depending on how much fuel we burn.
 	 */
-	public static final int PROD_THR = 5;
+	public static final int PROD_THR = 2;
 	
 	/**
 	 * The Rate at wich the engine generator will send his production.

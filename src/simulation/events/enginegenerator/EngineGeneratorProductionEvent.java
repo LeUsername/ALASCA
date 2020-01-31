@@ -3,6 +3,7 @@ package simulation.events.enginegenerator;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
+import simulation.models.controller.ControllerModel;
 
 public class EngineGeneratorProductionEvent extends AbstractEngineGeneratorEvent {
 
@@ -47,9 +48,9 @@ public class EngineGeneratorProductionEvent extends AbstractEngineGeneratorEvent
 	@Override
 	public void	executeOn(AtomicModel model)
 	{
-//		assert	model instanceof ElectricMeterModel ;
-//
-//		ElectricMeterModel m = (ElectricMeterModel)model ;
-//		m.setProduction(((Reading)this.getEventInformation()).value);
+		assert	model instanceof ControllerModel ;
+
+		ControllerModel m = (ControllerModel)model ;
+		m.setProductionEngineGenerator(((Reading)this.getEventInformation()).value);
 	}
 }

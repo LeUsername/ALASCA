@@ -8,7 +8,6 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import simulation.models.windturbine.WindTurbineCoupledModel;
-import simulation.models.windturbine.WindTurbineModel;
 import simulation.plugins.WindTurbineSimulatorPlugin;
 import simulation.tools.windturbine.WindTurbineState;
 import wattwatt.interfaces.controller.IController;

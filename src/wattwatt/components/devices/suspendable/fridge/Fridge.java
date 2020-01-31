@@ -9,7 +9,6 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import simulation.models.fridge.FridgeCoupledModel;
-import simulation.models.fridge.FridgeModel;
 import simulation.plugins.FridgeSimulatorPlugin;
 import simulation.tools.fridge.FridgeConsumption;
 import simulation.tools.fridge.FridgeDoor;
@@ -104,7 +103,7 @@ public class Fridge extends AbstractCyPhyComponent implements EmbeddingComponent
 		this.consumptionState = FridgeConsumption.SUSPENDED;
 		this.currentDoorState = FridgeDoor.CLOSED;
 		this.intensity = 0.0;
-		this.temperature = (double) this.asp.getModelStateValue(FridgeModel.URI, "temperature");
+		this.temperature = 2.0;
 		this.on();
 		this.tracer.setRelativePosition(1, 0);
 	}

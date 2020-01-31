@@ -520,10 +520,10 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
 		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 		simParams.put(
-				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 5.0) ;
+				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 3.0) ;
 		simParams.put(
 				FridgeModel.URI + ":" + FridgeModel.MIN_TEMPERATURE, 1.0) ;
-		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 3.0) ;
+		simParams.put(FridgeModel.URI + ":" + FridgeModel.INITIAL_TEMP, 2.0) ;
 		simParams.put(
 				FridgeSensorModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 2.5) ;
 		simParams.put(

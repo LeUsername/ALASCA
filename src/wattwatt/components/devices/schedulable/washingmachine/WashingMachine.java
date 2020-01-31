@@ -233,7 +233,7 @@ public class WashingMachine extends AbstractCyPhyComponent implements EmbeddingC
 		if (name.equals("consumption")) {
 			this.conso = (double) value;
 		
-		}else if (name.equals("startAt")) {
+		}else if (name.equals("start")) {
 			this.On(); // revoir les planifable pour faire marcher le start at et tout
 		} 
 		else if (name.equals("stop")) {

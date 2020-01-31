@@ -253,7 +253,6 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 				Duration d;
 				if (this.nextEvent.equals(StartEvent.class)) {
 					
-
 					d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
 					Time t = this.getCurrentStateTime().add(d);
@@ -264,7 +263,9 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
 								actionToInteger(EngineGeneratorUserAction.START));
 					}
+					
 					this.componentRef.setEmbeddingComponentStateValue("start", null);
+					
 				} else if (this.nextEvent.equals(StopEvent.class)) {
 					
 					d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75),
@@ -276,7 +277,9 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
 								actionToInteger(EngineGeneratorUserAction.REFILL));
 					}
+					
 					this.componentRef.setEmbeddingComponentStateValue("stop", null);
+					
 				} else if (this.nextEvent.equals(RefillEvent.class)) {
 					
 					d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75),
@@ -288,7 +291,9 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
 								actionToInteger(EngineGeneratorUserAction.STOP));
 					}
+					
 					this.componentRef.setEmbeddingComponentStateValue("refill", null);
+					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
