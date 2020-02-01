@@ -14,17 +14,41 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
-import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class })
+
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ControllerStubModel</code> implements a simplified model of 
+* a energy provider device
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used to test that the controller can receive energy production event from other device
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class ControllerStubModel extends AtomicES_Model {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static class ControllerStubModelReport extends AbstractSimulationReport {
@@ -46,21 +70,8 @@ public class ControllerStubModel extends AtomicES_Model {
 	/** URI to be used when creating the model. */
 	public static final String URI = URIS.CONTROLLER_STUB_MODEL_URI;
 
-	// Model simulation implementation variables
-	/** initial delay before sending the first switch on event. */
-	protected double initialDelay;
-
-	/** delay between uses of the hair dryer from one day to another. */
-	protected double interdayDelay;
-
-	/** mean time between uses of the hair dryer in the same day. */
-	protected double meanTimeBetweenUsages;
-
-	/** during one use, mean time the hair dryer is at high temperature. */
-	protected double meanTimeWorking;
-
 	/** during one use, mean time the hair dryer is at low temperature. */
-	protected double meanTimeAtRefill;
+	protected double meanTimeBetweenSend;
 
 	/** next event to be sent. */
 	protected Class<?> nextEvent;
@@ -76,17 +87,11 @@ public class ControllerStubModel extends AtomicES_Model {
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.rg = new RandomDataGenerator();
-		// create a standard logger (logging on the terminal)
-		this.setLogger(new StandardLogger());
 	}
 
 	@Override
 	public void initialiseState(Time initialTime) {
-		this.initialDelay = 0.0;
-		this.interdayDelay = 100;
-		this.meanTimeBetweenUsages = 150;
-		this.meanTimeWorking = 20;
-		this.meanTimeAtRefill = 20;
+		this.meanTimeBetweenSend = 20;
 		this.production = 5.0;
 		this.consommation = 5.0;
 
@@ -94,8 +99,8 @@ public class ControllerStubModel extends AtomicES_Model {
 
 		super.initialiseState(initialTime);
 
-		Duration d1 = new Duration(this.initialDelay, this.getSimulatedTimeUnit());
-		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
+		Duration d1 = new Duration(0, this.getSimulatedTimeUnit());
+		Duration d2 = new Duration(2.0 * this.meanTimeBetweenSend * this.rg.nextBeta(1.75, 1.75),
 				this.getSimulatedTimeUnit());
 		Time t = this.getCurrentStateTime().add(d1).add(d2);
 		this.scheduleEvent(new EngineGeneratorProductionEvent(t, this.production));
@@ -145,13 +150,13 @@ public class ControllerStubModel extends AtomicES_Model {
 
 		if (this.nextEvent.equals(ConsumptionEvent.class)) {
 
-			d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+			d = new Duration(2.0 * this.meanTimeBetweenSend * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			Time t = this.getCurrentStateTime().add(d);
 
 			this.scheduleEvent(new EngineGeneratorProductionEvent(t, this.production + this.rg.nextUniform(-5, 5) ));
 
 		} else if (this.nextEvent.equals(EngineGeneratorProductionEvent.class)) {
-			d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
+			d = new Duration(2.0 * this.meanTimeBetweenSend * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 			this.scheduleEvent(new ConsumptionEvent(this.getCurrentStateTime().add(d), this.consommation + this.rg.nextUniform(-5, 5)));
 
 		}

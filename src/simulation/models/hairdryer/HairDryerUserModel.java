@@ -95,21 +95,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 	/**
 	 * create a hair dryer user model instance.
 	 * 
-	 * <p>
-	 * <strong>Contract</strong>
-	 * </p>
-	 * 
-	 * <pre>
-	 * pre	simulatedTimeUnit != null
-	 * pre	simulationEngine == null ||
-	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
-	 * post	this.getURI() != null
-	 * post	uri != null implies this.getURI().equals(uri)
-	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
-	 * post	simulationEngine != null implies
-	 * 			this.getSimulationEngine().equals(simulationEngine)
-	 * </pre>
-	 *
 	 * @param uri
 	 *            unique identifier of the model.
 	 * @param simulatedTimeUnit
