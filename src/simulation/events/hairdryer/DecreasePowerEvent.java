@@ -2,7 +2,6 @@ package simulation.events.hairdryer;
 
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
-import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.hairdryer.HairDryerModel;
 
@@ -38,24 +37,6 @@ public class DecreasePowerEvent extends AbstractHairDryerEvent {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * create a DecreasePower event.
-	 * 
-	 * <p>
-	 * <strong>Contract</strong>
-	 * </p>
-	 * 
-	 * <pre>
-	 * pre	timeOfOccurrence != null 
-	 * post	this.getTimeOfOccurrence().equals(timeOfOccurrence)
-	 * </pre>
-	 *
-	 * @param timeOfOccurrence time of occurrence of the event.
-	 */
-	public DecreasePowerEvent(Time timeOfOccurrence, EventInformationI content) {
-		super(timeOfOccurrence, content);
-	}
 
 	/**
 	 * create a DecreasePower event.

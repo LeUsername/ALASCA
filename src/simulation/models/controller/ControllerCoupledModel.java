@@ -28,7 +28,29 @@ import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import wattwatt.tools.URIS;
 
-// TODO
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ControllerCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the controller in the WattWatt 
+* simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class ControllerCoupledModel extends		CoupledModel{
 	// -------------------------------------------------------------------------
 	// Constants and variables

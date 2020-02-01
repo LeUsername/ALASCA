@@ -8,7 +8,7 @@ import simulation.models.electricmeter.ElectricMeterModel;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>HairDryerConsumptionEvent</code> defines the event 
-* used by the haire dryer to send his energy consumption
+* used by the hair dryer to send its energy consumption
 *
 * <p><strong>Description</strong></p>
 * 
@@ -36,10 +36,10 @@ public class HairDryerConsumptionEvent extends AbstractHairDryerEvent {
 	 * invariant		true
 	 * </pre>
 	 * 
-	* <p>Created on : 2020-01-27</p>
-* 
-* @author	<p>Bah Thierno, Zheng Pascal</p>
-*/
+	 * <p>Created on : 2020-01-27</p>
+	 * 
+	 * @author	<p>Bah Thierno, Zheng Pascal</p>
+	 */
 	public static class		Reading
 	implements EventInformationI
 	{
@@ -88,6 +88,9 @@ public class HairDryerConsumptionEvent extends AbstractHairDryerEvent {
 												+ " mAh";
 	}
 	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#executeOn(fr.sorbonne_u.devs_simulation.models.AtomicModel)
+	 */
 	@Override
 	public void	executeOn(AtomicModel model)
 	{

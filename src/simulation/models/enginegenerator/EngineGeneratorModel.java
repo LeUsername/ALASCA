@@ -23,13 +23,13 @@ import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.enginegenerator.AbstractEngineGeneratorEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
-import simulation.events.enginegenerator.StartEvent;
-import simulation.events.enginegenerator.StopEvent;
+import simulation.events.enginegenerator.StartEngineEvent;
+import simulation.events.enginegenerator.StopEngineEvent;
 import simulation.tools.enginegenerator.EngineGeneratorState;
 import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
-@ModelExternalEvents(imported = { RefillEvent.class, StartEvent.class, StopEvent.class, StartEngineGeneratorEvent.class,
+@ModelExternalEvents(imported = { RefillEvent.class, StartEngineEvent.class, StopEngineEvent.class, StartEngineGeneratorEvent.class,
 		StopEngineGeneratorEvent.class, TicEvent.class }, exported = { EngineGeneratorProductionEvent.class })
 public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 

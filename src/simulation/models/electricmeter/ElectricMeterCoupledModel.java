@@ -30,6 +30,29 @@ import fr.sorbonne_u.devs_simulation.utils.StandardCoupledModelReport;
 import simulation.events.electricmeter.ConsumptionEvent;
 import wattwatt.tools.URIS;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ElectricMeterCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the electric meter
+* in the WattWatt simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class ElectricMeterCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables

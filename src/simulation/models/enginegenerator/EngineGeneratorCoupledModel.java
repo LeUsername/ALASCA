@@ -31,10 +31,33 @@ import simulation.events.controller.StartEngineGeneratorEvent;
 import simulation.events.controller.StopEngineGeneratorEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
-import simulation.events.enginegenerator.StartEvent;
-import simulation.events.enginegenerator.StopEvent;
+import simulation.events.enginegenerator.StartEngineEvent;
+import simulation.events.enginegenerator.StopEngineEvent;
 import wattwatt.tools.URIS;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>EngineGeneratorCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the engine generator in the WattWatt 
+* simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class EngineGeneratorCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -95,11 +118,11 @@ public class EngineGeneratorCoupledModel extends CoupledModel {
 		submodels.add(TicModel.URI + "-3");
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(EngineGeneratorUserModel.URI, StartEvent.class);
-		EventSink[] to1 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEvent.class) };
+		EventSource from1 = new EventSource(EngineGeneratorUserModel.URI, StartEngineEvent.class);
+		EventSink[] to1 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEngineEvent.class) };
 		connections.put(from1, to1);
-		EventSource from2 = new EventSource(EngineGeneratorUserModel.URI, StopEvent.class);
-		EventSink[] to2 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEvent.class) };
+		EventSource from2 = new EventSource(EngineGeneratorUserModel.URI, StopEngineEvent.class);
+		EventSink[] to2 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEngineEvent.class) };
 		connections.put(from2, to2);
 		EventSource from3 = new EventSource(EngineGeneratorUserModel.URI, RefillEvent.class);
 		EventSink[] to3 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, RefillEvent.class) };
@@ -108,13 +131,7 @@ public class EngineGeneratorCoupledModel extends CoupledModel {
 		EventSource from5 = new EventSource(TicModel.URI + "-3", TicEvent.class);
 		EventSink[] to5 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, TicEvent.class) };
 		connections.put(from5, to5);
-		
-		/*Map<VariableSource, VariableSink[]> bindings = new HashMap<VariableSource, VariableSink[]>();
-		VariableSource source = new VariableSource("fuelCapacity", Double.class, GroupeElectrogeneModel.URI);
-		VariableSink[] sinks = new VariableSink[] {
-				new VariableSink("fuelCapacity", Double.class, GroupeElectrogeneUserModel.URI) };
-		bindings.put(source, sinks);*/
-		
+				
 		Map<Class<? extends EventI>, EventSink[]> imported = new HashMap<Class<? extends EventI>, EventSink[]>();
 		imported.put(
 				StartEngineGeneratorEvent.class,

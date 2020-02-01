@@ -36,6 +36,29 @@ import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
 import wattwatt.tools.URIS;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>FridgeCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the fridge in the WattWatt 
+* simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class FridgeCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables

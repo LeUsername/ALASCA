@@ -31,10 +31,33 @@ import simulation.events.controller.StartWashingMachineEvent;
 import simulation.events.controller.StopWashingMachineEvent;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
-import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.StartWashingEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import wattwatt.tools.URIS;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WashingMachineCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the washing machine in the WattWatt 
+* simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class WashingMachineCoupledModel extends CoupledModel {
 
 	// -------------------------------------------------------------------------
@@ -94,8 +117,8 @@ public class WashingMachineCoupledModel extends CoupledModel {
 		submodels.add(TicModel.URI + "-3");
 
 		Map<EventSource, EventSink[]> connections = new HashMap<EventSource, EventSink[]>();
-		EventSource from1 = new EventSource(WashingMachineUserModel.URI, StartAtEvent.class);
-		EventSink[] to1 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartAtEvent.class) };
+		EventSource from1 = new EventSource(WashingMachineUserModel.URI, StartWashingEvent.class);
+		EventSink[] to1 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartWashingEvent.class) };
 		connections.put(from1, to1);
 		EventSource from2 = new EventSource(WashingMachineUserModel.URI, EcoModeEvent.class);
 		EventSink[] to2 = new EventSink[] { new EventSink(WashingMachineModel.URI, EcoModeEvent.class) };

@@ -37,8 +37,8 @@ import simulation.events.controller.SuspendFridgeEvent;
 import simulation.events.electricmeter.ConsumptionEvent;
 import simulation.events.enginegenerator.EngineGeneratorProductionEvent;
 import simulation.events.enginegenerator.RefillEvent;
-import simulation.events.enginegenerator.StartEvent;
-import simulation.events.enginegenerator.StopEvent;
+import simulation.events.enginegenerator.StartEngineEvent;
+import simulation.events.enginegenerator.StopEngineEvent;
 import simulation.events.fridge.CloseEvent;
 import simulation.events.fridge.FridgeConsumptionEvent;
 import simulation.events.fridge.OpenEvent;
@@ -50,7 +50,7 @@ import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
-import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.StartWashingEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import simulation.events.windturbine.WindReadingEvent;
 import simulation.events.windturbine.WindTurbineProductionEvent;
@@ -202,11 +202,11 @@ public class WattWattMain {
 			submodels2.add(TicModel.URI + "-2");
 
 			Map<EventSource, EventSink[]> connections2 = new HashMap<EventSource, EventSink[]>();
-			EventSource from21 = new EventSource(EngineGeneratorUserModel.URI, StartEvent.class);
-			EventSink[] to21 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEvent.class) };
+			EventSource from21 = new EventSource(EngineGeneratorUserModel.URI, StartEngineEvent.class);
+			EventSink[] to21 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StartEngineEvent.class) };
 			connections2.put(from21, to21);
-			EventSource from22 = new EventSource(EngineGeneratorUserModel.URI, StopEvent.class);
-			EventSink[] to22 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEvent.class) };
+			EventSource from22 = new EventSource(EngineGeneratorUserModel.URI, StopEngineEvent.class);
+			EventSink[] to22 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, StopEngineEvent.class) };
 			connections2.put(from22, to22);
 			EventSource from23 = new EventSource(EngineGeneratorUserModel.URI, RefillEvent.class);
 			EventSink[] to23 = new EventSink[] { new EventSink(EngineGeneratorModel.URI, RefillEvent.class) };
@@ -294,8 +294,8 @@ public class WattWattMain {
 			submodels4.add(TicModel.URI + "-4");
 
 			Map<EventSource, EventSink[]> connections4 = new HashMap<EventSource, EventSink[]>();
-			EventSource from41 = new EventSource(WashingMachineUserModel.URI, StartAtEvent.class);
-			EventSink[] to41 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartAtEvent.class) };
+			EventSource from41 = new EventSource(WashingMachineUserModel.URI, StartWashingEvent.class);
+			EventSink[] to41 = new EventSink[] { new EventSink(WashingMachineModel.URI, StartWashingEvent.class) };
 			connections4.put(from41, to41);
 			EventSource from42 = new EventSource(WashingMachineUserModel.URI, EcoModeEvent.class);
 			EventSink[] to42 = new EventSink[] { new EventSink(WashingMachineModel.URI, EcoModeEvent.class) };

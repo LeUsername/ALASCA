@@ -33,15 +33,72 @@ import simulation.tools.fridge.FridgeConsumption;
 import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(imported = { ConsumptionEvent.class, EngineGeneratorProductionEvent.class,
-		WindTurbineProductionEvent.class }, exported = { StartEngineGeneratorEvent.class,
-				StopEngineGeneratorEvent.class, SuspendFridgeEvent.class, ResumeFridgeEvent.class,
-				StartWashingMachineEvent.class, StopWashingMachineEvent.class })
+@ModelExternalEvents(imported = { ConsumptionEvent.class, 
+								  EngineGeneratorProductionEvent.class,
+								  WindTurbineProductionEvent.class },
+					 exported = { StartEngineGeneratorEvent.class,
+							 	  StopEngineGeneratorEvent.class, 
+							 	  SuspendFridgeEvent.class, 
+							 	  ResumeFridgeEvent.class,
+							 	  StartWashingMachineEvent.class, 
+							 	  StopWashingMachineEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ControllerModel</code> implements a simplified model of 
+* a controller in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+ * The controller model has two main variables: consumption and production. 
+ * It imports multiple events providing the consumption and the production
+ * of energy in the household. Given the received values, it triggers 
+ * decisions that are either to the models (in MIL) or cause calls to
+ * functions in the components (in SIL).
+ * </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class ControllerModel extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Inner classes
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>DecisionPiece</code> implements a piece in a piecewise
+	 * representation of the observed decision function.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true	// TODO
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class DecisionPiece {
 		public final double first;
 		public final double last;
@@ -63,6 +120,27 @@ public class ControllerModel extends AtomicModel {
 		}
 	}
 
+	/**
+	 * The class <code>ControllerModelReport</code> implements the simulation
+	 * report of the controller model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class ControllerModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -78,6 +156,10 @@ public class ControllerModel extends AtomicModel {
 			return "ControllerModel(" + this.getModelURI() + ")";
 		}
 	}
+
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
 
 	/**
 	 * 
@@ -105,18 +187,51 @@ public class ControllerModel extends AtomicModel {
 	private static final String CONTROLLER_STUB = "controller-stub";
 	public static final String CONTROLLER_STUB_SERIES = "controller-stub-series";
 
+	/**
+	 * energy consumption (in Watt) retrieved from the electric meter
+	 */
 	protected double consumption;
+	/**
+	 * trigger to notify the controller model that a decision has to be sent
+	 */
 	protected boolean mustTransmitDecision;
+	/**
+	 * energy production (in Watt) provided by the engine generator
+	 */
 	protected double productionEngineGenerator;
+	/**
+	 * energy production (in Watt) provide by the wind turbine
+	 */
 	protected double productionWindTurbine;
 
+	/**
+	 * state of the engine generator
+	 */
 	protected EngineGeneratorState EGState;
+	/**
+	 * state of the fridge
+	 */
 	protected FridgeConsumption FridgeState;
+	/**
+	 * state of the washing machine
+	 */
 	protected WashingMachineState WMState;
 
+	/**
+	 * next decision to be sent to the engine generator
+	 */
 	protected Decision triggeredDecisionEngineGenerator;
+	/**
+	 * last decision sent to the engine generator
+	 */
 	protected Decision lastDecisionEngineGenerator;
+	/**
+	 * time of the last decision sent to the engine generator
+	 */
 	protected double lastDecisionTimeEngineGenerator;
+	/**
+	 * every decision sent to the engine generator are store in this variable
+	 */
 	protected final Vector<DecisionPiece> decisionFunctionEngineGenerator;
 
 	protected Decision triggeredDecisionFridge;
@@ -129,10 +244,19 @@ public class ControllerModel extends AtomicModel {
 	protected double lastDecisionTimeWashingMachine;
 	protected final Vector<DecisionPiece> decisionFunctionWashingMachine;
 
+	/**
+	 * plotter for the production level over time
+	 */
 	protected XYPlotter productionPlotter;
 
+	/**
+	 * plotter for the decision on the components over time
+	 */
 	protected final Map<String, XYPlotter> modelsPlotter;
 
+	/** reference on the object representing the component that holds the
+	 *  model; enables the model to access the state of this component
+	 */
 	protected EmbeddingComponentAccessI componentRef;
 
 	// -------------------------------------------------------------------------

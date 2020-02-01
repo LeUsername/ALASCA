@@ -21,11 +21,11 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
-import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.StartWashingEvent;
 import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(exported = { StartAtEvent.class, EcoModeEvent.class, PremiumModeEvent.class })
+@ModelExternalEvents(exported = { StartWashingEvent.class, EcoModeEvent.class, PremiumModeEvent.class })
 public class WashingMachineUserModel extends AtomicES_Model {
 
 	public static class WashingMachineUserModelReport extends AbstractSimulationReport {
@@ -139,7 +139,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 				this.getSimulatedTimeUnit());
 		Time t = this.getCurrentStateTime().add(d1).add(d2);
-		this.scheduleEvent(new StartAtEvent(t, this.startingTimeDelay));
+		this.scheduleEvent(new StartWashingEvent(t, this.startingTimeDelay));
 
 		this.nextTimeAdvance = this.timeAdvance();
 		this.timeOfNextEvent = this.getCurrentStateTime().add(this.nextTimeAdvance);
@@ -181,7 +181,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		if (componentRef == null) {
 			Duration d;
-			if (this.nextEvent.equals(StartAtEvent.class)) {
+			if (this.nextEvent.equals(StartWashingEvent.class)) {
 				Random r = new Random();
 				if (r.nextFloat() > 0.75) {
 					d = new Duration(
@@ -210,7 +210,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 						this.getSimulatedTimeUnit());
 				Time t = this.getCurrentStateTime().add(d);
 
-				this.scheduleEvent(new StartAtEvent(t, this.startingTimeDelay));
+				this.scheduleEvent(new StartWashingEvent(t, this.startingTimeDelay));
 
 				Random r = new Random();
 				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
@@ -224,7 +224,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 						this.getSimulatedTimeUnit());
 
-				this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d), this.startingTimeDelay));
+				this.scheduleEvent(new StartWashingEvent(this.getCurrentStateTime().add(d), this.startingTimeDelay));
 
 				Random r = new Random();
 				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;
@@ -237,7 +237,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 			}
 		} else {
 			Duration d;
-			if (this.nextEvent.equals(StartAtEvent.class)) {
+			if (this.nextEvent.equals(StartWashingEvent.class)) {
 				try {
 					this.componentRef.setEmbeddingComponentStateValue("start", null);
 				} catch (Exception e) {
@@ -275,7 +275,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 						this.getSimulatedTimeUnit());
 				Time t = this.getCurrentStateTime().add(d);
 
-				this.scheduleEvent(new StartAtEvent(t, this.startingTimeDelay));
+				this.scheduleEvent(new StartWashingEvent(t, this.startingTimeDelay));
 
 				Random r = new Random();
 				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(2800) - 1400;
@@ -294,7 +294,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 						this.getSimulatedTimeUnit());
 
-				this.scheduleEvent(new StartAtEvent(this.getCurrentStateTime().add(d), this.startingTimeDelay));
+				this.scheduleEvent(new StartWashingEvent(this.getCurrentStateTime().add(d), this.startingTimeDelay));
 
 				Random r = new Random();
 				this.startingTimeDelay = this.meanTimeBetweenUsages + r.nextInt(1000) - 500;

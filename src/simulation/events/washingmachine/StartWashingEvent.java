@@ -7,13 +7,55 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.events.controller.StopWashingMachineEvent;
 import simulation.models.washingmachine.WashingMachineModel;
 
-public class StartAtEvent extends AbstractWashingMachineEvent{
+//-----------------------------------------------------------------------------
+/**
+* The class <code>StartWashingEvent</code> defines the event which starts
+* the washing machine
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* <p>
+* <strong>Invariant</strong>
+* </p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+public class StartWashingEvent extends AbstractWashingMachineEvent{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The class <code>StartingTimeDelay</code> implements the 
+	 * time at which the washing machine starts
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+	 * <p>Created on : 2020-01-27</p>
+	 * 
+	 * @author	<p>Bah Thierno, Zheng Pascal</p>
+	 */
 	public static class		StartingTimeDelay
 	implements EventInformationI
 	{
@@ -27,12 +69,12 @@ public class StartAtEvent extends AbstractWashingMachineEvent{
 		}
 	}
 
-	public StartAtEvent(Time timeOfOccurrence, EventInformationI content) {
+	public StartWashingEvent(Time timeOfOccurrence, EventInformationI content) {
 		super(timeOfOccurrence, content);
 		
 	}
 	
-	public StartAtEvent(Time timeOfOccurrence, double delay) {
+	public StartWashingEvent(Time timeOfOccurrence, double delay) {
 		super(timeOfOccurrence, new StartingTimeDelay(delay));
 	}
 	@Override

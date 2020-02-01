@@ -23,7 +23,7 @@ import simulation.events.controller.StopWashingMachineEvent;
 import simulation.events.washingmachine.AbstractWashingMachineEvent;
 import simulation.events.washingmachine.EcoModeEvent;
 import simulation.events.washingmachine.PremiumModeEvent;
-import simulation.events.washingmachine.StartAtEvent;
+import simulation.events.washingmachine.StartWashingEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import simulation.tools.washingmachine.WashingMachineState;
 import wattwatt.tools.URIS;
@@ -32,7 +32,7 @@ import wattwatt.tools.washingmachine.WashingMachineSetting;
 
 @ModelExternalEvents(imported = { EcoModeEvent.class, 
 								  PremiumModeEvent.class, 
-								  StartAtEvent.class, 
+								  StartWashingEvent.class, 
 								  TicEvent.class,
 								  StopWashingMachineEvent.class,
 								  StartWashingMachineEvent.class },

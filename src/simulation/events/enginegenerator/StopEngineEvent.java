@@ -7,7 +7,8 @@ import simulation.models.enginegenerator.EngineGeneratorModel;
 
 //----------------------------------------------------------------------------
 /**
-* The class <code>RefillEvent</code> define an event sent by the engine generator user to start the engine generator fuel 
+* The class <code>StopEngineEvent</code> define an event sent by 
+* the engine generator user to stop the engine generator 
 *
 * 
 * <p>
@@ -19,35 +20,30 @@ import simulation.models.enginegenerator.EngineGeneratorModel;
 *        Bah Thierno, Zheng Pascal
 *        </p>
 */
-public class StartEvent extends AbstractEngineGeneratorEvent{
+public class StopEngineEvent extends AbstractEngineGeneratorEvent {
 
-	
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Create an StartEvent sent by the engine generator user
+	 * Create an StopEvent sent by the engine generator user
 	 * 
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public StartEvent(Time timeOfOccurrence) {
+	public StopEngineEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
-
+	
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		if(e instanceof RefillEvent) {
-			return false;
-		} else {
-			return true;
-		}
+		return true ;
 	}
 	
 	@Override
 	public String		eventAsString()
 	{
-		return "StartEvent(" + this.eventContentAsString() + ")" ;
+		return "StopEvent(" + this.eventContentAsString() + ")" ;
 	}
 	
 	/**
@@ -58,6 +54,7 @@ public class StartEvent extends AbstractEngineGeneratorEvent{
 		assert model instanceof EngineGeneratorModel;
 
 		EngineGeneratorModel m = (EngineGeneratorModel) model;
-		m.start();
+		m.stop();
 	}
+
 }

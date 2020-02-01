@@ -35,6 +35,29 @@ import simulation.events.hairdryer.SwitchOffEvent;
 import simulation.events.hairdryer.SwitchOnEvent;
 import wattwatt.tools.URIS;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>HairDryerCoupledModel</code> implements a coupled model used to gather
+* together all of the model representing the hair dryer in the WattWatt 
+* simulation
+*
+* <p><strong>Description</strong></p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class HairDryerCoupledModel extends CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables

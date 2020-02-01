@@ -18,13 +18,13 @@ import fr.sorbonne_u.devs_simulation.utils.AbstractSimulationReport;
 import fr.sorbonne_u.utils.PlotterDescription;
 import fr.sorbonne_u.utils.XYPlotter;
 import simulation.events.enginegenerator.RefillEvent;
-import simulation.events.enginegenerator.StartEvent;
-import simulation.events.enginegenerator.StopEvent;
+import simulation.events.enginegenerator.StartEngineEvent;
+import simulation.events.enginegenerator.StopEngineEvent;
 import simulation.tools.enginegenerator.EngineGeneratorUserAction;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(exported = { StartEvent.class, RefillEvent.class,
-		 StopEvent.class})
+@ModelExternalEvents(exported = { StartEngineEvent.class, RefillEvent.class,
+		 StopEngineEvent.class})
 public class EngineGeneratorUserModel extends AtomicES_Model {
 
 	public static class EngineGeneratorUserModelReport extends AbstractSimulationReport {
@@ -151,7 +151,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		Duration d1 = new Duration(this.initialDelay, this.getSimulatedTimeUnit());
 		Duration d2 = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),this.getSimulatedTimeUnit());
 		Time t = this.getCurrentStateTime().add(d1).add(d2);
-		this.scheduleEvent(new StartEvent(t));
+		this.scheduleEvent(new StartEngineEvent(t));
 
 		this.nextTimeAdvance = this.timeAdvance();
 		this.timeOfNextEvent = this.getCurrentStateTime().add(this.nextTimeAdvance);
@@ -203,12 +203,12 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 
 		if (componentRef == null) {
 			Duration d;
-			if (this.nextEvent.equals(StartEvent.class) ) {
+			if (this.nextEvent.equals(StartEngineEvent.class) ) {
 
 				d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 				Time t = this.getCurrentStateTime().add(d);
 
-				this.scheduleEvent(new StopEvent(t));
+				this.scheduleEvent(new StopEngineEvent(t));
 				if (this.actionPlotter != null) {
 					this.actionPlotter.addData(
 							ACTION,
@@ -219,7 +219,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 							this.getCurrentStateTime().getSimulatedTime(),
 							actionToInteger(EngineGeneratorUserAction.START)) ;
 				}
-			} else if (this.nextEvent.equals(StopEvent.class)) {
+			} else if (this.nextEvent.equals(StopEngineEvent.class)) {
 
 				d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
 				this.scheduleEvent(new RefillEvent(this.getCurrentStateTime().add(d)));
@@ -236,7 +236,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 			} else if (this.nextEvent.equals(RefillEvent.class)) {
 
 				d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-				this.scheduleEvent(new StartEvent(this.getCurrentStateTime().add(d)));
+				this.scheduleEvent(new StartEngineEvent(this.getCurrentStateTime().add(d)));
 				if (this.actionPlotter != null) {
 					this.actionPlotter.addData(
 							ACTION,
@@ -251,12 +251,12 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		}else {
 			try {
 				Duration d;
-				if (this.nextEvent.equals(StartEvent.class)) {
+				if (this.nextEvent.equals(StartEngineEvent.class)) {
 					
 					d = new Duration(2.0 * this.meanTimeBetweenUsages * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
 					Time t = this.getCurrentStateTime().add(d);
-					this.scheduleEvent(new StopEvent(t));
+					this.scheduleEvent(new StopEngineEvent(t));
 					if (this.actionPlotter != null) {
 						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
 								actionToInteger(EngineGeneratorUserAction.STOP));
@@ -266,7 +266,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 					
 					this.componentRef.setEmbeddingComponentStateValue("start", null);
 					
-				} else if (this.nextEvent.equals(StopEvent.class)) {
+				} else if (this.nextEvent.equals(StopEngineEvent.class)) {
 					
 					d = new Duration(2.0 * this.meanTimeAtRefill * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
@@ -284,7 +284,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 					
 					d = new Duration(2.0 * this.meanTimeUsing * this.rg.nextBeta(1.75, 1.75),
 							this.getSimulatedTimeUnit());
-					this.scheduleEvent(new StartEvent(this.getCurrentStateTime().add(d)));
+					this.scheduleEvent(new StartEngineEvent(this.getCurrentStateTime().add(d)));
 					if (this.actionPlotter != null) {
 						this.actionPlotter.addData(ACTION, this.getCurrentStateTime().getSimulatedTime(),
 								actionToInteger(EngineGeneratorUserAction.REFILL));

@@ -38,22 +38,12 @@ public class CloseEvent  extends AbstractFridgeEvent
 		super(timeOfOccurrence, null) ;
 	}
 
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.events.ES_Event#hasPriorityOver(fr.sorbonne_u.devs_simulation.models.events.EventI)
-	 */
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
 		return true ;
 	}
 
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#eventAsString()
-	 */
 	@Override
 	public String		eventAsString()
 	{

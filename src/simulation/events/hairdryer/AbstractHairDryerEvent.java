@@ -6,7 +6,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 
 //-----------------------------------------------------------------------------
 /**
-* The class <code>AbstractHairDryerEvent</code> defines all events used in the <code>HairDryerCoupledModel</code>
+* The class <code>AbstractHairDryerEvent</code> defines all events 
+* used in the <code>HairDryerCoupledModel</code>
 *
 * <p><strong>Description</strong></p>
 * 

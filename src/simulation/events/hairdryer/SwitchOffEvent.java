@@ -5,28 +5,57 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import simulation.models.hairdryer.HairDryerModel;
 
+//-----------------------------------------------------------------------------
+/**
+* The class <code>SwitchOffEvent</code> defines the event which turns off the 
+* hair dryer
+*
+* <p>
+* <strong>Description</strong>
+* </p>
+* 
+* <p>
+* <strong>Invariant</strong>
+* </p>
+* 
+* <pre>
+* invariant		true
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 public class SwitchOffEvent extends AbstractHairDryerEvent {
-	// -------------------------------------------------------------------------
-	// Constants and variables
-	// -------------------------------------------------------------------------
-
+	
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
-	// -------------------------------------------------------------------------
-	// Constructors
-	// -------------------------------------------------------------------------
-
+	/**
+	 * create a SwitchOffEvent event.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	timeOfOccurrence != null 
+	 * post	this.getTimeOfOccurrence().equals(timeOfOccurrence)
+	 * </pre>
+	 *
+	 * @param timeOfOccurrence time of occurrence of the event.
+	 */
 	public SwitchOffEvent(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
-	// ------------------------------------------------------------------------
-	// Methods
-	// ------------------------------------------------------------------------
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#eventAsString()
-	 */
 	@Override
 	public String eventAsString() {
 		return "HairDryer::SwitchOff";

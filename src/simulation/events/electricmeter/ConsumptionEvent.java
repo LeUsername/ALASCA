@@ -94,7 +94,7 @@ public class ConsumptionEvent extends AbstractElectricMeterEvent {
 		ControllerModel m = (ControllerModel)model ;
 		m.setConsumption(((Reading)this.getEventInformation()).value);
 		
-		// The folling code is used to test the MIL of electric meter with his stub
+		// The following code is used to test the MIL of electric meter with his stub
 //		assert	model instanceof ElectricMeterModel ;
 //		ElectricMeterModel m = (ElectricMeterModel)model ;
 //		m.setConsumption(((Reading)this.getEventInformation()).value);
