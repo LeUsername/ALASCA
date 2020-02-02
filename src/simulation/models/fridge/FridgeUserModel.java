@@ -299,6 +299,11 @@ extends		AtomicES_Model
 							this.getCurrentStateTime().getSimulatedTime(),
 							1.0) ;
 				}
+				
+				double closedTime = this.rg.nextExponential(this.meanTimeBetweenInterruptions);
+				Duration d = new Duration(closedTime, this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
+				this.scheduleEvent(new CloseEvent(t)) ;
 			} else {
 				assert	this.currentState == FridgeDoor.CLOSED ;
 				this.currentState = FridgeDoor.OPENED ;
@@ -313,6 +318,11 @@ extends		AtomicES_Model
 							this.getCurrentStateTime().getSimulatedTime(),
 							0.0) ;
 				}
+				
+				double openedTime = this.rg.nextExponential(this.meanInterruptionDuration);
+				Duration d = new Duration(openedTime, this.getSimulatedTimeUnit());
+				Time t = this.getCurrentStateTime().add(d);
+				this.scheduleEvent(new OpenEvent(t)) ;
 			}
 		}else {
 			try {

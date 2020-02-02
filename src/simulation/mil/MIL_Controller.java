@@ -9,6 +9,7 @@ import fr.sorbonne_u.utils.PlotterDescription;
 import simulation.deployment.WattWattMain;
 import simulation.models.controller.ControllerCoupledModel;
 import simulation.models.controller.ControllerModel;
+import simulation.tools.TimeScale;
 
 //-----------------------------------------------------------------------------
 /**
@@ -57,7 +58,7 @@ public class MIL_Controller {
 			se.setSimulationRunParameters(simParams);
 			se.setDebugLevel(0) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			se.doStandAloneSimulation(0.0, 500.0) ;
+			se.doStandAloneSimulation(0.0, TimeScale.DAY) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

@@ -46,7 +46,7 @@ public class MIL_Fridge {
 			se = localArchitecture.constructSimulator() ;
 			Map<String, Object> simParams = new HashMap<String, Object>() ;
 			
-			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
+			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 500.0) ;
 			simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 			simParams.put(
 					FridgeUserModel.URI + ":" + PlotterDescription.PLOTTING_PARAM_NAME,
@@ -107,7 +107,7 @@ public class MIL_Fridge {
 			se.setDebugLevel(0) ;
 			System.out.println(se.simulatorAsString()) ;
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L ;
-			se.doStandAloneSimulation(0.0, TimeScale.DAY) ;
+			se.doStandAloneSimulation(0.0, TimeScale.WEEK) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

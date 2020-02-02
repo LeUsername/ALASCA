@@ -508,12 +508,9 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 		simParams.put(EngineGeneratorUserModel.URI + ":" + EngineGeneratorUserModel.MEAN_TIME_REFILL,
 				EngineGeneratorUserBehaviour.MEAN_TIME_REFILL);
 		
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
+		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 500.0) ;
 		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 		
-		
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MTBI, 200.0) ;
-		simParams.put(FridgeUserModel.URI + ":" + FridgeUserModel.MID, 10.0) ;
 		simParams.put(
 				FridgeModel.URI + ":" + FridgeModel.MAX_TEMPERATURE, 3.0) ;
 		simParams.put(
@@ -699,7 +696,7 @@ public class WattWattSupervisorComponent extends AbstractComponent {
 				new PlotterDescription(
 						"Fridge Sensor Model",
 						"Time (min)",
-						"Temperature (Celcius)",
+						"Temperature (Celsius)",
 						WattWattMain.ORIGIN_X + 3*WattWattMain.getPlotterWidth(),
 						WattWattMain.ORIGIN_Y + 2*WattWattMain.getPlotterHeight(), 
 						WattWattMain.getPlotterWidth(),
