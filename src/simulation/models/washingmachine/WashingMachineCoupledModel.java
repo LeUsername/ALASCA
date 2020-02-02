@@ -38,8 +38,7 @@ import wattwatt.tools.URIS;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>WashingMachineCoupledModel</code> implements a coupled model used to gather
-* together all of the model representing the washing machine in the WattWatt 
-* simulation
+* together all of the model representing the washing machine in the WattWatt simulation
 *
 * <p><strong>Description</strong></p>
 * 

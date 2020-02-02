@@ -28,7 +28,8 @@ import wattwatt.tools.URIS;
 * <p><strong>Description</strong></p>
 * 
 * <p>
-* This model is used to test that the controller can receive energy production event from other device
+* This model is used in MIL_Controller to test that the controller can receive energy production 
+* event from other devices
 * </p>
 * 
 * <p><strong>Invariant</strong></p>
@@ -79,21 +80,37 @@ public class ControllerStubModel extends AtomicES_Model {
 	/** a random number generator from common math library. */
 	protected final RandomDataGenerator rg;
 
-	protected Double consommation;
-
+	/**
+	 * stub consumption sent from this model to the controller model
+	 */
+	protected Double consumption;
+	/**
+	 * stub production sent from this model to the controller model
+	 */
 	protected Double production;
 
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+	
 	public ControllerStubModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.rg = new RandomDataGenerator();
 	}
+	
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
 	@Override
 	public void initialiseState(Time initialTime) {
 		this.meanTimeBetweenSend = 20;
 		this.production = 5.0;
-		this.consommation = 5.0;
+		this.consumption = 5.0;
 
 		this.rg.reSeedSecure();
 
@@ -110,6 +127,9 @@ public class ControllerStubModel extends AtomicES_Model {
 
 	}
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 	}
@@ -157,12 +177,15 @@ public class ControllerStubModel extends AtomicES_Model {
 
 		} else if (this.nextEvent.equals(EngineGeneratorProductionEvent.class)) {
 			d = new Duration(2.0 * this.meanTimeBetweenSend * this.rg.nextBeta(1.75, 1.75), this.getSimulatedTimeUnit());
-			this.scheduleEvent(new ConsumptionEvent(this.getCurrentStateTime().add(d), this.consommation + this.rg.nextUniform(-5, 5)));
+			this.scheduleEvent(new ConsumptionEvent(this.getCurrentStateTime().add(d), this.consumption + this.rg.nextUniform(-5, 5)));
 
 		}
 
 	}
-
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.interfaces.ModelDescriptionI#getFinalReport()
+	 */
 	@Override
 	public SimulationReportI getFinalReport() throws Exception {
 		return new ControllerStubModelReport(this.getURI());

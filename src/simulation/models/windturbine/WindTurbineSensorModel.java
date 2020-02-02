@@ -22,12 +22,69 @@ import simulation.events.windturbine.WindReadingEvent;
 import simulation.tools.windturbine.WindTurbineState;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(exported = { WindReadingEvent.class, SwitchOffEvent.class, SwitchOnEvent.class })
+@ModelExternalEvents(exported = { WindReadingEvent.class, 
+								  SwitchOffEvent.class, 
+								  SwitchOnEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WindTurbineSensorModel</code> implements a simplified model of 
+* a wind turbine sensor
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The wind turbine sensor model has two roles: it is tasked to "read" the wind speed
+* and send it to the <code>WindTurbineModel</code>  and it also has to turn on
+* and off the <code>WindTurbineModel</code> if the wind is too low or too strong
+*  is used in the <code>FridgeCoupledModel</code>
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class WindTurbineSensorModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>WindTurbineSensorModelReport</code> implements the simulation
+	 * report for the wind turbine sensor model.
+	 *
+	 * <p>
+	 * <strong>Description</strong>
+	 * </p>
+	 * 
+	 * <p>
+	 * <strong>Invariant</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * invariant	true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class WindTurbineSensorModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -55,14 +112,23 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	public static final String INITIAL_DELAY = "initial-delay";
 	public static final String INTERDAY_DELAY = "interday-delay";
 
+	/** initial delay before sending the wind reading */
 	protected double initialDelay;
+	
+	/** delay from one day to another. */
 	protected double interdayDelay;
 
+	/** maximum wind speed over which the sensor should switch off
+	 * the wind turbine */
 	protected static final double MAX_WIND = 15.0;
+	/** minimum wind speed under which the sensor should switch off
+	 * the wind turbine */
 	protected static final double MIN_WIND = 3.0;
 
+	/** current wind speed */
 	protected double currentWind;
 
+	/** State in which the wind turbine is in (ON, OFF) */
 	protected WindTurbineState state;
 
 	/** next event to be sent. */
@@ -81,6 +147,18 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create a wind turbine sensor model instance.
+	 * 
+	 * @param uri
+	 *            unique identifier of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation clock.
+	 * @param simulationEngine
+	 *            simulation engine enacting the model.
+	 * @throws Exception
+	 *             <i>TODO</i>.
+	 */
 	public WindTurbineSensorModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
@@ -116,7 +194,6 @@ public class WindTurbineSensorModel extends AtomicES_Model {
 	 */
 	@Override
 	public void initialiseState(Time initialTime) {
-
 		if (this.componentRef == null) {
 			this.state = WindTurbineState.OFF;
 		} else {

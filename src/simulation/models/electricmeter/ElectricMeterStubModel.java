@@ -16,6 +16,34 @@ import simulation.events.electricmeter.ConsumptionEvent;
 import wattwatt.tools.URIS;
 
 @ModelExternalEvents(exported = { ConsumptionEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ElectricMeterStubModel</code> implements a simplified model of 
+* a energy consumer device
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used in MIL_ElectricMeter to test that the electric meter can receive energy 
+* consumption event from other devices
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class ElectricMeterStubModel extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -25,8 +53,14 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 	
 	public static final String URI = URIS.ELECTRIC_METER_STUB_MODEL_URI;
 
+	/**
+	 * the initial delay before the emission of a consumption event
+	 */
 	protected double initialDelay;
-	protected double interdayDelay;
+	/**
+	 * the delay betweeen emissions of consumption events
+	 */
+	protected double delayBetweenEachSending;
 
 	/** next event to be sent. */
 	protected Class<?> nextEvent;
@@ -57,7 +91,7 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 	@Override
 	public void initialiseState(Time initialTime) {
 		this.initialDelay = 10.0;
-		this.interdayDelay = 100.0;
+		this.delayBetweenEachSending = 100.0;
 
 		this.rg.reSeedSecure();
 
@@ -89,7 +123,6 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 		// model is given by the earliest time among the currently scheduled
 		// events.
 		Duration d = super.timeAdvance();
-		this.logMessage("CompteurSensorModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
 		return d;
 	}
 
@@ -118,7 +151,6 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 		// to keep it for the internal transition)
 		this.nextEvent = ret.get(0).getClass();
 
-		this.logMessage("CompteurSensorModel::output() " + this.nextEvent.getCanonicalName());
 		return ret;
 	}
 
@@ -136,7 +168,7 @@ public class ElectricMeterStubModel extends AtomicES_Model {
 
 		this.scheduleEvent(new ConsumptionEvent(t, 1));
 
-		d = new Duration(this.interdayDelay, this.getSimulatedTimeUnit());
+		d = new Duration(this.delayBetweenEachSending, this.getSimulatedTimeUnit());
 		this.scheduleEvent(new ConsumptionEvent(this.getCurrentStateTime().add(d), 1));
 
 	}

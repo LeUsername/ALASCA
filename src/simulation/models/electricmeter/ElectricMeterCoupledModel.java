@@ -33,8 +33,7 @@ import wattwatt.tools.URIS;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>ElectricMeterCoupledModel</code> implements a coupled model used to gather
-* together all of the model representing the electric meter
-* in the WattWatt simulation
+* together all of the model representing a electric meter in the WattWatt simulation
 *
 * <p><strong>Description</strong></p>
 * 

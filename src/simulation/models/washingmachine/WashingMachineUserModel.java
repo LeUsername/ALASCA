@@ -25,9 +25,63 @@ import simulation.events.washingmachine.StartWashingEvent;
 import simulation.tools.washingmachine.WashingMachineUserBehaviour;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(exported = { StartWashingEvent.class, EcoModeEvent.class, PremiumModeEvent.class })
+@ModelExternalEvents(exported = { StartWashingEvent.class, 
+								  EcoModeEvent.class,
+								  PremiumModeEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WashingMachineUserModel</code> implements a model of user of
+* the washing machine device
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used to simulate how a real life user would interact with a
+* washing machine
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class WashingMachineUserModel extends AtomicES_Model {
+	// -------------------------------------------------------------------------
+	// Inner class
+	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>WashingMachineUserModelReport</code> implements the simulation
+	 * report for the washing machine user model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class WashingMachineUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -40,7 +94,7 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		 */
 		@Override
 		public String toString() {
-			return "LaveLingeUserModelReport(" + this.getModelURI() + ")";
+			return "WashingMachineUserModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -54,29 +108,39 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	/** URI to be used when creating the model. */
 	public static final String URI = URIS.WASHING_MACHINE_USER_MODEL_URI;
 	/**
-	 * name of the run parameter defining the mean time between interruptions.
+	 * name of the run parameter defining the mean time between usages.
 	 */
 	public static final String MTBU = "mtbu";
 	/**
-	 * name of the run parameter defining the mean duration of interruptions.
+	 * name of the run parameter defining the mean time in eco mode.
 	 */
 	public static final String MTWE = "mtwe";
-
+	/**
+	 * name of the run parameter defining the mean time in premium mode.
+	 */
 	public static final String MTWP = "mtwp";
-
+	/**
+	 * name of the run parameter defining the starting delay.
+	 */
 	public static final String STD = "std";
 
 	// Model simulation implementation variables
+	/** initial delay before sending the first switch on event. */
 	protected double initialDelay;
 
+	/** delay between uses from one day to another. */
 	protected double interdayDelay;
 
+	/** mean time between uses of the washing machine. */
 	protected double meanTimeBetweenUsages;
 
+	/** during one use in eco mode, mean time the washing machine is 
+	 * consuming energy */
 	protected double meanTimeWorkingEco;
-
+	/** during one use in premium mode, mean time the washing machine is 
+	 * consuming energy */
 	protected double meanTimeWorkingPremium;
-
+	/** delay before the first usage of the washing machine */
 	protected double startingTimeDelay;
 
 	/** next event to be sent. */
@@ -92,6 +156,32 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	 */
 	protected EmbeddingComponentAccessI componentRef;
 
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+	/**
+	 * create an washing machine user model instance.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uri != null
+	 * pre	simulatedTimeUnit != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param uri
+	 *            URI of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation time.
+	 * @param simulationEngine
+	 *            simulation engine to which the model is attached.
+	 * @throws Exception
+	 *             <i>to do.</i>
+	 */
 	public WashingMachineUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
@@ -103,6 +193,9 @@ public class WashingMachineUserModel extends AtomicES_Model {
 	// Methods
 	// -------------------------------------------------------------------------
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 		String vname = this.getURI() + ":" + MTWE;
@@ -126,6 +219,9 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.WASHING_MACHINE_URI);
 	}
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
 	@Override
 	public void initialiseState(Time initialTime) {
 		this.initialDelay = WashingMachineUserBehaviour.INITIAL_DELAY;
@@ -153,14 +249,10 @@ public class WashingMachineUserModel extends AtomicES_Model {
 			throw new RuntimeException(e);
 		}
 	}
-
-	@Override
-	public Duration timeAdvance() {
-		Duration d = super.timeAdvance();
-		this.logMessage("LaveLingeUserModel::timeAdvance() 1 " + d + " " + this.eventListAsString());
-		return d;
-	}
-
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
+	 */
 	@Override
 	public ArrayList<EventI> output() {
 		if (componentRef != null) {
@@ -177,6 +269,18 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		}
 	}
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		Duration d = super.timeAdvance();
+		return d;
+	}
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
+	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		if (componentRef == null) {
@@ -307,6 +411,9 @@ public class WashingMachineUserModel extends AtomicES_Model {
 		}
 	}
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#endSimulation(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
 	@Override
 	public void endSimulation(Time endTime) throws Exception {
 		this.plotter.addData(ACTION, endTime.getSimulatedTime(), 0.0);

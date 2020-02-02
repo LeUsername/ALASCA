@@ -37,12 +37,64 @@ import wattwatt.tools.washingmachine.WashingMachineSetting;
 								  StopWashingMachineEvent.class,
 								  StartWashingMachineEvent.class },
 					 exported = { WashingMachineConsumptionEvent.class})
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WashingMachineModel</code> implements a model of a washing
+* machine in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The washing machine model has two main variables: state and washingMode that
+* define the consumption of the device. These variables can be manipulated 
+* both by the controller and the washing machine user. As such, we've chosen to
+* give priority to the controller.
+* <code>RefillEvent</code>.
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class WashingMachineModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>WashingMachineReport</code> implements the simulation
+	 * report for the washing machine model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class WashingMachineReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -55,7 +107,7 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		 */
 		@Override
 		public String toString() {
-			return "LaveLingeReport(" + this.getModelURI() + ")";
+			return "WashingMachineReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -70,43 +122,67 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 	 */
 	public static final String URI = URIS.WASHING_MACHINE_MODEL_URI;
 
-	private static final String SERIES = "intensity";
-	public static final String CONSUMPTION_SERIES = "intensity";
+	private static final String SERIES = "consumption";
+	public static final String CONSUMPTION_SERIES = "consumption-series";
 	
 	public static final String CONSUMPTION_ECO ="consoEco";
 	public static final String CONSUMPTION_PREMIUM ="consoPremium";
+	
+	/**
+	 * name of the run parameter defining the intial delay.
+	 */
 	public static final String STD ="std";
 
+	/** State in which the washing machine is in (ON, OFF, WORKING) */
+	protected WashingMachineState state;
+	/** Mode in which the washing machine is in (ECO, PREMIUM) */
+	protected WashingMachineMode washingMode;
+	/**Delay before first washing starts */
+	protected double startingTimeDelay;
+	/**Consumption in ECO mode */
+	protected  double consoEco;
+	/**Consumption in PREMIUM mode */
+	protected  double consoPremium;
+	/** current consumption in Watt */
+	protected double currentConsumption;
 
 	/** true when a external event triggered a reading. */
 	protected boolean triggerReading;
 
 	/** plotter for the intensity level over time. */
 	protected XYPlotter consumptionPlotter;
-
-	/** current intensity in Amperes; intensity is power/tension. */
-	protected double currentConsumption;
-
+	
 	/**
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
 	protected EmbeddingComponentAccessI componentRef;
 
-	/** Etat dans lequel se trouve le seche cheveux */
-	protected WashingMachineState state;
-
-	protected WashingMachineMode washingMode;
-	
-	protected double startingTimeDelay;
-	
-	protected  double consoEco;
-	protected  double consoPremium;
-
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create an instance of washing machine model.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	simulatedTimeUnit != null
+	 * pre	simulationEngine == null ||
+	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
+	 * post	this.getURI() != null
+	 * post	uri != null implies this.getURI().equals(uri)
+	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
+	 * post	simulationEngine != null implies
+	 * 					this.getSimulationEngine().equals(simulationEngine)
+	 * </pre>
+	 *
+	 * @param uri					unique identifier of the model.
+	 * @param simulatedTimeUnit		time unit used for the simulation clock.
+	 * @param simulationEngine		simulation engine enacting the model.
+	 * @throws Exception			<i>todo.</i>
+	 */
 	public WashingMachineModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
@@ -183,16 +259,9 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 		super.initialiseVariables(startTime);
 	}
 
-	@Override
-	public Duration timeAdvance() {
-		
-		if (!this.triggerReading) {
-			return Duration.INFINITY;
-		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
-		}
-	}
-
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
+	 */
 	@Override
 	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
@@ -206,6 +275,19 @@ public class WashingMachineModel extends AtomicHIOAwithEquations {
 			
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
+		} else {
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
 

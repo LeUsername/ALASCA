@@ -29,10 +29,71 @@ import simulation.tools.enginegenerator.EngineGeneratorState;
 import wattwatt.tools.URIS;
 import wattwatt.tools.EngineGenerator.EngineGeneratorSetting;
 
-@ModelExternalEvents(imported = { RefillEvent.class, StartEngineEvent.class, StopEngineEvent.class, StartEngineGeneratorEvent.class,
-		StopEngineGeneratorEvent.class, TicEvent.class }, exported = { EngineGeneratorProductionEvent.class })
+@ModelExternalEvents(imported = { RefillEvent.class, 
+								  StartEngineEvent.class, 
+								  StopEngineEvent.class, 
+								  StartEngineGeneratorEvent.class,
+								  StopEngineGeneratorEvent.class, 
+								  TicEvent.class }, 
+					 exported = { EngineGeneratorProductionEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>EngineGeneratorModel</code> implements a model of a engine
+* generator in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The engine generator model has two main variables: fuel capacity and
+* production that directly impacts each other. The more fuel is consumed,
+* the more energy is produced. However, the fuel contained in the engine
+* generator is limited and has to be refilled through an user via the 
+* <code>RefillEvent</code>.
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 
+	// -------------------------------------------------------------------------
+	// Inner class
+	// -------------------------------------------------------------------------
+
+	/**
+	 * The class <code>EngineGeneratorModelReport</code> implements the simulation
+	 * report for the engine generator model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class EngineGeneratorModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -49,6 +110,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		}
 	}
 
+	// -------------------------------------------------------------------------
+	// Constants and variables
+	// -------------------------------------------------------------------------
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -61,6 +126,21 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	public static final String PRODUCTION_SERIES = "production-series";
 	private static final String FUEL_QUANTITY = "quantity";
 	public static final String FUEL_QUANTITY_SERIES = "quantity-series";
+	
+	/**
+	 * energy production (in Watt)
+	 */
+	protected double production;
+	/**
+	 * remaining fuel (in Liters)
+	 */
+	protected double fuelCapacity;
+
+	/**
+	 * State in which the engine generator is in: 	- ON
+	 * 												- OFF
+	 */
+	protected EngineGeneratorState state;
 
 	/** true when a external event triggered a reading. */
 	protected boolean triggerReading;
@@ -77,15 +157,42 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 	 */
 	protected EmbeddingComponentAccessI componentRef;
 
-	protected double production;
-	protected double fuelCapacity;
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 
-	protected EngineGeneratorState state;
-
+	/**
+	 * create an instance of engine generator model.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	simulatedTimeUnit != null
+	 * pre	simulationEngine == null ||
+	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
+	 * post	this.getURI() != null
+	 * post	uri != null implies this.getURI().equals(uri)
+	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
+	 * post	simulationEngine != null implies
+	 * 					this.getSimulationEngine().equals(simulationEngine)
+	 * </pre>
+	 *
+	 * @param uri					unique identifier of the model.
+	 * @param simulatedTimeUnit		time unit used for the simulation clock.
+	 * @param simulationEngine		simulation engine enacting the model.
+	 * @throws Exception			<i>todo.</i>
+	 */
 	public EngineGeneratorModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 	}
 
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
 	@Override
 	public void setSimulationRunParameters(Map<String, Object> simParams) throws Exception {
 		String vname = this.getURI() + ":" + EngineGeneratorModel.PRODUCTION_SERIES + ":"
@@ -104,6 +211,9 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.ENGINE_GENERATOR_URI);
 	}
 
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
 	@Override
 	public void initialiseState(Time initialTime) {
 
@@ -152,16 +262,10 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		}
 
 	}
-
-	@Override
-	public Duration timeAdvance() {
-		if (!this.triggerReading) {
-			return Duration.INFINITY;
-		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
-		}
-	}
-
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
+	 */
 	@Override
 	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
@@ -174,6 +278,18 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 			return ret;
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
+		} else {
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
 
@@ -268,11 +384,6 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 		}
 	}
 
-	@Override
-	public SimulationReportI getFinalReport() throws Exception {
-		return new EngineGeneratorModelReport(this.getURI());
-	}
-
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#endSimulation(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
@@ -283,6 +394,18 @@ public class EngineGeneratorModel extends AtomicHIOAwithEquations {
 				this.fuelCapacity);
 		super.endSimulation(endTime);
 	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
+	 */
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new EngineGeneratorModelReport(this.getURI());
+	}
+	
+	// ------------------------------------------------------------------------
+	// Model-specific methods
+	// ------------------------------------------------------------------------
 
 	public void refill() {
 		this.fuelCapacity = EngineGeneratorSetting.FULL_CAPACITY;

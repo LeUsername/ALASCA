@@ -23,10 +23,65 @@ import simulation.events.hairdryer.SwitchOnEvent;
 import wattwatt.tools.URIS;
 import wattwatt.tools.hairdryer.HairDryerMode;
 
-@ModelExternalEvents(exported = { SwitchOnEvent.class, SwitchOffEvent.class, SwitchModeEvent.class,
-		IncreasePowerEvent.class, DecreasePowerEvent.class })
+@ModelExternalEvents(exported = { SwitchOnEvent.class, 
+								  SwitchOffEvent.class, 
+								  SwitchModeEvent.class,
+								  IncreasePowerEvent.class, 
+								  DecreasePowerEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>HairDryerUserModel</code> implements a model of user of
+* the hair dryer device
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used to simulate how a real life user would interact with a
+* hair dryer, impacting the global consumption of the house
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class HairDryerUserModel extends AtomicES_Model {
+	// -------------------------------------------------------------------------
+	// Inner class
+	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>HairDryerUserModelReport</code> implements the simulation
+	 * report for the hair dryer user model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class HairDryerUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -43,7 +98,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 		}
 	}
 
-	
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -164,18 +218,6 @@ public class HairDryerUserModel extends AtomicES_Model {
 	}
 
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		// This is just for debugging purposes; the time advance for an ES
-		// model is given by the earliest time among the currently scheduled
-		// events.
-		Duration d = super.timeAdvance();
-		return d;
-	}
-
-	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
 	@Override
@@ -207,6 +249,18 @@ public class HairDryerUserModel extends AtomicES_Model {
 //			this.logMessage("HairDryerUserModel::output() " + this.nextEvent.getCanonicalName());
 			return ret;
 		}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		// This is just for debugging purposes; the time advance for an ES
+		// model is given by the earliest time among the currently scheduled
+		// events.
+		Duration d = super.timeAdvance();
+		return d;
 	}
 
 	/**
@@ -253,13 +307,7 @@ public class HairDryerUserModel extends AtomicES_Model {
 				this.scheduleEvent(new SwitchOnEvent(this.getCurrentStateTime().add(d)));
 			}
 		} else {
-			// This method implements a usage scenario for the hair dryer.
-			// Here, we assume that the hair dryer is used once each cycle (day)
-			// and then it starts in low mode, is set in high mode shortly after,
-			// used for a while in high mode and then set back in low mode to
-			// complete the drying.
 			Duration d;
-			// See what is the type of event to be executed
 			try {
 				if (this.nextEvent.equals(SwitchOnEvent.class)) {
 					this.componentRef.setEmbeddingComponentStateValue("switchOn", null);

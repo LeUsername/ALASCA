@@ -200,7 +200,7 @@ public class ControllerModel extends AtomicModel {
 	 */
 	protected double productionEngineGenerator;
 	/**
-	 * energy production (in Watt) provide by the wind turbine
+	 * energy production (in Watt) provided by the wind turbine
 	 */
 	protected double productionWindTurbine;
 
@@ -230,18 +230,42 @@ public class ControllerModel extends AtomicModel {
 	 */
 	protected double lastDecisionTimeEngineGenerator;
 	/**
-	 * every decision sent to the engine generator are store in this variable
+	 * every decision sent to the engine generator are stored in this variable
 	 */
 	protected final Vector<DecisionPiece> decisionFunctionEngineGenerator;
 
+	/**
+	 * next decision to be sent to the fridge
+	 */
 	protected Decision triggeredDecisionFridge;
+	/**
+	 * last decision sent to the fridge
+	 */
 	protected Decision lastDecisionFridge;
+	/**
+	 * time of the last decision sent to the fridge
+	 */
 	protected double lastDecisionTimeFridge;
+	/**
+	 * every decision sent to the fridge are stored in this variable
+	 */
 	protected final Vector<DecisionPiece> decisionFunctionFridge;
 	
+	/**
+	 * next decision to be sent to the washing machine
+	 */
 	protected Decision triggeredDecisionWashingMachine;
+	/**
+	 * last decision sent to the washing machine
+	 */
 	protected Decision lastDecisionWashingMachine;
+	/**
+	 * time of the last decision sent to the washing machine
+	 */
 	protected double lastDecisionTimeWashingMachine;
+	/**
+	 * every decision sent to the washing machine are stored in this variable
+	 */
 	protected final Vector<DecisionPiece> decisionFunctionWashingMachine;
 
 	/**
@@ -263,6 +287,27 @@ public class ControllerModel extends AtomicModel {
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create an instance of controller model.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	simulatedTimeUnit != null
+	 * pre	simulationEngine == null ||
+	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
+	 * post	this.getURI() != null
+	 * post	uri != null implies this.getURI().equals(uri)
+	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
+	 * post	simulationEngine != null implies
+	 * 					this.getSimulationEngine().equals(simulationEngine)
+	 * </pre>
+	 *
+	 * @param uri					unique identifier of the model.
+	 * @param simulatedTimeUnit		time unit used for the simulation clock.
+	 * @param simulationEngine		simulation engine enacting the model.
+	 * @throws Exception			<i>todo.</i>
+	 */
 	public ControllerModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 
@@ -275,7 +320,7 @@ public class ControllerModel extends AtomicModel {
 	}
 
 	// -------------------------------------------------------------------------
-	// Simulation protocol and related methods
+	// Methods
 	// -------------------------------------------------------------------------
 
 	/**
@@ -393,45 +438,6 @@ public class ControllerModel extends AtomicModel {
 							this.decisionToInteger(this.lastDecisionEngineGenerator));
 				}
 			}
-		}
-	}
-
-	/**
-	 * return an integer representation to ease the plotting.
-	 * 
-	 * <p>
-	 * <strong>Contract</strong>
-	 * </p>
-	 * 
-	 * <pre>
-	 * pre	s != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 *
-	 * @param s
-	 *            a state for the controller.
-	 * @return an integer representation to ease the plotting.
-	 */
-	protected int decisionToInteger(Decision d) {
-		assert d != null;
-
-		if (d == Decision.START_ENGINE) {
-			return 1;
-		} else if (d == Decision.STOP_ENGINE) {
-			return 0;
-		} else if (d == Decision.RESUME_FRIDGE) {
-			return 1;
-		} else if (d == Decision.SUSPEND_FRIDGE) {
-			return 0;
-		} 
-		else if (d == Decision.START_WASHING) {
-			return 1;
-		} else if (d == Decision.STOP_WASHING) {
-			return 0;
-		}
-		else {
-			// Need to add other decisions
-			return -1;
 		}
 	}
 
@@ -782,6 +788,49 @@ public class ControllerModel extends AtomicModel {
 	public SimulationReportI getFinalReport() throws Exception {
 		return new ControllerModelReport(this.getURI());
 	}
+	
+	// ------------------------------------------------------------------------
+	// Model-specific methods
+	// ------------------------------------------------------------------------
+
+	/**
+	 * return an integer representation to ease the plotting.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	s != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param d
+	 *            a decision made by the controller.
+	 * @return an integer representation to ease the plotting.
+	 */
+	protected int decisionToInteger(Decision d) {
+		assert d != null;
+
+		if (d == Decision.START_ENGINE) {
+			return 1;
+		} else if (d == Decision.STOP_ENGINE) {
+			return 0;
+		} else if (d == Decision.RESUME_FRIDGE) {
+			return 1;
+		} else if (d == Decision.SUSPEND_FRIDGE) {
+			return 0;
+		} 
+		else if (d == Decision.START_WASHING) {
+			return 1;
+		} else if (d == Decision.STOP_WASHING) {
+			return 0;
+		}
+		else {
+			// Need to add other decisions
+			return -1;
+		}
+	}
 
 	public void setConsumption(double consumption) {
 		this.consumption = consumption;
@@ -795,4 +844,3 @@ public class ControllerModel extends AtomicModel {
 		this.productionEngineGenerator = prod;
 	}
 }
-// -----------------------------------------------------------------------------

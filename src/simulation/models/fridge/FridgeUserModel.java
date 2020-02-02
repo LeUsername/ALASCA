@@ -22,9 +22,34 @@ import simulation.events.fridge.OpenEvent;
 import simulation.tools.fridge.FridgeDoor;
 import wattwatt.tools.URIS;
 
-//-----------------------------------------------------------------------------
 @ModelExternalEvents(exported = { CloseEvent.class, 
-								 OpenEvent.class})
+								  OpenEvent.class})
+//-----------------------------------------------------------------------------
+/**
+* The class <code>FridgeUserModel</code> implements a model of user of the fridge
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used to simulate how a real life user would interact with a fridge,
+* mainly with the its door
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
 //-----------------------------------------------------------------------------
 public class FridgeUserModel 
 extends		AtomicES_Model
@@ -32,13 +57,34 @@ extends		AtomicES_Model
 	// -------------------------------------------------------------------------
 	// Inner classes
 	// -------------------------------------------------------------------------
-
-	public static class	RefrigerateurUserModelReport
+	
+	/**
+	 * The class <code>FridgeUser</code> implements the simulation
+	 * report for the fridge user model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
+	public static class	FridgeUserModelReport
 	extends		AbstractSimulationReport
 	{
 		private static final long			serialVersionUID = 1L ;
 
-		public			RefrigerateurUserModelReport(String modelURI)
+		public			FridgeUserModelReport(String modelURI)
 		{
 			super(modelURI) ;
 		}
@@ -49,7 +95,7 @@ extends		AtomicES_Model
 		@Override
 		public String	toString()
 		{
-			return "RefrigerateurUserModelReport(" + this.getModelURI() + ")";
+			return "FridgeUserModelReport(" + this.getModelURI() + ")";
 			
 		}
 	}
@@ -64,30 +110,27 @@ extends		AtomicES_Model
 	/** URI to be used when creating the model.								*/
 	public static final String	URI = URIS.FRIDGE_USER_MODEL_URI ;
 	/** name of the run parameter defining the mean time between
-	 *  interruptions.														*/
+	 * door openings.														*/
 	public static final String	MTBI = "mtbi" ;
 	/** name of the run parameter defining the mean duration of
-	 *  interruptions.														*/
+	 *  a door opening.														*/
 	public static final String	MID = "mid" ;
 
 	// Model simulation implementation variables
-	/** the time between interruptions follows an exponential
-	 *  distribution with mean <code>meanTimeBetweenInterruptions</code>.	*/
+	/** mean time between door's opening									*/
 	protected double					meanTimeBetweenInterruptions ;
-	/** the duration of the interruptions follows an exponential
-	 *  distribution with mean <code>meanInterruptionDuration</code>.		*/
+	/** mean duration of a door opening										*/
 	protected double					meanInterruptionDuration ;
 	/**	a random number generator from common math library.					*/
 	protected final RandomDataGenerator	rg ;
-	/** 	the current state of the refrigerateur's door.					*/
+	/** the current state of the fridge's door.								*/
 	protected FridgeDoor currentState ;
 	
 	/** next event to be sent. */
 	protected Class<?> nextEvent;
 
 	// Plotting
-	/** Frame used to plot the bandwidth interruption function during
-	 *  the simulation.														*/
+	/** Frame used the openings and the closings of the fridge's door		*/
 	protected XYPlotter					plotter ;
 	
 	/** reference on the object representing the component that holds the
@@ -99,25 +142,26 @@ extends		AtomicES_Model
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create an instance of the WiFi disconnection model.
+	 * create an fridge user model instance.
 	 * 
-	 * <p><strong>Contract</strong></p>
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
 	 * 
 	 * <pre>
+	 * pre	uri != null
 	 * pre	simulatedTimeUnit != null
-	 * pre	simulationEngine == null ||
-	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
-	 * post	this.getURI() != null
-	 * post	uri != null implies this.getURI().equals(uri)
-	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
-	 * post	simulationEngine != null implies
-	 * 			this.getSimulationEngine().equals(simulationEngine)
+	 * post	true			// no postcondition.
 	 * </pre>
 	 *
-	 * @param uri					unique identifier of the model.
-	 * @param simulatedTimeUnit		time unit used for the simulation clock.
-	 * @param simulationEngine		simulation engine enacting the model.
-	 * @throws Exception			<i>todo.</i>
+	 * @param uri
+	 *            URI of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation time.
+	 * @param simulationEngine
+	 *            simulation engine to which the model is attached.
+	 * @throws Exception
+	 *             <i>to do.</i>
 	 */
 	public				FridgeUserModel(
 		String uri,
@@ -131,9 +175,9 @@ extends		AtomicES_Model
 		this.rg = new RandomDataGenerator() ;
 	}
 
-	// -------------------------------------------------------------------------
-	// Simulation protocol and related methods
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
+	// Methods
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -206,15 +250,6 @@ extends		AtomicES_Model
 	}
 	
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		Duration d = super.timeAdvance();
-		return d;
-	}
-	
-	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
 	@Override
@@ -232,6 +267,15 @@ extends		AtomicES_Model
 			return ret;
 		}
 	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		Duration d = super.timeAdvance();
+		return d;
+	}
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
@@ -243,12 +287,6 @@ extends		AtomicES_Model
 			if (this.currentState == FridgeDoor.OPENED) {
 				
 				this.currentState = FridgeDoor.CLOSED ;
-
-				// compute the time of occurrence (in the future)
-//				double closedTime = this.rg.nextExponential(this.meanTimeBetweenInterruptions);
-//				Duration d = new Duration(closedTime, this.getSimulatedTimeUnit());
-//				Time t = this.getCurrentStateTime().add(d);
-//				this.scheduleEvent(new CloseEvent(t)) ;
 
 				// Update the plotter with the next event occurrence
 				if (this.plotter != null) {
@@ -265,12 +303,6 @@ extends		AtomicES_Model
 				assert	this.currentState == FridgeDoor.CLOSED ;
 				this.currentState = FridgeDoor.OPENED ;
 
-				// compute the time of occurrence (in the future)
-//				double openedTime = this.rg.nextExponential(this.meanInterruptionDuration);
-//				Duration d = new Duration(openedTime, this.getSimulatedTimeUnit());
-//				Time t = this.getCurrentStateTime().add(d);
-//				this.scheduleEvent(new OpenEvent(t)) ;
-//				
 				if (this.plotter != null) {
 					this.plotter.addData(
 							SERIES,
@@ -371,9 +403,8 @@ extends		AtomicES_Model
 	throws Exception
 	{
 		
-		return new RefrigerateurUserModelReport(this.getURI()) ;
+		return new FridgeUserModelReport(this.getURI()) ;
 	}
 
 
 }
-// -----------------------------------------------------------------------------

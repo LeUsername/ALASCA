@@ -23,10 +23,63 @@ import simulation.events.enginegenerator.StopEngineEvent;
 import simulation.tools.enginegenerator.EngineGeneratorUserAction;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(exported = { StartEngineEvent.class, RefillEvent.class,
-		 StopEngineEvent.class})
+@ModelExternalEvents(exported = { StartEngineEvent.class, 
+								  RefillEvent.class,
+								  StopEngineEvent.class})
+//-----------------------------------------------------------------------------
+/**
+* The class <code>EngineGeneratorUserModel</code> implements a model of user of
+* the energy generator device
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* This model is used to simulate how a real life user would interact with an
+* engine generator to provides its house more energy
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class EngineGeneratorUserModel extends AtomicES_Model {
+	// -------------------------------------------------------------------------
+	// Inner class
+	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>EngineGeneratorUserModelReport</code> implements the simulation
+	 * report for the engine generator user model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class EngineGeneratorUserModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -43,15 +96,17 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		}
 	}
 
-	private static final long serialVersionUID = 1L;
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
-	public static final String ACTION = "START/STOP/REFILL";
 	
+	private static final long serialVersionUID = 1L;
+
 	/** URI to be used when creating the model. */
 	public static final String URI = URIS.ENGINE_GENERATOR_USER_MODEL_URI;
+	
+	public static final String ACTION = "START/STOP/REFILL";
+
 	/**
 	 * name of the run parameter defining the intial delay.
 	 */
@@ -78,7 +133,7 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	/** initial delay before sending the first switch on event. */
 	protected double initialDelay;
 
-	/** delay between uses  from one day to another. */
+	/** delay between uses from one day to another. */
 	protected double interdayDelay;
 
 	/** mean time between uses of the engine generator. */
@@ -96,11 +151,13 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	/** a random number generator from common math library. */
 	protected final RandomDataGenerator rg;
 
+	/** the remaining fuel in the engine
+	 * This variable should be exported from the engine generator
+	 */
 	protected double fuelCapacity;
 
 	/**
 	 * The plotter corresponding to the action taken by a user
-	 * 
 	 */
 	protected XYPlotter actionPlotter;
 	
@@ -110,6 +167,32 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	 */
 	protected EmbeddingComponentAccessI componentRef;
 
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
+
+	/**
+	 * create an engine generator user model instance.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uri != null
+	 * pre	simulatedTimeUnit != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param uri
+	 *            URI of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation time.
+	 * @param simulationEngine
+	 *            simulation engine to which the model is attached.
+	 * @throws Exception
+	 *             <i>to do.</i>
+	 */
 	public EngineGeneratorUserModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine)
 			throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
@@ -117,6 +200,13 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 
 	}
 	
+	// ------------------------------------------------------------------------
+	// Methods
+	// ------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
 	@Override
 	public void			setSimulationRunParameters(
 		Map<String, Object> simParams
@@ -142,6 +232,9 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		this.componentRef = (EmbeddingComponentAccessI) simParams.get(URIS.ENGINE_GENERATOR_URI);
 	}
 	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
+	 */
 	@Override
 	public void initialiseState(Time initialTime) {
 		this.rg.reSeedSecure();
@@ -163,17 +256,6 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		
 	}
 	
-	
-	
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		Duration d = super.timeAdvance();
-		return d;
-	}
-	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#output()
 	 */
@@ -192,7 +274,15 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 
 			return ret;
 		}
-		
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		Duration d = super.timeAdvance();
+		return d;
 	}
 	
 	/**
@@ -200,7 +290,6 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-
 		if (componentRef == null) {
 			Duration d;
 			if (this.nextEvent.equals(StartEngineEvent.class) ) {
@@ -302,9 +391,33 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 		
 	}
 	
+	@Override
+	public SimulationReportI getFinalReport() throws Exception {
+		return new EngineGeneratorUserModelReport(this.getURI());
+	}
+	
+	// ------------------------------------------------------------------------
+	// Model-specific methods
+	// ------------------------------------------------------------------------
+	
+	/**
+	 * return an integer representation to ease the plotting.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	s != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param action
+	 *            an action taken by the user.
+	 * @return an integer representation to ease the plotting.
+	 */
 	public int actionToInteger(EngineGeneratorUserAction action) {
 		assert	action != null ;
-
 		if (action == EngineGeneratorUserAction.START) {
 			return 1 ;
 		} else if (action == EngineGeneratorUserAction.STOP) {
@@ -313,10 +426,5 @@ public class EngineGeneratorUserModel extends AtomicES_Model {
 			assert action == EngineGeneratorUserAction.REFILL;
 			return 2 ;
 		}
-	}
-	
-	@Override
-	public SimulationReportI getFinalReport() throws Exception {
-		return new EngineGeneratorUserModelReport(this.getURI());
 	}
 }

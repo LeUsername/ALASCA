@@ -23,13 +23,68 @@ import simulation.events.hairdryer.HairDryerConsumptionEvent;
 import simulation.events.washingmachine.WashingMachineConsumptionEvent;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(imported = { HairDryerConsumptionEvent.class, WashingMachineConsumptionEvent.class,
-		FridgeConsumptionEvent.class, TicEvent.class }, exported = { ConsumptionEvent.class })
+@ModelExternalEvents(imported = { HairDryerConsumptionEvent.class, 
+								  WashingMachineConsumptionEvent.class,
+								  FridgeConsumptionEvent.class, 
+								  TicEvent.class }, 
+					 exported = { ConsumptionEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>ElectricMeterModel</code> implements a simplified model of 
+* an electric meter in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The electric meter model is used to collect the energy consumption in the 
+* house through their respective consumption events. It then aggregates and 
+* store their sum in a single variable which is either sent via an event to
+* the controller model (in MIL) or retrieved by the controller through the
+* controller and electric meter components (in SIL).
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
-	// Inner classes and types
+	// Inner class
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>ElectricMeterModelReport</code> implements the simulation
+	 * report for the electric meter model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class ElectricMeterModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -60,12 +115,27 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	private static final String SERIES = "consumption";
 	public static final String CONSUMPTION_SERIES = "consumption-series";
 
+	/**
+	 * total energy consumption (in Watt)
+	 */
 	protected double totalConsumption;
 
+	/**
+	 * energy consumption (in Watt) of the hair dryer
+	 */
 	protected double hairDryerConsumption;
+	/**
+	 * energy consumption (in Watt) of the fridge
+	 */
 	protected double fridgeConsumption;
+	/**
+	 * energy consumption (in Watt) of washing machine
+	 */
 	protected double washingMachineConsumption;
 
+	/** 
+	 * true when a external event triggered a reading.					
+	 */
 	protected boolean triggerReading;
 
 	/** plotter for the consumption level over time. */
@@ -306,7 +376,6 @@ public class ElectricMeterModel extends AtomicHIOAwithEquations {
 	// ------------------------------------------------------------------------
 
 	public double getConsumption() {
-
 		this.totalConsumption = this.fridgeConsumption + this.hairDryerConsumption + this.washingMachineConsumption;
 		return this.totalConsumption;
 	}

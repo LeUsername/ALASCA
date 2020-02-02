@@ -30,11 +30,65 @@ import wattwatt.tools.URIS;
 								  SwitchOnEvent.class, 
 								  TicEvent.class },
 					 exported = { WindTurbineProductionEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>WindTurbineModel</code> implements a model of a wind turbine
+* supplying power to the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The wind turbine model main role is to provide energy to the house. To do so,
+* it will, through <code>WindReadingEvent</code> sent to it by the 
+* <code>WindTurbineSensorModel</code>. It will the compute in the production 
+* variable the quantity of energy produced and either send it to the controller
+* thanks to the <code>WindTurbineProductionEvent</code> (in MIL) or be retrieved 
+* by the controller through the controller and wind turbine components 
+* <code>RefillEvent</code>.
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class WindTurbineModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>WindTurbineModelReport</code> implements the simulation
+	 * report for the wind turbine model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class WindTurbineModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -68,13 +122,17 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	/** true when a external event triggered a reading. */
 	protected boolean triggerReading;
 
+	/** current production in Watt */
 	protected double production;
 
+	/** State in which the wind turbine is in (ON, OFF)*/
 	protected WindTurbineState state;
 
-	public static final double KELVIN_TEMP = 288.15; // On suppose la temperatur en Kelvin et constante
+	/** Global temperature around the wind turbine*/
+	public static final double KELVIN_TEMP = 288.15; // We suppose the temperature constant and in Kelvin
 
-	public static final int BLADES_AREA = 5; // m2
+	/** Size of the wind turbine's blades */
+	public static final int BLADES_AREA = 5; // in cubic meters (m2)
 
 	/** plotter for the production level over time. */
 	protected XYPlotter productionPlotter;
@@ -89,6 +147,27 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create an instance of wind turbine model.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	simulatedTimeUnit != null
+	 * pre	simulationEngine == null ||
+	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
+	 * post	this.getURI() != null
+	 * post	uri != null implies this.getURI().equals(uri)
+	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
+	 * post	simulationEngine != null implies
+	 * 					this.getSimulationEngine().equals(simulationEngine)
+	 * </pre>
+	 *
+	 * @param uri					unique identifier of the model.
+	 * @param simulatedTimeUnit		time unit used for the simulation clock.
+	 * @param simulationEngine		simulation engine enacting the model.
+	 * @throws Exception			<i>todo.</i>
+	 */
 	public WindTurbineModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 	}
@@ -128,7 +207,6 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 				e.printStackTrace();
 			}
 		}
-		
 		
 		this.triggerReading = false;
 
@@ -174,7 +252,7 @@ public class WindTurbineModel extends AtomicHIOAwithEquations {
 	@Override
 	public ArrayList<EventI> output() {
 		if (this.triggerReading) {
-			double reading = this.production; // kW
+			double reading = this.production;
 
 			ArrayList<EventI> ret = new ArrayList<EventI>(1);
 			Time currentTime = this.getCurrentStateTime().add(this.getNextTimeAdvance());

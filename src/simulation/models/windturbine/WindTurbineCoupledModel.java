@@ -36,8 +36,7 @@ import wattwatt.tools.URIS;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>WindTurbineCoupledModel</code> implements a coupled model used to gather
-* together all of the model representing the wind turbine in the WattWatt 
-* simulation
+* together all of the model representing the wind turbine in the WattWatt simulation
 *
 * <p><strong>Description</strong></p>
 * 

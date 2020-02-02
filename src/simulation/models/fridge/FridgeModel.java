@@ -38,21 +38,78 @@ import wattwatt.tools.fridge.FridgeSetting;
 								  OpenEvent.class, 
 								  ResumeEvent.class, 
 								  SuspendEvent.class,
-								  TicEvent.class, SuspendFridgeEvent.class, ResumeFridgeEvent.class},
-					exported = { FridgeConsumptionEvent.class})
+								  SuspendFridgeEvent.class, 
+								  ResumeFridgeEvent.class,
+								  TicEvent.class},
+					 exported = { FridgeConsumptionEvent.class})
+//-----------------------------------------------------------------------------
+/**
+* The class <code>FridgeModel</code> implements a simplified model of a fridge
+* in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The fridge model has multiple variables that represent the state it's in. These 
+* are the following: - temperature that gives the inside temperature (in Celsius)
+* of the fridge
+* 					 - currentState which indicates if the fridge is currently
+* cooling down (RESUMED) or not (SUSPENDED)
+* 					 - currentDoorState wihch is either OPENED or CLOSED
+* 					 - consumption (in Watt) that gives the energy consumption of
+* the fridge. This variable depends on a combination of the last two variables
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class FridgeModel
 extends AtomicHIOAwithEquations
 {
 	// ------------------------------------------------------------------------
-	// Inner classes
+	// Inner class
 	// ------------------------------------------------------------------------
 	
-	public static class	RefrigerateurModelReport
+	/**
+	 * The class <code>FridgeModelReport</code> implements the simulation
+	 * report for the fridge model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
+	public static class	FridgeModelReport
 	extends		AbstractSimulationReport
 	{
 		private static final long serialVersionUID = 1L ;
 
-		public			RefrigerateurModelReport(String modelURI)
+		public			FridgeModelReport(String modelURI)
 		{
 			super(modelURI) ;
 		}
@@ -63,7 +120,7 @@ extends AtomicHIOAwithEquations
 		@Override
 		public String	toString()
 		{
-			return "RefrigerateurModelReport(" + this.getModelURI() + ")";
+			return "FridgeModelReport(" + this.getModelURI() + ")";
 		}
 	}
 
@@ -72,12 +129,18 @@ extends AtomicHIOAwithEquations
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L ;
+	
 	private static final String	TEMPERATURE_SERIES = "refrigerateur temperature" ;
 	private static final String	CONSUMPTION_SERIES = "refrigerateur intensity" ;
 	public static final String	URI = URIS.FRIDGE_MODEL_URI ;
-	/** nominal tension (in Volts) of the fridge. */
+	/** nominal tension (in Volts) of the fridge.							*/
 	protected static final double TENSION = 220.0; // Volts
-	protected static final double TEMPERATURE_CHANGE = 0.05; // �C
+	/** indicates the quantity of degree the internal temperature
+	 * of the fridge change each step. This variable can be added 
+	 * or substracted to the current temperature depending on the
+	 * fridge's state
+	 */
+	protected static final double TEMPERATURE_CHANGE = 0.05; // in Celsius
 
 	// Run parameter names to be used when initialising them before each run
 	/** name of the run parameter defining the maximum temperature.			*/
@@ -86,60 +149,75 @@ extends AtomicHIOAwithEquations
 	public static final String	MIN_TEMPERATURE = "min-temperature" ;
 	/** name of the plotter that displays the temperature.					*/
 	public static final String	TEMPERATURE = "temperature" ;
-	/** name of the plotter that displays the intensity.					*/
-	public static final String	CONSUMPTION = "intensity" ;
-
+	/** name of the plotter that displays the consumption.					*/
+	public static final String	CONSUMPTION = "consumption" ;
+	/** name of the plotter that displays the initial temperature.			*/
 	public static final String	INITIAL_TEMP = "inital-temp" ;
 	// Model implementation variables
 	/** the maximum temperature												*/
 	protected double maxTemperature ;
 	/** the minimum temperature												*/
 	protected double minTemperature ;
-	
+	/** the initial temperature 											*/
 	protected double initialTemp;
-
 
 	/**	Random number generator for the bandwidth after resumption;
 	 *  the bandwidth after resumption follows a beta distribution.			*/
 	protected final RandomDataGenerator	genTemperature ;
 
-
-	/** the value of the temperature at the next internal transition time.	*/
-	protected double					nextTemperature ;
-	/** delay until the next update of the bandwidth value.					*/
-	protected double					nextDelay ;
-
+	/** Consumption in Watt.												*/
+	protected Double				consumption ;
 	/** current state of the door.											*/
 	protected FridgeDoor		currentDoorState ;
 	/** current state of the consumption.									*/
 	protected FridgeConsumption	currentState ;
+	
+	/**  true when a external event triggered a reading.					*/
+	protected boolean triggerReading;
 
-	// Bandwidth function and statistics for the report
-	/** Frame used to plot the temperature during the simulation.				*/
+	/** Frame used to plot the temperature during the simulation.			*/
 	protected XYPlotter					temperaturePlotter ;
-	/** Frame used to plot the intensity during the simulation.				*/
+	/** Frame used to plot the consumption during the simulation.			*/
 	protected XYPlotter					consumptionPlotter ;
 	/** reference on the object representing the component that holds the
 	 *  model; enables the model to access the state of this component.		*/
 	protected EmbeddingComponentAccessI componentRef ;
-	
-	protected boolean triggerReading;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** Temp in �C.								*/
+	/** Temp in Celsius.								*/
 	@ExportedVariable(type = Double.class)
 	protected Value<Double>				temperature =
 											new Value<Double>(this, 10.0, 0) ;
-	/** Intensity in Watt.								*/
-	protected Double				consumption ;
 
 	// ------------------------------------------------------------------------
 	// Constructors
 	// ------------------------------------------------------------------------
 
+	/**
+	 * create an fridge model instance.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uri != null
+	 * pre	simulatedTimeUnit != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param uri
+	 *            URI of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation time.
+	 * @param simulationEngine
+	 *            simulation engine to which the model is attached.
+	 * @throws Exception
+	 *             <i>to do.</i>
+	 */
 	public				FridgeModel(
 		String uri,
 		TimeUnit simulatedTimeUnit,
@@ -156,10 +234,8 @@ extends AtomicHIOAwithEquations
 	}
 
 	// ------------------------------------------------------------------------
-	// Simulation protocol and related methods
+	// Methods
 	// ------------------------------------------------------------------------
-
-
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -261,20 +337,6 @@ extends AtomicHIOAwithEquations
 			
 		}
 	}
-
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
-	 */
-	@Override
-	public Duration		timeAdvance()
-	{
-		if (!this.triggerReading) {
-			return Duration.INFINITY;
-		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
-		}
-	}
 	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
@@ -295,8 +357,18 @@ extends AtomicHIOAwithEquations
 		}
 	}
 
-	
-	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration		timeAdvance()
+	{
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
+		} else {
+			return Duration.zero(this.getSimulatedTimeUnit());
+		}
+	}	
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
@@ -438,7 +510,7 @@ extends AtomicHIOAwithEquations
 	@Override
 	public SimulationReportI	getFinalReport() throws Exception
 	{
-		return new RefrigerateurModelReport(this.getURI()) ;
+		return new FridgeModelReport(this.getURI()) ;
 	}
 	
 	// ------------------------------------------------------------------------
@@ -507,4 +579,3 @@ extends AtomicHIOAwithEquations
 		return this.consumption;
 	}
 }
-//------------------------------------------------------------------------------

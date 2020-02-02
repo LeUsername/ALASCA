@@ -37,12 +37,63 @@ import wattwatt.tools.hairdryer.HairDryerSetting;
 								  DecreasePowerEvent.class,
 								  TicEvent.class}, 
 					 exported = { HairDryerConsumptionEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>HairDryerModel</code> implements a model of a hair dryer
+* in the house
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The hair dryer model is the only device that can never be controlled. As
+* such, only users can change its state and thus impacts its consumption.
+* For that, a <code>HairDryerUserModel</code> will send differents events
+* changing the numerous variables in this model.
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class HairDryerModel extends AtomicHIOAwithEquations {
 
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
+	/**
+	 * The class <code>HairDryerModelReport</code> implements the simulation
+	 * report for the hair dryer model.
+	 *
+	 * <p><strong>Description</strong></p>
+	 * 
+	 * <p><strong>Invariant</strong></p>
+	 * 
+	 * <pre>
+	 * invariant		true
+	 * </pre>
+	 * 
+ 	 * <p>
+ 	 * Created on : 2020-01-27
+	 * </p>
+	 * 
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
+	 */
 	public static class HairDryerModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
 
@@ -71,12 +122,24 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	public static final String URI = URIS.HAIR_DRYER_MODEL_URI;
 
-	private static final String SERIES = "intensity";
-	public static final String CONSUMPTION_SERIES = "intensity-series";
+	private static final String SERIES = "consumption";
+	public static final String CONSUMPTION_SERIES = "consumption-series";
 
 	/** nominal tension (in Volts) of the hair dryer. */
 	protected static final double TENSION = 220.0; // Volts
 
+	/** current consumption of the hair dryer (in Watt). */
+	protected double currentConsumption;
+	
+	/** Mode in which the hair dryer is in (HOT_AIR, COLD_AIR) */
+	protected HairDryerMode mode;
+	
+	/** State in which the hair dryer is in (ON, OFF) */
+	protected HairDryerState state;
+
+	/** Power level of the hair dryer (LOW, MEDIUM, HIGH) */
+	protected HairDryerPowerLevel powerLvl;
+	
 	/** true when a external event triggered a reading. */
 	protected boolean triggerReading;
 	
@@ -88,23 +151,32 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 * enables the model to access the state of this component.
 	 */
 	protected EmbeddingComponentAccessI componentRef;
-	
-	/** current intensity in Amperes; intensity is power/tension. */
-	//@ExportedVariable(type = Double.class)
-	protected double currentConsumption;
-	
-	/** Mode dans lequel est le seche cheveux (HOT_AIR, COLD_AIR) */
-	protected HairDryerMode mode;
-	
-	/** Etat dans lequel se trouve le seche cheveux */
-	protected HairDryerState state;
-
-	protected HairDryerPowerLevel powerLvl;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create an instance of hair dryer model.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	simulatedTimeUnit != null
+	 * pre	simulationEngine == null ||
+	 * 		    	simulationEngine instanceof HIOA_AtomicEngine
+	 * post	this.getURI() != null
+	 * post	uri != null implies this.getURI().equals(uri)
+	 * post	this.getSimulatedTimeUnit().equals(simulatedTimeUnit)
+	 * post	simulationEngine != null implies
+	 * 					this.getSimulationEngine().equals(simulationEngine)
+	 * </pre>
+	 *
+	 * @param uri					unique identifier of the model.
+	 * @param simulatedTimeUnit		time unit used for the simulation clock.
+	 * @param simulationEngine		simulation engine enacting the model.
+	 * @throws Exception			<i>todo.</i>
+	 */
 	public HairDryerModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
 	}
@@ -165,11 +237,8 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 	 */
 	@Override
 	protected void initialiseVariables(Time startTime) {
-		// as the hair dryer starts in mode OFF, its power consumption should be 0
-		
-		
-		
 		if(componentRef == null) {
+			// as the hair dryer starts in mode OFF, its power consumption should be 0
 			this.currentConsumption = 0.0;
 		} else {
 			try {
@@ -183,19 +252,6 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 		this.consumptionPlotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.getIntensity());
 
 		super.initialiseVariables(startTime);
-	}
-	
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		
-		if (!this.triggerReading) {
-			return Duration.INFINITY;
-		} else {
-			return Duration.zero(this.getSimulatedTimeUnit());
-		}
 	}
 
 	/**
@@ -215,6 +271,19 @@ public class HairDryerModel extends AtomicHIOAwithEquations {
 			return ret;
 		} else {
 			return null;
+		}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		
+		if (!this.triggerReading) {
+			return Duration.INFINITY;
+		} else {
+			return Duration.zero(this.getSimulatedTimeUnit());
 		}
 	}
 

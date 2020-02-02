@@ -39,8 +39,7 @@ import wattwatt.tools.URIS;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>FridgeCoupledModel</code> implements a coupled model used to gather
-* together all of the model representing the fridge in the WattWatt 
-* simulation
+* together all of the model representing the fridge in the WattWatt simulation
 *
 * <p><strong>Description</strong></p>
 * 

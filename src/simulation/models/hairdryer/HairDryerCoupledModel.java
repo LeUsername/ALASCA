@@ -38,8 +38,7 @@ import wattwatt.tools.URIS;
 //-----------------------------------------------------------------------------
 /**
 * The class <code>HairDryerCoupledModel</code> implements a coupled model used to gather
-* together all of the model representing the hair dryer in the WattWatt 
-* simulation
+* together all of the model representing the hair dryer in the WattWatt simulation
 *
 * <p><strong>Description</strong></p>
 * 

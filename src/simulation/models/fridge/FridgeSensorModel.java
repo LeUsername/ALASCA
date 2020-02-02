@@ -22,15 +22,49 @@ import simulation.events.fridge.ResumeEvent;
 import simulation.events.fridge.SuspendEvent;
 import wattwatt.tools.URIS;
 
-@ModelExternalEvents(imported = { TicEvent.class }, exported = { ResumeEvent.class, SuspendEvent.class })
+@ModelExternalEvents(imported = { TicEvent.class }, 
+					 exported = { ResumeEvent.class, 
+							 	  SuspendEvent.class })
+//-----------------------------------------------------------------------------
+/**
+* The class <code>FridgeSensorModel</code> implements a simplified model of 
+* a fridge sensor
+*
+* <p><strong>Description</strong></p>
+* 
+* <p>
+* The fridge sensor model is used in the <code>FridgeCoupledModel</code>
+* to autoadapt thebehaviour of the fridge. As there is a max (and a min) 
+* temperature that are targeted by the device, this model is going to 
+* send a <code>ResumeEvent</code> (or <code>SuspendEvent</code>) depending 
+* on the temperature it reads through its temperature variable shared 
+* with the <code>FridgeModel</code>
+* </p>
+* 
+* <p><strong>Invariant</strong></p>
+* 
+* <pre>
+* invariant		true	// TODO
+* </pre>
+* 
+* <p>
+* Created on : 2020-01-27
+* </p>
+* 
+* @author
+*         <p>
+*         Bah Thierno, Zheng Pascal
+*         </p>
+*/
+//-----------------------------------------------------------------------------
 public class FridgeSensorModel extends AtomicHIOAwithEquations {
 	// -------------------------------------------------------------------------
 	// Inner classes
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>WiFiBandwidthSensorReport</code> implements the simulation
-	 * report for the WiFi bandwidth sensor model.
+	 * The class <code>FridgeSensorModelReport</code> implements the simulation
+	 * report for the fridge sensor model.
 	 *
 	 * <p>
 	 * <strong>Description</strong>
@@ -44,12 +78,14 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 	 * invariant	true
 	 * </pre>
 	 * 
-	 * <p>
-	 * Created on : 2018-07-18
+ 	 * <p>
+ 	 * Created on : 2020-01-27
 	 * </p>
 	 * 
-	 * @author <a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
-	 * @version $Name$ -- $Revision$ -- $Date$
+	 * @author
+	 *         <p>
+	 *         Bah Thierno, Zheng Pascal
+	 *         </p>
 	 */
 	public static class FridgeSensorModelReport extends AbstractSimulationReport {
 		private static final long serialVersionUID = 1L;
@@ -89,37 +125,55 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 	/** true when a external event triggered a reading. */
 	protected boolean triggerReading;
 
-
-	/** frame used to plot the bandwidth readings during the simulation. */
+	/** frame used to plot the temperature readings during the simulation. */
 	protected XYPlotter plotter;
-
-	// -------------------------------------------------------------------------
-	// HIOA model variables
-	// -------------------------------------------------------------------------
-
-	/** Temp in �C. */
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> temperature;
 
 	/**
 	 * reference on the object representing the component that holds the model;
 	 * enables the model to access the state of this component.
 	 */
 	protected EmbeddingComponentAccessI componentRef;
+	// -------------------------------------------------------------------------
+	// HIOA model variables
+	// -------------------------------------------------------------------------
+
+	/** Temp in Celsius */
+	@ImportedVariable(type = Double.class)
+	protected Value<Double> temperature;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
+	/**
+	 * create an fridge sensor model instance.
+	 * 
+	 * <p>
+	 * <strong>Contract</strong>
+	 * </p>
+	 * 
+	 * <pre>
+	 * pre	uri != null
+	 * pre	simulatedTimeUnit != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 *
+	 * @param uri
+	 *            URI of the model.
+	 * @param simulatedTimeUnit
+	 *            time unit used for the simulation time.
+	 * @param simulationEngine
+	 *            simulation engine to which the model is attached.
+	 * @throws Exception
+	 *             <i>to do.</i>
+	 */
 	public FridgeSensorModel(String uri, TimeUnit simulatedTimeUnit, SimulatorI simulationEngine) throws Exception {
 		super(uri, simulatedTimeUnit, simulationEngine);
-
-
 	}
 
-	// -------------------------------------------------------------------------
-	// Simulation protocol and related methods
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
+	// Methods
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
@@ -157,19 +211,7 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 
 		super.initialiseState(initialTime);
 	}
-
-	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
-	 */
-	@Override
-	public Duration timeAdvance() {
-		if (this.triggerReading) {
-			return Duration.zero(this.getSimulatedTimeUnit());
-		} else {
-			return Duration.INFINITY;
-		}
-	}
-
+	
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
@@ -214,6 +256,18 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 				this.plotter.addData(SERIES, this.getCurrentStateTime().getSimulatedTime(), this.temperature.v);
 			}
 			return null;
+		}
+	}
+	
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
+	 */
+	@Override
+	public Duration timeAdvance() {
+		if (this.triggerReading) {
+			return Duration.zero(this.getSimulatedTimeUnit());
+		} else {
+			return Duration.INFINITY;
 		}
 	}
 
@@ -263,4 +317,3 @@ public class FridgeSensorModel extends AtomicHIOAwithEquations {
 		return new FridgeSensorModelReport(this.getURI());
 	}
 }
-// -----------------------------------------------------------------------------
